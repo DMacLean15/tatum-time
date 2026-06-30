@@ -1,0 +1,69 @@
+# ───────────────────────────────────────────────────────────────
+#  Tatum Time — CMS configuration (the fields Dan fills in)
+# ───────────────────────────────────────────────────────────────
+
+backend:
+  name: git-gateway      # logs in through Netlify Identity (set up on Netlify)
+  branch: main           # the branch your site deploys from
+
+# Lets you trial the CMS on your own computer first (see DEPLOY-CMS guide).
+local_backend: true
+
+# Where uploaded images are stored in the repo.
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+# 👉 After deploying, change these to your real Netlify address.
+site_url: https://tatumtime.netlify.app
+display_url: https://tatumtime.netlify.app
+
+collections:
+  - name: "blog"
+    label: "📝 Blog Posts"
+    description: "Write, edit, reorder, and delete Tatum Time posts."
+    editor:
+      preview: false          # hide the built-in preview (it won't match the real site styling)
+    files:
+      - name: "posts"
+        label: "All Posts"
+        file: "content/posts.json"
+        fields:
+          - name: "posts"
+            label: "Posts"
+            label_singular: "Post"
+            widget: "list"
+            summary: "{{fields.date}}  —  {{fields.title}}"
+            hint: "Newest post goes at the TOP. Drag a post by its handle to reorder."
+            fields:
+
+              - name: "title"
+                label: "Headline"
+                widget: "string"
+
+              - name: "emoji"
+                label: "Banner Emoji"
+                widget: "string"
+                default: "🏀"
+                hint: "One emoji shown on the post's banner — e.g. 🏀 🍀 🔥 🏆 🎯 🐣 🃏"
+
+              - name: "category"
+                label: "Category"
+                widget: "select"
+                default: "Recap"
+                options: ["Recap", "Analysis", "News", "Playoffs", "Draft", "Roster", "Milestone"]
+
+              - name: "date"
+                label: "Date"
+                widget: "string"
+                hint: "Shown exactly as you type it, e.g. Jul 1, 2026"
+
+              - name: "gameLink"
+                label: "Game Box-Score Link (optional)"
+                widget: "string"
+                required: false
+                hint: "Paste an NBA.com box-score web address to show a green 'See full game stats' button. Leave blank for no button."
+
+              - name: "body"
+                label: "Article"
+                widget: "markdown"
+                hint: "Write your post. Use the toolbar for bold, headings and lists. Tip: wrap a stat in == to make it a green tag, e.g. ==28.3 PPG=="

@@ -1,0 +1,176 @@
+================================================================
+   HEY DAN — LET'S GET TATUM TIME ONLINE  ☘️
+   A no-experience-needed guide. Just follow it top to bottom.
+================================================================
+
+Don't worry — you don't need to know ANY code. You'll be
+clicking buttons and typing your email a few times. Total time
+is about 30–40 minutes, and you only EVER do this once. After
+that, posting a new blog is just filling out a form.
+
+You'll make two free accounts:
+   • GitHub  — a place that stores your website's files
+   • Netlify — puts the site on the internet + handles your login
+
+Keep this guide open in one window and do the steps in another.
+If you get stuck on any step, take a screenshot and send it to
+whoever gave you this — they can unstick you in seconds.
+
+
+================================================================
+  PART 0 — GET YOUR WEBSITE FILES READY  (2 min)
+================================================================
+1. You were sent a file called  "TatumTime-Website.zip".
+   Save it somewhere easy, like your Desktop.
+2. Right-click it  ->  "Extract All..."  ->  "Extract"
+   (on a Mac: just double-click it).
+3. You now have a FOLDER called "TatumTime-Website" (or
+   "tatum-time") full of files. Leave that folder open — you'll
+   grab files from it in Part 2.
+
+   ✅ You're ready.
+
+
+================================================================
+  PART 1 — MAKE A GITHUB ACCOUNT  (5 min)
+================================================================
+1. Open a web browser and go to:   github.com
+2. Click "Sign up".
+3. Type your email, make up a password, and pick a username
+   (anything is fine, like  dmaclean15 ).
+4. It may ask you to solve a little picture puzzle to prove
+   you're human — do that.
+5. It emails you a code. Open your email, copy the code, paste
+   it in.
+6. If it asks questions like "how many team members" or shows
+   paid plans, choose the FREE option / "just me" / skip.
+
+   ✅ You now have GitHub. Leave this tab open and signed in.
+
+
+================================================================
+  PART 2 — PUT YOUR WEBSITE FILES ON GITHUB  (8 min)
+================================================================
+1. While signed in to GitHub, click the "+" sign in the
+   TOP-RIGHT corner of the page  ->  "New repository".
+   ("Repository" is just GitHub's word for a project folder.)
+2. In "Repository name", type:   tatum-time
+3. Make sure the circle next to "Public" is selected.
+4. Click the green "Create repository" button at the bottom.
+5. The next page has some text in the middle. Find and click the
+   blue link that says  "uploading an existing file".
+6. Now go to your "TatumTime-Website" folder from Part 0.
+   - Click on one file inside it, then press Ctrl+A (Cmd+A on
+     Mac) to select EVERYTHING in the folder.
+   - Drag all of it onto the big upload box in your browser.
+   - It's important the smaller folders named "content", "admin"
+     and "images" come along — they will, just drag everything.
+7. Wait until all the file names finish appearing in the list.
+8. Click the green "Commit changes" button (bottom of page).
+
+   ✅ Your website's files now live on GitHub. Nice work.
+
+
+================================================================
+  PART 3 — MAKE A NETLIFY ACCOUNT + PUT THE SITE LIVE  (8 min)
+================================================================
+1. Open a new tab and go to:   netlify.com
+2. Click "Sign up".
+3. Choose the button "Sign up with GitHub" (this links the two
+   accounts so you don't need another password). Click
+   "Authorize" if it asks.
+4. Once you're on the Netlify dashboard, click
+   "Add new site"  ->  "Import an existing project".
+5. Click "Deploy with GitHub" (click "Authorize"/"Configure" if
+   it asks, and allow access to your repositories).
+6. In the list, click your project:  tatum-time
+7. DON'T type anything in the boxes on the next screen. Just
+   scroll down and click the "Deploy" button.
+8. Wait about 30 seconds. You'll see a web address near the top
+   that looks like   https://something-random-123.netlify.app
+   Click it — YOUR SITE IS LIVE ON THE INTERNET. 🎉☘️
+
+   (Optional, to get a nicer address)
+9. Click "Site configuration" -> "Change site name", type
+   something like  tatumtime , and save. Your address becomes
+   https://tatumtime.netlify.app  — write your address down!
+
+
+================================================================
+  PART 4 — TURN ON YOUR LOGIN  (6 min)
+================================================================
+This is what lets YOU (and only you) sign in to write posts.
+
+1. In your site's menu on the left, look for the word
+   "Identity". (If you can't find it, use the search box at the
+   top of Netlify and type "Identity".) Click it.
+2. Click the "Enable Identity" button.
+3. On that same Identity page, find "Registration preferences"
+   (or just "Registration") and set it to  "Invite only".
+4. Now find a section called "Services". Under it, click
+   "Enable Git Gateway".
+
+   ✅ The hard part is officially over.
+
+
+================================================================
+  PART 5 — CREATE YOUR WRITER LOGIN  (3 min)
+================================================================
+1. Still on the Identity page, click "Invite users".
+2. Type YOUR OWN email address and send the invite.
+3. Check your email for a message from your site. Click the
+   link inside it.
+4. It opens your website with a box asking you to set a
+   password. Pick a password — this is your writer login.
+
+   ✅ You're now the official author of Tatum Time.
+
+
+================================================================
+  PART 6 — WRITE YOUR FIRST BLOG POST  🏀
+================================================================
+1. Go to your website address with  /admin  added on the end,
+   for example:   https://tatumtime.netlify.app/admin
+2. Log in with your email and the password you just made.
+3. Click "Blog Posts"  ->  "All Posts".
+4. Click "Add Posts" to start a new one. Fill in the boxes:
+      • Headline       — your title
+      • Banner Emoji   — one emoji, like 🏀 or 🍀
+      • Category       — pick one from the little menu
+      • Date           — type today's date
+      • Game Box-Score Link — OPTIONAL. If your post is about one
+        game, go to NBA.com, open that game's box score, copy
+        the web address, and paste it here. A green "See full
+        game stats" button shows up by itself. Leave blank if
+        you don't want it.
+      • Article        — write your post! The little toolbar does
+        bold, headings and lists. Cool trick: put == around a
+        stat to make it a green tag, like  ==28.3 PPG==
+5. IMPORTANT: drag your new post to the TOP of the list so it
+   shows up as the newest.
+6. Click the "Publish" button at the top.
+7. Wait about a minute, then open your website and refresh.
+   Your post is live for the world. You did it! 🎉
+
+
+================================================================
+  FROM NOW ON
+================================================================
+Every time you want to post, you ONLY do Part 6:
+   go to  YOUR-ADDRESS/admin , log in, "Add Posts", Publish.
+That's it. Everything else above was a one-time setup.
+
+
+================================================================
+  IF YOU GET STUCK
+================================================================
+• Can't find "Identity" on Netlify? Use Netlify's search box and
+  type "Identity", or look under "Integrations".
+• The invite email didn't show up? Check spam, or just go to
+  YOUR-ADDRESS/admin and click "Sign up" with your email.
+• Anything looks scary or different from this guide? STOP, take
+  a screenshot, and send it to your tech friend. Don't guess —
+  it's easy to help when we can see your screen.
+
+   Go Celtics. ☘️💚
+================================================================

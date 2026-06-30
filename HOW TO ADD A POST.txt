@@ -1,0 +1,67 @@
+============================================================
+  TATUM TIME — HOW TO ADD A NEW BLOG POST
+============================================================
+
+THE EASY WAY (recommended): use the writing dashboard.
+  Once the site is online, go to  YOURSITE/admin , log in, and
+  click "Add Posts". No code at all. Full setup instructions are
+  in "DEPLOY-CMS.txt".
+
+The rest of this file is the BACKUP method — editing the posts
+file by hand. You only need this if you're not using the
+dashboard.
+
+------------------------------------------------------------
+BACKUP METHOD — EDIT THE POSTS FILE
+------------------------------------------------------------
+All posts live in:   content/posts.json
+The website reads that file, so editing it changes the site.
+
+1. Make a backup copy of posts.json first (just in case).
+
+2. Open content/posts.json in Notepad (or any text editor).
+
+3. Find the line near the top that reads:   "posts": [
+   The newest post goes right after it. Copy this block and
+   paste it in as the FIRST item in the list:
+
+      {
+        "title": "Type Your Headline Here",
+        "emoji": "🏀",
+        "category": "Recap",
+        "date": "Jul 1, 2026",
+        "gameLink": "",
+        "body": "Write your first paragraph here.\n\nWrite another paragraph here."
+      },
+
+4. Fill in your words:
+      • title     = your headline
+      • emoji     = any emoji for the banner
+      • category  = Recap / Analysis / News / Playoffs / Draft / Roster / Milestone
+      • date      = shown exactly as you type it
+      • gameLink  = (optional) paste an NBA.com box-score web
+                    address to show a green "See full game stats"
+                    button. Leave the "" empty for no button.
+      • body      = your article text.
+
+   In the body:
+      \n\n   starts a new paragraph
+      #### Heading        makes a sub-heading
+      **bold text**       makes text bold
+      - item              makes a bullet point
+      ==28.3 PPG==        makes a green stat tag
+
+5. Save the file and re-upload it to GitHub (or, if you're just
+   viewing locally, the built-in copy in index.html is what
+   shows — see DEPLOY-CMS.txt for why).
+
+------------------------------------------------------------
+THE 3 GOLDEN RULES (so nothing breaks)
+------------------------------------------------------------
+1. Keep the "double quotes" around every value.
+2. Keep the comma after each post's closing }  — except the
+   very last post in the list has NO comma.
+3. Don't delete the [ after "posts": or the ] at the end.
+
+If the page looks broken, restore your backup copy and retry.
+============================================================

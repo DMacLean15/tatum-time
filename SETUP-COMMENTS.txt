@@ -1,0 +1,61 @@
+============================================================
+  TATUM TIME — TURN ON COMMENTS (Giscus)
+============================================================
+
+Comments use a free tool called "giscus" that stores replies in
+your GitHub repository's Discussions. It's free, has no ads, and
+fans sign in with a free GitHub account to comment.
+
+Do this AFTER the site is already on GitHub (see START-HERE).
+Takes about 5 minutes.
+
+------------------------------------------------------------
+STEP 1 — turn on Discussions for your repo
+------------------------------------------------------------
+1. Go to your repo on GitHub  ->  "Settings" tab.
+2. Scroll to "Features" and tick the "Discussions" checkbox.
+
+------------------------------------------------------------
+STEP 2 — install the giscus app
+------------------------------------------------------------
+1. Go to   https://github.com/apps/giscus
+2. Click "Install", choose your "tatum-time" repo, confirm.
+
+------------------------------------------------------------
+STEP 3 — get your settings from giscus.app
+------------------------------------------------------------
+1. Go to   https://giscus.app
+2. In the "Repository" box, type:  your-username/tatum-time
+   (a green check appears if it's set up correctly).
+3. Under "Page ↔ Discussions Mapping", choose
+   "Discussion title contains a specific term".
+4. Under "Discussion Category", pick "Announcements".
+5. Scroll down to the "Enable giscus" box. You'll see code that
+   contains four values you need:
+        data-repo="..."
+        data-repo-id="..."
+        data-category="Announcements"
+        data-category-id="..."
+
+------------------------------------------------------------
+STEP 4 — paste those 4 values into the site
+------------------------------------------------------------
+1. Open  index.html  and search for:   giscusConfig
+2. You'll find this line:
+      const giscusConfig={ repo:"", repoId:"", category:"Announcements", categoryId:"", theme:"dark" };
+3. Fill in the blanks from giscus.app, for example:
+      const giscusConfig={
+        repo:"your-username/tatum-time",
+        repoId:"R_kgD...",
+        category:"Announcements",
+        categoryId:"DIC_kwD...",
+        theme:"dark"
+      };
+4. Save and re-upload index.html to GitHub.
+
+Done! A comment box now appears under every blog post, and each
+post keeps its own separate comment thread automatically.
+
+(Until you do this, posts show a small note saying comments
+aren't switched on yet — nothing looks broken.)
+============================================================
