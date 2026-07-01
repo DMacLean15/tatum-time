@@ -1941,8 +1941,8 @@ const rosterNotes={
   'Amari Williams':'A 7-foot rookie center out of Kentucky with a 7-foot-6 wingspan; a rim protector on a two-way deal.',
   'Max Shulga':'A 6-foot-5 sharpshooting rookie guard — the reigning Atlantic-10 Player of the Year out of VCU.',
   'John Tonje':'A big-bodied scoring guard out of Wisconsin, acquired in a trade with the Jazz.',
-  'Mike Conley':'Savvy veteran point guard acquired via trade — a steady, playoff-tested floor general.',
-  'Mitchell Robinson':'Rim-protecting, offensive-rebounding center brought in via trade to anchor the paint.'
+  'Mike Conley':'Savvy veteran point guard signed in free agency — a steady, playoff-tested floor general.',
+  'Mitchell Robinson':'Rim-protecting, offensive-rebounding center signed in free agency to anchor the paint.'
 };
 /* Veteran trade/free-agent pickups from the last year. Rookies & just-drafted
    players get the "New" badge automatically (first NBA season); ESPN doesn't
@@ -1990,6 +1990,14 @@ function postsMentioning(name){
 }
 /* open a post in the reader (used by the player-card blog buttons) */
 function goToPost(slug){ const i=posts.findIndex(p=>p.slug===slug); if(i>=0) renderPost(i,true); return false; }
+/* Accurate auto-bio for any player without a hand-written note.
+   Built only from live ESPN fields — never asserts how the player was acquired. */
+function autoBio(pos,exp,college){
+  const P=pos||'Player';
+  const school=college?(' out of '+college):'';
+  if(exp==null||exp===0) return 'Rookie '+P.toLowerCase()+school+'.';
+  return P+school+' with '+exp+' year'+(exp>1?'s':'')+' of NBA experience.';
+}
 async function loadRoster(){
   const rg=document.getElementById('rosterGrid'); if(!rg) return;
   rg.innerHTML='<div class="skel" style="height:250px"></div>'.repeat(4);
@@ -2004,6 +2012,7 @@ async function loadRoster(){
       const bp=a.birthPlace||{};
       const hometown=bp.city?(bp.city+(bp.state?(', '+bp.state):(bp.country?(', '+bp.country):''))):'';
       const college=(a.college&&a.college.name)||'';
+      const pos=(a.position&&(a.position.displayName||a.position.abbreviation))||'';
       const expTxt=(exp==null||exp===0)?'Rookie':(exp+' yr'+(exp>1?'s':'')+' in NBA');
       const stName=(a.status&&a.status.name)||'';
       const status=(stName&&stName.toLowerCase()!=='active')?((a.status.abbreviation||stName)):'';
@@ -2014,11 +2023,11 @@ async function loadRoster(){
       return {
         name:a.displayName,
         num:a.jersey?('#'+a.jersey):'',
-        pos:(a.position&&(a.position.displayName||a.position.abbreviation))||'',
+        pos:pos,
         imgUrl:(a.headshot&&a.headshot.href)||'',
         salary:(a.contracts&&a.contracts[0]&&a.contracts[0].salary)||0,
         isNew:isNew,
-        note: known || (isNew?'✨ One of the newest Celtics — welcome to Boston! ☘️':''),
+        note: known || autoBio(pos, exp, college),
         meta:{size:size, college:college, hometown:hometown, exp:expTxt, status:status},
         links:plinks,
         posts: postsMentioning(a.displayName)
