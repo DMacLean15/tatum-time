@@ -12,14 +12,36 @@
 <meta property="og:site_name" content="Tatum Time" />
 <meta property="og:title" content="Tatum Time — A Celtics Blog For Serious Fans" />
 <meta property="og:description" content="Boston Celtics analysis, recaps, draft grades and live scores by Dan MacLean. Go Celtics. ☘️" />
-<meta property="og:url" content="https://tatumtime.netlify.app/" />
-<meta property="og:image" content="https://tatumtime.netlify.app/og.png" />
+<meta property="og:url" content="https://tatumtime.net/" />
+<meta property="og:image" content="https://tatumtime.net/og.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Tatum Time — A Celtics Blog For Serious Fans" />
 <meta name="twitter:description" content="Boston Celtics analysis, recaps and live scores by Dan MacLean. ☘️" />
-<meta name="twitter:image" content="https://tatumtime.netlify.app/og.png" />
+<meta name="twitter:image" content="https://tatumtime.net/og.png" />
+<!-- Google Search Console verification -->
+<meta name="google-site-verification" content="5e5o-y8jat0Xg_sQDSC59t7F7mBKTePcDdK8sDI67CY" />
+<!-- Canonical (consolidates netlify.app + www onto the real domain) -->
+<link rel="canonical" href="https://tatumtime.net/" />
+<!-- Structured data for Google -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "Tatum Time",
+  "alternateName": "Tatum Time — A Celtics Blog For Serious Fans",
+  "url": "https://tatumtime.net/",
+  "description": "Boston Celtics analysis, recaps, draft grades and live scores by Dan MacLean.",
+  "inLanguage": "en-US",
+  "author": { "@type": "Person", "name": "Dan MacLean" },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Tatum Time",
+    "logo": { "@type": "ImageObject", "url": "https://tatumtime.net/og.png" }
+  }
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700&display=swap" rel="stylesheet" />
@@ -1150,7 +1172,7 @@ function buildNav(id){
 
 /* ---------- extras: meta, search/tags, share, comments, live schedule ---------- */
 let activeCat='All', countdownTimer=null;
-const giscusConfig={ repo:"", repoId:"", category:"Announcements", categoryId:"", theme:"dark" };
+const giscusConfig={ repo:"DMacLean15/tatum-time", repoId:"R_kgDOTJNfAw", category:"Announcements", categoryId:"DIC_kwDOTJNfA84DAQw5", theme:"dark" };
 
 /* turn YouTube links in a post into an embedded player */
 function youtubeId(url){ const m=(url||'').match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/); return m?m[1]:null; }

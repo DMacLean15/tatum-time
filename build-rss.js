@@ -4,7 +4,7 @@
    No npm packages needed. */
 const fs = require('fs');
 
-const SITE = 'https://tatumtime.netlify.app';   // 👉 change to your real address
+const SITE = 'https://tatumtime.net';   // live domain
 const posts = JSON.parse(fs.readFileSync('content/posts.json', 'utf8')).posts || [];
 
 const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
