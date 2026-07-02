@@ -3,8 +3,11 @@
 # ───────────────────────────────────────────────────────────────
 
 backend:
-  name: git-gateway      # logs in through Netlify Identity (set up on Netlify)
-  branch: main           # the branch your site deploys from
+  name: github                       # logs in with a GitHub account (works on any host)
+  repo: DMacLean15/tatum-time        # the GitHub repo the site deploys from
+  branch: main                       # the branch your site deploys from
+  base_url: https://tatumtime.net    # where the login helper lives (Cloudflare Pages Functions)
+  auth_endpoint: /auth
 
 # Lets you trial the CMS on your own computer first (see DEPLOY-CMS guide).
 local_backend: true

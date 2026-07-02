@@ -1,0 +1,178 @@
+================================================================
+  MOVE TATUM TIME FROM NETLIFY  ->  CLOUDFLARE PAGES
+  (free, UNLIMITED deploys — no more "credit" limits)
+================================================================
+
+WHY: Netlify's new pricing charges per deploy. Every post edit =
+a deploy = credits, and the site got blocked. Cloudflare Pages
+hosts the exact same site for free with unlimited deploys, so Dan
+can edit as much as he wants.
+
+WHAT STAYS THE SAME FOR DAN:
+  • Same /admin page, same editor, same live preview, same fields.
+  • Same green ==tags==, photos, YouTube — identical.
+  • ONLY change: he logs in with "GitHub" instead of email+password.
+
+WHAT THIS GUIDE DOES (about 30–40 min, one time):
+  Part 0  Push the updated code
+  Part 1  Add the newsletter table to Supabase
+  Part 2  Create a GitHub login app (for the CMS)
+  Part 3  Put the site on Cloudflare Pages
+  Part 4  Move the tatumtime.net domain to Cloudflare
+  Part 5  Test everything
+  Part 6  Turn Netlify off
+
+You'll need logins for: GitHub (have it), Supabase (have it),
+Namecheap (where tatumtime.net is), and a NEW free Cloudflare account.
+
+
+================================================================
+  PART 0 — PUSH THE UPDATED CODE  (2 min)
+================================================================
+Commit + push these files to the GitHub repo (DMacLean15/tatum-time):
+  • index.html          (newsletter now uses Supabase; Netlify login removed)
+  • admin/config.yml    (CMS now logs in via GitHub)
+  • admin/index.html     (Netlify login widget removed)
+  • functions/auth.js       (NEW — GitHub login helper)
+  • functions/callback.js   (NEW — GitHub login helper)
+  • CLOUDFLARE-MIGRATION.txt (this guide)
+Do NOT commit content/posts.json.
+
+
+================================================================
+  PART 1 — NEWSLETTER TABLE IN SUPABASE  (1 min)
+================================================================
+The newsletter used to run on Netlify Forms. Now it saves to your
+existing Supabase project.
+1. Supabase → your project → SQL Editor → New query.
+2. Paste this and Run:
+
+-------------------- copy from here --------------------
+create table if not exists subscribers (
+  id          bigint generated always as identity primary key,
+  email       text not null unique,
+  created_at  timestamptz not null default now()
+);
+
+alter table subscribers enable row level security;
+
+create policy "public can subscribe"
+  on subscribers for insert
+  to anon
+  with check ( char_length(email) between 3 and 200 and position('@' in email) > 1 );
+--------------------- to here --------------------------
+
+(There is NO public read policy on purpose — nobody can pull the
+email list from the site. You view subscribers in Supabase →
+Table Editor → subscribers.)
+
+
+================================================================
+  PART 2 — MAKE A GITHUB LOGIN APP  (5 min)
+================================================================
+This is what lets Dan sign in to /admin with GitHub.
+1. Go to:  https://github.com/settings/developers
+2. Click "OAuth Apps" → "New OAuth App".
+3. Fill in:
+     • Application name:        Tatum Time CMS
+     • Homepage URL:            https://tatumtime.net
+     • Authorization callback URL:  https://tatumtime.net/callback
+4. Click "Register application".
+5. On the next page:
+     • Copy the "Client ID" — save it.
+     • Click "Generate a new client secret", copy that too — save it.
+   (You'll paste both into Cloudflare in Part 3. Keep the secret
+    private — treat it like a password.)
+
+
+================================================================
+  PART 3 — PUT THE SITE ON CLOUDFLARE PAGES  (8 min)
+================================================================
+1. Go to  https://dash.cloudflare.com/sign-up  and make a free account.
+2. In the dashboard, left sidebar → "Workers & Pages" → "Create" →
+   "Pages" tab → "Connect to Git".
+3. Authorize GitHub, then pick the repo:  tatum-time
+4. On the build settings screen:
+     • Framework preset:        None
+     • Build command:           node build-rss.js
+     • Build output directory:  /       (just a slash — the site
+                                          lives at the repo root)
+5. Expand "Environment variables (advanced)" and add TWO:
+     • GITHUB_CLIENT_ID      =  (the Client ID from Part 2)
+     • GITHUB_CLIENT_SECRET  =  (the Client Secret from Part 2)
+6. Click "Save and Deploy". Wait ~1 minute.
+7. You'll get a web address like  https://tatum-time-abc.pages.dev
+   Open it — the site should look exactly like before. 🎉
+   (The CMS login won't work on this .pages.dev address yet — it's
+    wired to tatumtime.net, which we set up next.)
+
+
+================================================================
+  PART 4 — MOVE tatumtime.net TO CLOUDFLARE  (10 min + waiting)
+================================================================
+Right now tatumtime.net points at Netlify. We move it to Cloudflare.
+
+STEP A — Add the domain to Cloudflare
+1. Cloudflare dashboard → top → "Add a site" (or "Add a domain").
+2. Type:  tatumtime.net  → continue → choose the FREE plan.
+3. Cloudflare scans your current DNS records. It then shows you TWO
+   "nameservers" (like  xxx.ns.cloudflare.com ). Copy both.
+
+STEP B — Point Namecheap at Cloudflare
+4. Log in to Namecheap → Domain List → tatumtime.net → "Manage".
+5. Find "Nameservers", choose "Custom DNS", and paste Cloudflare's
+   two nameservers (replace what's there). Save (the green check).
+6. Cloudflare will email you when it takes over (minutes to a few
+   hours — usually fast).
+
+STEP C — Connect the domain to your Pages site
+7. Back in Cloudflare → Workers & Pages → your "tatum-time" project →
+   "Custom domains" tab → "Set up a custom domain".
+8. Enter  tatumtime.net  and confirm. Do it again for  www.tatumtime.net
+   if you want the www version too. Cloudflare adds the DNS records
+   automatically.
+9. Give it a few minutes. Then open  https://tatumtime.net  — it now
+   serves from Cloudflare.
+
+
+================================================================
+  PART 5 — TEST EVERYTHING  (5 min)
+================================================================
+1. SITE:  open https://tatumtime.net — looks right, scores load. ✅
+2. CMS LOGIN:  go to  https://tatumtime.net/admin
+     • Click "Login with GitHub", authorize once.
+     • You should land in the editor with your posts. ✅
+     • (Send me a screenshot if the login popup errors — it's
+        almost always a typo in the callback URL or an env var.)
+3. WRITE A TEST:  open a post, use the PREVIEW, publish once. In a
+   minute it's live. Notice: no credit warnings, ever. ✅
+4. NEWSLETTER:  scroll to "Never Miss A Post", enter an email,
+   Subscribe. Check Supabase → Table Editor → subscribers — your
+   email is there. ✅
+
+
+================================================================
+  PART 6 — TURN OFF NETLIFY  (optional, do it last)
+================================================================
+Only after Cloudflare is confirmed working:
+  • Netlify → the Tatum Time site → Site configuration → Danger zone
+    → "Delete site" (or just leave it; it's blocked and harmless).
+Keep the GitHub repo — that's your source of truth for both.
+
+
+================================================================
+  IF THE CMS LOGIN FAILS
+================================================================
+• "redirect_uri mismatch" → the GitHub OAuth App's callback URL must
+  be EXACTLY  https://tatumtime.net/callback  (Part 2, step 3).
+• Login popup opens then does nothing → check the two environment
+  variables in Cloudflare Pages are named EXACTLY GITHUB_CLIENT_ID
+  and GITHUB_CLIENT_SECRET, then re-deploy (Pages → Deployments →
+  "Retry deployment").
+• Deploy fails on the "build command" step → in Cloudflare Pages →
+  Settings → Builds, set the Build command to EMPTY and re-deploy.
+  The site works fine that way; only the RSS feed won't auto-refresh.
+• Still stuck → screenshot the error and send it over.
+
+  Go Celtics. ☘️💚
+================================================================
