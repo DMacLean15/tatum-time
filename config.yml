@@ -22,7 +22,7 @@ collections:
     label: "📝 Blog Posts"
     description: "Write, edit, reorder, and delete Tatum Time posts."
     editor:
-      preview: false          # hide the built-in preview (it won't match the real site styling)
+      preview: true           # live preview pane, styled to match the blog (see admin/index.html)
     files:
       - name: "posts"
         label: "All Posts"
@@ -66,4 +66,4 @@ collections:
               - name: "body"
                 label: "Article"
                 widget: "markdown"
-                hint: "Write your post. Use the toolbar for bold, headings and lists. Tip: wrap a stat in == to make it a green tag, e.g. ==28.3 PPG=="
+                hint: "Toolbar = bold, headings, lists, photos. Wrap a stat in == for a green tag (==28.3 PPG==). Paste a YouTube link on its own line to embed the video. The preview on the right shows how it'll look (green tags show as ==text== in the preview but turn green on the live site)."

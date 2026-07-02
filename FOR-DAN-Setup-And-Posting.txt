@@ -144,13 +144,64 @@ This is what lets YOU (and only you) sign in to write posts.
         game stats" button shows up by itself. Leave blank if
         you don't want it.
       • Article        — write your post! The little toolbar does
-        bold, headings and lists. Cool trick: put == around a
-        stat to make it a green tag, like  ==28.3 PPG==
+        bold, headings and lists. For photos, videos, and green
+        stat tags, see "YOUR STYLING CHEAT SHEET" just below.
 5. IMPORTANT: drag your new post to the TOP of the list so it
    shows up as the newest.
 6. Click the "Publish" button at the top.
 7. Wait about a minute, then open your website and refresh.
    Your post is live for the world. You did it! 🎉
+
+
+================================================================
+  YOUR STYLING CHEAT SHEET  —  how a post gets dressed up
+================================================================
+All of this is OPTIONAL. Plain writing already looks great. But
+here are the little tricks and a couple of things to know.
+
+📝 PREVIEW AS YOU TYPE
+   While you're in the "Article" box, a live PREVIEW appears on the
+   RIGHT (on a small screen there's a button to show/hide it). It's
+   styled to look like the real blog, so you can see how your post
+   will look before you publish. Your newest post is at the TOP of
+   the preview.
+
+✍️ BASIC FORMATTING
+   Use the little toolbar above the writing box for BOLD, italics,
+   Headings (great for section titles), bullet lists, and links.
+
+🟢 GREEN STAT TAGS
+   Put == around any stat to turn it into a green highlight tag:
+        Tatum went off for ==28.3 PPG== last month
+   ONE thing to know: in the PREVIEW this shows as plain "==28.3
+   PPG==", but on the LIVE site it turns green. That's the only
+   thing the preview can't show you — everything else is accurate.
+
+📸 PHOTOS
+   Click the image button in the toolbar and upload a photo. It
+   resizes itself to fit the post automatically — nothing else to do.
+   • Sometimes the little thumbnail doesn't show while you're
+     attaching it. That's just a cosmetic hiccup — the photo IS
+     there. Glance at the PREVIEW on the right to confirm it.
+   • Tip: if a photo is huge (a raw phone photo can be 5+ MB),
+     shrink it a little before uploading so the site stays fast
+     for readers.
+
+▶️ YOUTUBE VIDEOS
+   Paste a YouTube link on its OWN line and it becomes a playable
+   video right in the post. Just the plain link works, e.g.:
+        https://www.youtube.com/watch?v=XXXXXXXXXXX
+
+🏀 GAME STATS BUTTON
+   Fill in the "Game Box-Score Link" field (an NBA.com box-score
+   web address) and a green "See full game stats" button appears
+   on the post. Leave it blank for no button.
+
+🍀 BANNER EMOJI
+   The "Banner Emoji" you pick shows on the post's banner card.
+
+When it looks right in the preview, drag the post to the TOP of the
+list and hit Publish. That's it!
 
 
 ================================================================
