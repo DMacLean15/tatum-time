@@ -412,6 +412,15 @@
   .citem .cwhen{color:var(--muted);font-size:.76rem}
   .citem .cbody{color:var(--txt);font-size:.92rem;line-height:1.55;white-space:pre-wrap}
   .cempty{color:var(--muted);font-size:.9rem;font-style:italic;padding:4px 0}
+  /* emoji reactions */
+  .react-bar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:30px;padding-top:22px;border-top:1px solid var(--line)}
+  .react-lbl{font-size:.7rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold);margin-right:4px}
+  .react-btn{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:999px;padding:6px 13px;cursor:pointer;transition:.14s;line-height:1}
+  .react-btn:hover{border-color:var(--green);background:rgba(22,196,91,.1)}
+  .react-btn.active{border-color:var(--green-glow);background:rgba(22,196,91,.16)}
+  .react-btn .re{font-size:1.12rem}
+  .react-btn .rc{font-size:.82rem;font-weight:700;color:var(--muted);min-width:8px;text-align:left}
+  .react-btn.active .rc{color:var(--green-glow)}
 
   /* ---------- MOBILE POLISH ---------- */
   /* long links / words can never force the page wider than the screen */
@@ -513,12 +522,30 @@
   @keyframes tabfade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
   /* ---------- THIS DAY ---------- */
+  .thisday-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+  .thisday-row .thisday{margin-bottom:0;height:100%}
   .thisday{display:flex;gap:14px;align-items:flex-start;background:linear-gradient(120deg,rgba(22,196,91,.10),rgba(191,161,90,.06));border:1px solid rgba(22,196,91,.22);border-radius:14px;padding:14px 18px;margin-bottom:22px}
   .thisday .td-ico{font-size:1.5rem;flex:0 0 auto;line-height:1.1}
   .thisday .td-body{min-width:0}
   .thisday .td-label{font-size:.66rem;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
   .thisday .td-text{color:var(--txt);font-size:.92rem;line-height:1.45}
   .thisday .td-text b{color:var(--green-glow)}
+  /* Latest Celtics news */
+  .news-list{display:grid;gap:12px}
+  .news-item{display:flex;justify-content:space-between;align-items:center;gap:16px;background:linear-gradient(165deg,var(--card),#0a1510);border:1px solid var(--line);border-radius:14px;padding:15px 18px;transition:.16s}
+  .news-item:hover{border-color:rgba(22,196,91,.35)}
+  .news-main{min-width:0}
+  .news-head{color:#fff;font-weight:700;font-size:1rem;line-height:1.35;text-decoration:none}
+  .news-head:hover{color:var(--green-glow)}
+  .news-meta{color:var(--muted);font-size:.78rem;margin-top:5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .news-src{color:var(--gold);font-weight:800;text-transform:uppercase;letter-spacing:.6px}
+  .news-take{flex:0 0 auto;background:linear-gradient(145deg,var(--green-glow),var(--green));color:#062a14;font-weight:800;border:none;border-radius:999px;padding:9px 16px;font-size:.82rem;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+  .news-take:hover{filter:brightness(1.06)}
+  @media(max-width:560px){
+    .news-item{flex-direction:column;align-items:flex-start;gap:10px;padding:14px 16px}
+    .news-head{font-size:.94rem}
+    .news-take{align-self:stretch;justify-content:center}
+  }
 
   /* ---------- SCHEDULE LIST ---------- */
   .sched-list{display:flex;flex-direction:column;gap:8px}
@@ -589,6 +616,7 @@
     .tab{flex:none;padding:9px 8px;font-size:.82rem;line-height:1.2;white-space:normal;text-align:center;border:1px solid var(--line);border-radius:12px}
     .tab.active{background:var(--green);color:#fff;border-color:var(--green)}
     .tab.active::after{display:none}
+    .thisday-row{grid-template-columns:1fr;gap:10px;margin-bottom:16px}
     .thisday{padding:12px 14px;gap:10px}
     .thisday .td-text{font-size:.86rem}
     .stand-card{grid-template-columns:1fr;gap:0;padding:18px;text-align:center}
@@ -770,7 +798,10 @@
         <p>Scores, schedule and standings — straight from the NBA, updated on its own.</p>
       </div>
     </div>
-    <div class="thisday" id="thisDay"></div>
+    <div class="thisday-row">
+      <div class="thisday" id="factDay"></div>
+      <div class="thisday" id="onThisDay"></div>
+    </div>
     <div class="tabs" role="tablist">
       <button class="tab active" data-tab="g-next">Last &amp; Next</button>
       <button class="tab" data-tab="g-sched">Schedule</button>
@@ -797,6 +828,20 @@
       <div class="inj-title">🩹 Injury Report</div>
       <div class="inj-list" id="injList"></div>
     </div>
+  </div>
+</section>
+
+<!-- LATEST CELTICS NEWS -->
+<section id="news">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="kicker">Off The Wire</div>
+        <h2 class="display">Celtics <span class="accent">Headlines</span></h2>
+        <p>The latest Boston buzz from around the league — with Dan’s take when he’s written about it.</p>
+      </div>
+    </div>
+    <div class="news-list" id="newsList"></div>
   </div>
 </section>
 
@@ -831,6 +876,7 @@
               <div class="share" id="shareRow"></div>
             </div>
             <div class="article" id="readerArticle"></div>
+            <div class="react-bar" id="reactBar"></div>
             <div class="comments">
               <h3 class="comments-title">💬 Comments</h3>
               <div id="commentsNote" class="comments-note" style="display:none"></div>
@@ -1205,7 +1251,8 @@ async function initBlog(){
   const startIdx=postIndexFromHash();
   renderPost(startIdx>=0?startIdx:0, false, startIdx>=0);
   loadSchedule();   // live scores + schedule list + shot clock (default tab)
-  renderThisDay();  // "this day in Celtics history" card
+  loadNews();       // latest Celtics headlines + "Hear Dan's Take"
+  renderThisDay();  // Fact of the Day + On This Day cards
   renderTimeline(); // championship timeline (static, no network)
   wireTabs();       // tabs — Standings/Players fetch only when first opened
   wireNewsletter(); // newsletter signup (Netlify Forms)
@@ -1228,7 +1275,7 @@ function renderPost(i, scroll, setHash=true){
   document.getElementById('readerMeta').textContent='Dan MacLean · '+p.date;
   document.getElementById('readerArticle').innerHTML=p.body;
   document.getElementById('readTime').textContent='⏱ '+p.readMins+' min read';
-  buildShare(p); loadComments(p.slug);
+  buildShare(p); loadComments(p.slug); loadReactions(p.slug);
   if(setHash && history.replaceState) history.replaceState(null,'','#/post/'+p.slug);
   document.querySelectorAll('.post-item').forEach(el=>{
     const on=(+el.dataset.i===i); el.classList.toggle('active',on);
@@ -1393,6 +1440,46 @@ function postComment(ev){
   }).catch(()=>{ status.textContent='Couldn’t post — try again.'; })
    .finally(()=>{ btn.disabled=false; });
   return false;
+}
+
+/* ---- emoji reactions on posts (Supabase, no login) ---- */
+const REACTIONS=['🍀','🔥','💚','🙌','😤'];
+function reactKey(slug){ return 'tt_react_'+slug; }
+function myReactions(slug){ try{ return JSON.parse(localStorage.getItem(reactKey(slug))||'[]'); }catch(e){ return []; } }
+function renderReactions(slug,counts){
+  const bar=document.getElementById('reactBar'); if(!bar) return;
+  const mine=myReactions(slug);
+  bar.innerHTML='<span class="react-lbl">React</span>'+REACTIONS.map(function(e){
+    const active=mine.indexOf(e)>-1?' active':'';
+    return '<button class="react-btn'+active+'" type="button" onclick="react(event,\''+slug+'\',\''+e+'\')"><span class="re">'+e+'</span><span class="rc">'+(counts[e]||0)+'</span></button>';
+  }).join('');
+}
+function loadReactions(slug){
+  const bar=document.getElementById('reactBar'); if(!bar) return;
+  bar.style.display='none';   // stay hidden until the reactions table confirms it's set up
+  if(!commentsReady()) return;
+  fetch(commentsConfig.url+'/rest/v1/reactions?select=emoji&post_slug=eq.'+encodeURIComponent(slug),{headers:chead()})
+    .then(function(r){ return r.ok?r.json():Promise.reject(); })
+    .then(function(rows){
+      if(slug!==currentCommentSlug) return;   // navigated away
+      const c={}; REACTIONS.forEach(function(e){ c[e]=0; });
+      rows.forEach(function(r){ if(c[r.emoji]!=null) c[r.emoji]++; });
+      bar.style.display='';
+      renderReactions(slug,c);
+    }).catch(function(){ bar.style.display='none'; });
+}
+function react(ev,slug,emoji){
+  if(!commentsReady()) return;
+  const mine=myReactions(slug);
+  if(mine.indexOf(emoji)>-1) return;   // one of each per person (per browser)
+  mine.push(emoji); try{ localStorage.setItem(reactKey(slug),JSON.stringify(mine)); }catch(e){}
+  const btn=ev&&ev.currentTarget;   // optimistic bump
+  if(btn){ btn.classList.add('active'); const rc=btn.querySelector('.rc'); if(rc) rc.textContent=String(parseInt(rc.textContent||'0',10)+1); }
+  fetch(commentsConfig.url+'/rest/v1/reactions',{
+    method:'POST',
+    headers:Object.assign({'Content-Type':'application/json',Prefer:'return=minimal'},chead()),
+    body:JSON.stringify({post_slug:slug,emoji:emoji})
+  }).catch(function(){});
 }
 
 /* ----- live schedule via ESPN public feed ----- */
@@ -1628,9 +1715,17 @@ function renderConf(g){
 }
 
 const onThisDay=[
-  {md:'06-17', text:'On this date the Celtics clinched the NBA title <b>twice</b> — Banner 17 in 2008 (over the Lakers) and Banner 18 in 2024 (over the Mavericks).'},
-  {md:'06-12', text:'In 1984, Boston beat the Lakers in a Game 7 at the Garden to win the NBA Finals — a defining chapter of the rivalry.'},
-  {md:'04-13', text:'In 1957, the Celtics won their first-ever championship, edging the St. Louis Hawks in a double-overtime Game 7.'}
+  {md:'06-17', text:'<b>June 17</b> is golden in Boston — the Celtics clinched Banner 17 in 2008 (over the Lakers) and, 16 years to the day, Banner 18 in 2024 (over the Mavericks).'},
+  {md:'06-12', text:'On <b>June 12, 1984</b>, Boston beat the Lakers in a Game 7 at the Garden to win the NBA Finals — a defining chapter of the rivalry.'},
+  {md:'04-13', text:'On <b>April 13, 1957</b>, the Celtics won their first-ever championship, edging the St. Louis Hawks in a double-overtime Game 7.'},
+  {md:'07-31', text:'On <b>July 31, 2007</b>, Boston acquired Kevin Garnett from Minnesota, completing the "Big Three" that would deliver Banner 17.'},
+  {md:'06-28', text:'On <b>June 28, 2007</b>, the Celtics traded for Ray Allen on draft night — the first move toward the 2008 title.'},
+  {md:'06-09', text:'On <b>June 9, 1978</b>, the Celtics drafted <b>Larry Bird</b> sixth overall — one of the greatest picks in NBA history.'},
+  {md:'04-15', text:'On <b>April 15, 1965</b>, John Havlicek made his legendary steal — "Havlicek stole the ball!" — to seal a Game 7 win over the 76ers.'},
+  {md:'08-11', text:'On <b>August 11, 2022</b>, the NBA retired <b>Bill Russell’s No. 6</b> across the entire league — the first leaguewide retirement in NBA history.'},
+  {md:'12-07', text:'Celtics legend <b>Larry Bird</b> was born on <b>December 7, 1956</b>, in West Baden Springs, Indiana.'},
+  {md:'02-12', text:'The greatest winner in team sports, <b>Bill Russell</b>, was born on <b>February 12, 1934</b>.'},
+  {md:'10-13', text:'Celtics great <b>Paul Pierce</b> — "The Truth" — was born on <b>October 13, 1977</b>.'}
 ];
 const celticsFacts=[
   'The Celtics have won <b>18</b> NBA championships — the most in league history.',
@@ -1644,15 +1739,68 @@ const celticsFacts=[
   'Jayson Tatum and Jaylen Brown led Boston to <b>Banner 18</b> in 2024.',
   'TD Garden’s lucky leprechaun mascot has cheered on the green for decades.'
 ];
+/* ---- Latest Celtics news (ESPN) + "Hear Dan's Take" when a post matches ---- */
+const NEWS_STOP=new Set('the and for with from over into onto after before amid among sources source report reports says said will could would that this these those their they them his her but are was were has have had who what why how new off out top get gets going per via agree agrees agreed deal deals sign signs signed trade trades traded celtics boston nba wnba season seasons game games team teams star update updates latest full former next year years night day days more back grade grades grading preview recap analysis takeaways ranking rankings winners losers buzz tracker roundup breakdown primer offseason agency signing signings extension extensions insider mock reaction reactions takes free questions question'.split(' '));
+function sigWords(s){
+  return Array.from(new Set((s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(w=>w.length>=4&&!/^\d+$/.test(w)&&!NEWS_STOP.has(w))));
+}
+function matchPost(headline){
+  if(!Array.isArray(posts)||!posts.length) return null;
+  const hw=sigWords(headline);
+  if(hw.length<2) return null;
+  const bodies=posts.map(function(p){ return ((p.title||'')+' '+(p.body||'')).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); });
+  // document frequency of each headline word across Dan's posts
+  const df={}; hw.forEach(function(w){ let d=0; bodies.forEach(function(b){ if(b.indexOf(w)>-1) d++; }); df[w]=d; });
+  const half=posts.length*0.5;
+  // score each post: rarer shared words weigh more (1/df); ignore words that are common across posts
+  let best=null,bestW=0,bestN=0;
+  bodies.forEach(function(b,i){
+    let w=0,n=0;
+    hw.forEach(function(word){ const d=df[word]; if(d>0&&d<=half&&b.indexOf(word)>-1){ w+=1/d; n++; } });
+    if(w>bestW){ bestW=w; bestN=n; best=posts[i]; }
+  });
+  if(best && bestN>=2 && bestW>=1.2) return best;   // broad overlap: two+ distinctive shared words
+  // strong single signal: a rare term unique to ONE post that also appears in that post's title
+  for(let k=0;k<hw.length;k++){ const word=hw[k];
+    if(df[word]===1 && word.length>=5){
+      const idx=bodies.findIndex(function(b){ return b.indexOf(word)>-1; });
+      if(idx>-1){ const t=(posts[idx].title||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); if(t.indexOf(word)>-1) return posts[idx]; }
+    }
+  }
+  return null;
+}
+async function loadNews(){
+  const box=document.getElementById('newsList'); if(!box) return;
+  box.innerHTML='<div class="skel" style="height:72px"></div>'.repeat(3);
+  try{
+    const data=await cachedFetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/news?team=2&limit=8',30);
+    const arts=(data.articles||[]).slice(0,3);
+    if(!arts.length){ box.innerHTML='<div class="no-results">No Celtics headlines right now — check back soon.</div>'; return; }
+    box.innerHTML=arts.map(function(a){
+      const head=a.headline||a.title||'';
+      const link=(a.links&&a.links.web&&a.links.web.href)||(a.links&&a.links.mobile&&a.links.mobile.href)||'#';
+      const when=a.published?fmtDate(a.published):'';
+      const post=matchPost(head);
+      const take=post?('<a class="news-take" href="#/post/'+post.slug+'" onclick="return goToPost(\''+post.slug+'\')">🎙️ Hear Dan’s Take</a>'):'';
+      return '<div class="news-item"><div class="news-main"><a class="news-head" href="'+link+'" target="_blank" rel="noopener">'+escHtml(head)+'</a>'+
+        '<div class="news-meta"><span class="news-src">ESPN</span>'+(when?'<span>· '+when+'</span>':'')+'</div></div>'+take+'</div>';
+    }).join('');
+  }catch(e){ box.innerHTML='<div class="no-results">Celtics headlines are unavailable right now.</div>'; }
+}
+function fillDayCard(id,ico,label,text){
+  const el=document.getElementById(id); if(!el) return;
+  el.innerHTML='<div class="td-ico">'+ico+'</div><div class="td-body"><div class="td-label">'+label+'</div><div class="td-text">'+text+'</div></div>';
+}
 function renderThisDay(){
-  const el=document.getElementById('thisDay'); if(!el) return;
   const now=new Date();
+  const doy=Math.floor((now-new Date(now.getFullYear(),0,0))/864e5);
+  // Fact of the Day (rotates daily)
+  fillDayCard('factDay','☘️','Celtics Fact of the Day',celticsFacts[doy%celticsFacts.length]);
+  // On This Day — exact date match if we have one, else a rotating moment from Celtics history
   const md=String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
   const hit=onThisDay.find(x=>x.md===md);
-  let label,text;
-  if(hit){ label='On This Day'; text=hit.text; }
-  else { const doy=Math.floor((now-new Date(now.getFullYear(),0,0))/864e5); text=celticsFacts[doy%celticsFacts.length]; label='Celtics Fact of the Day'; }
-  el.innerHTML='<div class="td-ico">☘️</div><div class="td-body"><div class="td-label">'+label+'</div><div class="td-text">'+text+'</div></div>';
+  if(hit) fillDayCard('onThisDay','📅','On This Day',hit.text);
+  else fillDayCard('onThisDay','📜','A Moment in Celtics History',onThisDay[doy%onThisDay.length].text);
 }
 
 function wireTabs(){
@@ -1708,8 +1856,14 @@ async function loadPlayers(){
       ];
       const html=cats.map(function(c){
         const cat=(data.categories||[]).find(x=>x.name===c.k); if(!cat||!cat.leaders||!cat.leaders.length) return '';
-        const top=cat.leaders[0], ref=(top.athlete&&top.athlete['$ref'])||'', m=ref.match(/athletes\/(\d+)/), id=m?m[1]:null;
-        const p=(id&&byId[id])||{}, img=p.img||(id?('https://a.espncdn.com/i/headshots/nba/players/full/'+id+'.png'):'');
+        // pick the top leader still on the current roster — skips traded/departed players (leaders is ranked desc)
+        let top=null,id=null;
+        for(let i=0;i<cat.leaders.length;i++){
+          const r=(cat.leaders[i].athlete&&cat.leaders[i].athlete['$ref'])||'', mm=r.match(/athletes\/(\d+)/), cand=mm?mm[1]:null;
+          if(cand&&byId[cand]){ top=cat.leaders[i]; id=cand; break; }
+        }
+        if(!top) return '';
+        const p=byId[id]||{}, img=p.img||(id?('https://a.espncdn.com/i/headshots/nba/players/full/'+id+'.png'):'');
         const val=top.displayValue+(c.pct?'%':'');
         return '<div class="leader">'+(img?'<img src="'+img+'" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">':'')+
           '<div style="min-width:0"><div class="l-cat">'+c.l+' Leader</div><div class="l-val">'+val+'</div><div class="l-name">'+(p.name||'—')+'</div></div></div>';
@@ -1924,6 +2078,7 @@ legends.forEach(p=>lg.appendChild(personCard(p)));
 /* full active roster — pulled live from ESPN, ordered by salary (salary not shown) */
 const rosterNotes={
   'Jayson Tatum':'The face of the franchise. Triple-double threat rounding into MVP-level form.',
+  'Paul George':'Nine-time All-Star wing acquired from the 76ers in the blockbuster Jaylen Brown trade — a proven two-way scorer bringing veteran star power to Boston in his fifth NBA stop.',
   'Jaylen Brown':'Career year — 28.8 PPG, 4th in the NBA. The other half of The Jays.',
   'Derrick White':'Two-way connector and one of the league’s most reliable role players.',
   'Nikola Vucevic':'Veteran frontcourt scoring and a steadying interior presence.',
@@ -1985,7 +2140,7 @@ function postsMentioning(name){
   if(!n) return [];
   return posts.filter(p=>norm((p.title||'')+' '+(p.body||'')).indexOf(n)>-1)
     .sort((a,b)=>new Date(b.date)-new Date(a.date))   // most recent first
-    .slice(0,3)                                        // max 3
+    .slice(0,2)                                        // max 2
     .map(p=>({slug:p.slug,title:p.title}));
 }
 /* open a post in the reader (used by the player-card blog buttons) */
@@ -2019,7 +2174,7 @@ async function loadRoster(){
       const size=[a.displayHeight,a.displayWeight].filter(Boolean).join(' · ');
       const L=a.links||[];
       const lk=rel=>{ const x=L.find(y=>y.rel&&y.rel.indexOf(rel)>-1&&y.rel.indexOf('desktop')>-1&&/^https?:/.test(y.href||'')); return x&&x.href; };
-      const plinks=[['Profile','playercard'],['Stats','stats'],['Game Log','gamelog'],['News','news']].map(z=>{const h=lk(z[1]);return h?{label:z[0],href:h}:null;}).filter(Boolean);
+      const plinks=[['Profile','playercard'],['Stats','stats'],['Game Log','gamelog']].map(z=>{const h=lk(z[1]);return h?{label:z[0],href:h}:null;}).filter(Boolean);
       return {
         name:a.displayName,
         num:a.jersey?('#'+a.jersey):'',
