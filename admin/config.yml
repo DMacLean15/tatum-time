@@ -24,51 +24,52 @@ logo_url: /logo.svg     # Tatum Time logo shown on the login screen
 collections:
   - name: "blog"
     label: "📝 Blog Posts"
-    description: "Write, edit, reorder, and delete Tatum Time posts. Newest post goes at the TOP. Stuck on formatting? Click the green 'Formatting Help' button in the bottom-right corner anytime."
+    label_singular: "Post"
+    description: "Write, edit, and delete Tatum Time posts. Each post is its own entry — use the search box to find one fast. Posts sort by date automatically. Stuck on formatting? Click the green 'Formatting Help' button in the bottom-right corner anytime."
+    folder: "content/posts"       # each post is one .md file in here
+    create: true                  # allow creating new posts
+    slug: "{{slug}}"              # filename comes from the headline
+    summary: "{{fields.date}}  —  {{fields.title}}"
+    sortable_fields: ["title", "date"]
     editor:
-      preview: true           # live preview pane, styled to match the blog (see admin/index.html)
-    files:
-      - name: "posts"
-        label: "All Posts"
-        file: "content/posts.json"
-        fields:
-          - name: "posts"
-            label: "Posts"
-            label_singular: "Post"
-            widget: "list"
-            summary: "{{fields.date}}  —  {{fields.title}}"
-            hint: "Newest post goes at the TOP. Drag a post by its handle to reorder."
-            fields:
+      preview: true               # live preview pane, styled to match the blog (see admin/index.html)
+    fields:
+      - name: "title"
+        label: "Headline"
+        widget: "string"
 
-              - name: "title"
-                label: "Headline"
-                widget: "string"
+      - name: "emoji"
+        label: "Banner Emoji"
+        widget: "string"
+        default: "🏀"
+        hint: "One emoji shown on the post's banner — e.g. 🏀 🍀 🔥 🏆 🎯 🐣 🃏"
 
-              - name: "emoji"
-                label: "Banner Emoji"
-                widget: "string"
-                default: "🏀"
-                hint: "One emoji shown on the post's banner — e.g. 🏀 🍀 🔥 🏆 🎯 🐣 🃏"
+      - name: "category"
+        label: "Category"
+        widget: "select"
+        default: "Recap"
+        options: ["Recap", "Analysis", "News", "Playoffs", "Draft", "Roster", "Milestone"]
 
-              - name: "category"
-                label: "Category"
-                widget: "select"
-                default: "Recap"
-                options: ["Recap", "Analysis", "News", "Playoffs", "Draft", "Roster", "Milestone"]
+      - name: "featured"
+        label: "⭐ Feature this post"
+        widget: "boolean"
+        default: false
+        required: false
+        hint: "Turn ON to pin this to the big 'Featured Post' spot on the homepage. Leave OFF and the newest post is featured automatically. Only turn it on for one post."
 
-              - name: "date"
-                label: "Date"
-                widget: "string"
-                hint: "Shown exactly as you type it, e.g. Jul 1, 2026"
+      - name: "date"
+        label: "Date"
+        widget: "string"
+        hint: "Shown exactly as you type it, e.g. Jul 1, 2026"
 
-              - name: "gameLink"
-                label: "Game Box-Score Link (optional)"
-                widget: "string"
-                required: false
-                pattern: ['^$|^https?://.+', 'Paste a full web address starting with http:// (or leave it blank)']
-                hint: "Paste an NBA.com box-score web address to show a green 'See full game stats' button. Leave blank for no button."
+      - name: "gameLink"
+        label: "Game Box-Score Link (optional)"
+        widget: "string"
+        required: false
+        pattern: ['^$|^https?://.+', 'Paste a full web address starting with http:// (or leave it blank)']
+        hint: "Paste an NBA.com box-score web address to show a green 'See full game stats' button. Leave blank for no button."
 
-              - name: "body"
-                label: "Article"
-                widget: "markdown"
-                hint: "Toolbar = bold, headings, lists, photos. Wrap a stat in == for a green tag (==28.3 PPG==). Paste a YouTube link on its own line to embed the video. The preview on the right shows how it'll look (green tags show as ==text== in the preview but turn green on the live site)."
+      - name: "body"
+        label: "Article"
+        widget: "markdown"
+        hint: "Toolbar = bold, headings, lists, photos. Wrap a stat in == for a green tag (==28.3 PPG==). Paste a YouTube link on its own line to embed the video. The preview on the right shows how it'll look (green tags show as ==text== in the preview but turn green on the live site)."
