@@ -71,7 +71,7 @@
     input,textarea{cursor:text!important}
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
+  html{scroll-behavior:smooth;scroll-padding-top:84px}
   body{
     font-family:'Inter',system-ui,sans-serif;
     background:
@@ -773,7 +773,7 @@
       <h1 class="display">It's Always<br><em>Tatum Time</em><br>In Boston</h1>
       <p class="lead">Recaps, draft grades, playoff breakdowns and deep dives on the 18-time World Champion Boston Celtics — written for the fans who watch every possession.</p>
       <div class="hero-cta">
-        <a class="btn btn-primary" href="#posts">Read the latest ▸</a>
+        <a class="btn btn-primary" href="#posts" data-open-latest>Read the latest ▸</a>
         <a class="btn btn-ghost" href="#about">About the blog</a>
       </div>
       <div class="hero-stats">
@@ -969,7 +969,7 @@
       <p>Tatum Time is built for serious Celtics fans. It's a place for honest analysis, statistical trends, and everything happening around the green and white.</p>
       <p>Dan brings a sharp eye for the numbers — years deep into fantasy basketball on Fantrax, he's obsessed with tracking the trends that the box score doesn't always show, from per-40 projections to under-the-radar bench breakouts.</p>
       <p>If it has anything to do with Boston basketball, you'll find it here. Welcome to Tatum Time.</p>
-      <a class="btn btn-primary" style="margin-top:8px" href="#posts">Start reading ▸</a>
+      <a class="btn btn-primary" style="margin-top:8px" href="#posts" data-open-latest>Start reading ▸</a>
     </div>
   </div>
 </section>
@@ -2230,6 +2230,30 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowRight' && current<posts.length-1)  { e.preventDefault(); renderPost(current+1,false); }
 });
 function closeNav(){document.getElementById('navlinks').classList.remove('open');}
+
+/* ============ SMART IN-PAGE ANCHOR SCROLLING ============ */
+/* Offsets for the sticky nav, opens the latest post for "Read the latest",
+   and re-corrects the landing spot after lazy content (roster) loads and shifts the page. */
+function navHeight(){ const n=document.querySelector('header.nav'); return (n&&n.offsetHeight)||68; }
+function smartScroll(el){
+  const targetY=()=>Math.max(0, el.getBoundingClientRect().top+window.pageYOffset-navHeight()-12);
+  window.scrollTo({top:targetY(),behavior:'smooth'});
+  let cancelled=false;
+  const cancel=()=>{ cancelled=true; window.removeEventListener('wheel',cancel); window.removeEventListener('touchmove',cancel); window.removeEventListener('keydown',cancel); };
+  window.addEventListener('wheel',cancel,{passive:true});
+  window.addEventListener('touchmove',cancel,{passive:true});
+  window.addEventListener('keydown',cancel);
+  [400,900,1500].forEach(t=>setTimeout(()=>{ if(!cancelled) window.scrollTo({top:targetY(),behavior:'auto'}); },t));
+  setTimeout(cancel,1600);
+}
+document.addEventListener('click',function(e){
+  const a=e.target.closest('a[href^="#"]'); if(!a) return;
+  const href=a.getAttribute('href');
+  if(!href||href==='#'||href.charAt(1)==='/') return;   // ignore the blog reader's #/post/... routes
+  if(a.hasAttribute('data-open-latest')){ e.preventDefault(); closeNav(); renderPost(0,true); return; }
+  const target=document.querySelector(href); if(!target) return;
+  e.preventDefault(); closeNav(); smartScroll(target);
+});
 
 /* ============ SCROLL REVEAL ============ */
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
