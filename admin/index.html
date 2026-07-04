@@ -4,13 +4,76 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tatum Time — Content Manager</title>
+  <style>
+    /* ---- Floating "Formatting Help" cheat sheet (self-contained, won't touch the editor) ---- */
+    #tt-help-btn{
+      position:fixed;right:20px;bottom:20px;z-index:99998;
+      display:inline-flex;align-items:center;gap:8px;
+      background:linear-gradient(145deg,#16c45b,#007a33);color:#052012;
+      font:700 14px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+      border:none;border-radius:999px;padding:12px 18px;cursor:pointer;
+      box-shadow:0 8px 22px -6px rgba(22,196,91,.6);transition:.15s;
+    }
+    #tt-help-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px -6px rgba(22,196,91,.85)}
+    #tt-site-btn{
+      position:fixed;right:20px;bottom:72px;z-index:99998;
+      display:inline-flex;align-items:center;gap:7px;
+      background:#0f1d16;color:#e8efe9;
+      font:700 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+      border:1px solid rgba(22,196,91,.4);border-radius:999px;padding:10px 16px;
+      text-decoration:none;box-shadow:0 6px 18px -6px rgba(0,0,0,.5);transition:.15s;
+    }
+    #tt-site-btn:hover{border-color:#16c45b;background:#132a1f}
+    #tt-score{
+      position:fixed;left:16px;bottom:16px;z-index:99997;width:236px;
+      background:#0f1d16;border:1px solid rgba(22,196,91,.28);border-radius:14px;padding:12px 14px 13px;
+      color:#e8efe9;font:12px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+      box-shadow:0 12px 34px -14px rgba(0,0,0,.7);
+    }
+    #tt-score .tts-cap{font-size:.58rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#16c45b;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+    #tt-score .tts-h{font-size:.6rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#bfa15a;margin-bottom:1px}
+    #tt-score .tts-line{color:#fff;font-weight:600;margin-bottom:9px}
+    #tt-score .tts-sub{color:#9bb3a5;font-size:.78rem}
+    #tt-score .tts-hide{position:absolute;top:7px;right:9px;cursor:pointer;color:#9bb3a5;font-size:.85rem;background:none;border:none;line-height:1}
+    #tt-score .tts-hide:hover{color:#fff}
+    #tt-help-overlay{
+      position:fixed;inset:0;z-index:99999;display:none;
+      background:rgba(2,8,5,.72);backdrop-filter:blur(4px);
+      align-items:center;justify-content:center;padding:24px;
+    }
+    #tt-help-overlay.open{display:flex}
+    #tt-help-panel{
+      width:100%;max-width:640px;max-height:88vh;overflow-y:auto;
+      background:#0f1d16;border:1px solid rgba(22,196,91,.3);border-radius:18px;
+      box-shadow:0 30px 80px -20px rgba(0,0,0,.8);
+      color:#e8efe9;font:15px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+      padding:26px 28px 30px;position:relative;
+    }
+    #tt-help-panel h2{margin:0 0 4px;color:#fff;font-size:1.5rem;letter-spacing:.3px}
+    #tt-help-panel .tt-sub{color:#9bb3a5;font-size:.9rem;margin-bottom:18px}
+    #tt-help-panel h3{color:#16c45b;font-size:.95rem;margin:20px 0 6px;letter-spacing:.3px}
+    #tt-help-panel p{margin:0 0 8px}
+    #tt-help-panel code{background:rgba(255,255,255,.08);color:#ffd76b;padding:2px 7px;border-radius:6px;font-size:.9em;font-family:ui-monospace,monospace}
+    #tt-help-panel ul{margin:0 0 8px;padding-left:1.2em}
+    #tt-help-panel li{margin:.3em 0}
+    #tt-help-panel .tt-tag{background:rgba(22,196,91,.16);color:#16c45b;font-weight:700;border:1px solid rgba(22,196,91,.3);padding:1px 8px;border-radius:6px}
+    #tt-help-panel .tt-note{color:#9bb3a5;font-size:.86rem}
+    #tt-help-panel .tt-tips{background:rgba(191,161,90,.08);border:1px solid rgba(191,161,90,.28);border-radius:12px;padding:14px 16px;margin-top:6px}
+    #tt-help-panel .tt-tips h3{margin-top:0;color:#bfa15a}
+    #tt-help-close{
+      position:absolute;top:14px;right:16px;background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.15);color:#fff;width:34px;height:34px;
+      border-radius:50%;cursor:pointer;font-size:1.1rem;line-height:1;
+    }
+    #tt-help-close:hover{background:rgba(255,255,255,.14)}
+  </style>
 </head>
 <body>
   <!-- The CMS itself -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
   <script>
-    /* Style the live preview pane so it looks like the real Tatum Time blog. */
     if (window.CMS) {
+      /* 1) Style the live preview pane so it looks like the real Tatum Time blog. */
       CMS.registerPreviewStyle(
         "@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');" +
         "body{background:#0b120e;color:#e8efe9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.65;padding:26px 30px;margin:0}" +
@@ -24,10 +87,211 @@
         "code{background:rgba(255,255,255,.08);padding:2px 6px;border-radius:6px;font-size:.9em}" +
         "ul,ol{padding-left:1.35em;margin:0 0 1em}li{margin:.25em 0}" +
         "hr{border:none;border-top:1px solid rgba(255,255,255,.12);margin:22px 0}" +
-        "iframe{max-width:100%;border-radius:12px;margin:16px 0}",
+        "iframe{max-width:100%;border-radius:12px;margin:16px 0}" +
+        ".tt-green{background:rgba(22,196,91,.16);color:#16c45b;font-weight:700;border:1px solid rgba(22,196,91,.35);padding:1px 8px;border-radius:6px}" +
+        ".post-score{display:inline-flex;flex-direction:column;gap:2px;background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:12px 22px;margin:18px 0}" +
+        ".post-score .ps-row{display:flex;justify-content:space-between;gap:30px;padding:5px 0;color:#9bb3a5}" +
+        ".post-score .ps-team{font-weight:700}.post-score .ps-score{font-family:'Anton',sans-serif;font-size:1.4rem;min-width:46px;text-align:right;letter-spacing:1px}" +
+        ".post-score .ps-win .ps-team,.post-score .ps-win .ps-score{color:#16c45b}",
         { raw: true }
       );
+
+      /* 2) One-click YouTube button in the editor toolbar. Inserts a link the site auto-embeds. */
+      CMS.registerEditorComponent({
+        id: "youtube",
+        label: "YouTube Video",
+        fields: [{ name: "url", label: "YouTube link", widget: "string", hint: "Paste the full youtube.com or youtu.be address" }],
+        pattern: /^\[youtube\]\((\S+)\)$/,
+        fromBlock: function (match) { return { url: match[1] }; },
+        toBlock: function (obj) { return obj.url ? "[youtube](" + obj.url + ")" : ""; },
+        toPreview: function (obj) {
+          var m = (obj.url || "").match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+          return m ? '<iframe width="100%" height="315" src="https://www.youtube.com/embed/' + m[1] + '" frameborder="0" allowfullscreen></iframe>'
+                   : (obj.url ? '<a href="' + obj.url + '">' + obj.url + '</a>' : '');
+        }
+      });
+
+      /* Box Score button — inserts a styled final-score card (winner highlighted green). */
+      function scoreCard(o) {
+        var a = parseInt(o.scoreA, 10), b = parseInt(o.scoreB, 10);
+        var aw = (a > b) ? " ps-win" : "", bw = (b > a) ? " ps-win" : "";
+        return '<div class="post-score">' +
+          '<div class="ps-row' + aw + '"><span class="ps-team">' + (o.teamA || '') + '</span><span class="ps-score">' + (o.scoreA || '') + '</span></div>' +
+          '<div class="ps-row' + bw + '"><span class="ps-team">' + (o.teamB || '') + '</span><span class="ps-score">' + (o.scoreB || '') + '</span></div>' +
+          '</div>';
+      }
+      CMS.registerEditorComponent({
+        id: "boxscore",
+        label: "Box Score",
+        fields: [
+          { name: "teamA", label: "Team A", widget: "string", default: "Celtics" },
+          { name: "scoreA", label: "Team A score", widget: "number" },
+          { name: "teamB", label: "Team B", widget: "string" },
+          { name: "scoreB", label: "Team B score", widget: "number" }
+        ],
+        pattern: /^<div class="post-score"><div class="ps-row[^"]*"><span class="ps-team">(.*?)<\/span><span class="ps-score">(\d+)<\/span><\/div><div class="ps-row[^"]*"><span class="ps-team">(.*?)<\/span><span class="ps-score">(\d+)<\/span><\/div><\/div>$/,
+        fromBlock: function (m) { return { teamA: m[1], scoreA: m[2], teamB: m[3], scoreB: m[4] }; },
+        toBlock: function (o) { return (o.scoreA === "" && o.scoreB === "") ? "" : scoreCard(o); },
+        toPreview: function (o) { return scoreCard(o); }
+      });
     }
+
+    /* 3) Render ==stat== as a green tag in the live preview (best-effort; harmless if it can't reach the frame). */
+    (function () {
+      var RE = /==([^=]+)==/;
+      function paintNode(doc, node) {
+        var text = node.nodeValue;
+        if (text.indexOf("==") < 0) return;
+        var frag = doc.createDocumentFragment(), last = 0, re = /==([^=]+)==/g, m;
+        while ((m = re.exec(text))) {
+          if (m.index > last) frag.appendChild(doc.createTextNode(text.slice(last, m.index)));
+          var span = doc.createElement("span"); span.className = "tt-green"; span.textContent = m[1];
+          frag.appendChild(span); last = m.index + m[0].length;
+        }
+        if (last < text.length) frag.appendChild(doc.createTextNode(text.slice(last)));
+        if (node.parentNode) node.parentNode.replaceChild(frag, node);
+      }
+      function paintDoc(doc) {
+        if (!doc || !doc.body) return;
+        var walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, null, false), targets = [], n;
+        while ((n = walker.nextNode())) {
+          if (n.nodeValue.indexOf("==") > -1) {
+            var p = n.parentNode;
+            if (p && p.nodeName !== "SCRIPT" && p.nodeName !== "STYLE" && !(p.classList && p.classList.contains("tt-green"))) targets.push(n);
+          }
+        }
+        targets.forEach(function (node) { paintNode(doc, node); });
+      }
+      setInterval(function () {
+        try {
+          document.querySelectorAll("iframe").forEach(function (f) {
+            try { var d = f.contentDocument; if (d && d.body) paintDoc(d); } catch (e) {}
+          });
+        } catch (e) {}
+      }, 600);
+    })();
+  </script>
+
+  <!-- Quick "view the live site" shortcut + Formatting Help cheat sheet -->
+  <a id="tt-site-btn" href="https://tatumtime.net" target="_blank" rel="noopener">🌐 View Live Site ↗</a>
+  <button id="tt-help-btn" onclick="document.getElementById('tt-help-overlay').classList.add('open')">🍀 Formatting Help</button>
+  <div id="tt-help-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+    <div id="tt-help-panel">
+      <button id="tt-help-close" onclick="document.getElementById('tt-help-overlay').classList.remove('open')" aria-label="Close">✕</button>
+      <h2>🏀 Writing a Great Tatum Time Post</h2>
+      <div class="tt-sub">Everything's optional — plain writing already looks great. Use the preview on the right to see how it'll look.</div>
+
+      <div class="tt-tips">
+        <h3>⭐ Make it pop</h3>
+        <ul>
+          <li>Give it a <b>punchy headline</b> — it's the first thing readers see.</li>
+          <li>Keep paragraphs <b>short</b>. Break up long posts with <b>headings</b>.</li>
+          <li>Add a <b>photo or YouTube clip</b> — posts with visuals get read more.</li>
+          <li>Sprinkle in <b>green stat tags</b> for the key numbers.</li>
+        </ul>
+      </div>
+
+      <h3>📋 Post starters <span class="tt-note">(optional structures to riff on)</span></h3>
+      <p><b>🏀 Game recap:</b> Final score → 1–2 standout performers (with <span class="tt-tag">stat tags</span>) → the turning point → what's next.</p>
+      <p><b>📰 Trade / news reaction:</b> What happened → why it matters for the C's → your grade or hot take.</p>
+      <p><b>⭐ Player spotlight:</b> Quick intro → the numbers that pop → why he matters to the team.</p>
+
+      <h3>🟢 Green stat tags</h3>
+      <p>Wrap any stat in <code>==</code> to make a green highlight:</p>
+      <p>Tatum went off for <code>==28.3 PPG==</code> → <span class="tt-tag">28.3 PPG</span> on the live site.</p>
+      <p class="tt-note">Heads up: in the preview it shows as plain <code>==28.3 PPG==</code>, but it turns green on the published site.</p>
+
+      <h3>✍️ Formatting toolbar</h3>
+      <p>Use the toolbar above the writing box for <b>bold</b>, <i>italics</i>, Headings, bullet/numbered lists, links, and quotes.</p>
+
+      <h3>📸 Photos</h3>
+      <ul>
+        <li>Click the image button and upload — it auto-resizes to fit.</li>
+        <li>The little thumbnail sometimes doesn't show while attaching — that's cosmetic. Check the <b>preview</b> to confirm the photo's there.</li>
+        <li>Shrink huge phone photos before uploading so the site stays fast.</li>
+      </ul>
+
+      <h3>▶️ YouTube videos</h3>
+      <p>Two ways: paste a link on its <b>own line</b>, OR click the <b>"+"</b> in the editor → <b>"YouTube Video"</b> and paste the link.</p>
+
+      <h3>🏀 Box score card</h3>
+      <p>Click the <b>"+"</b> in the editor → <b>"Box Score"</b>, type the two teams and scores, and it drops in a clean final-score card (winner shown in green).</p>
+
+      <h3>🏀 "See full game stats" button</h3>
+      <p>Fill in the <b>Game Box-Score Link</b> field with an NBA.com box-score web address, and a green button appears on the post. Leave it blank for none.</p>
+
+      <h3>🍀 Banner emoji &amp; publishing</h3>
+      <ul>
+        <li>The <b>Banner Emoji</b> you pick shows on the post's banner card.</li>
+        <li>Drag your newest post to the <b>TOP</b> of the list.</li>
+        <li>Get it looking right in the preview, then hit <b>Publish</b> once. Edit as much as you want — it's free and unlimited.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Live Celtics scoreboard (last result + next game, straight from ESPN) -->
+  <div id="tt-score" style="display:none">
+    <button class="tts-hide" onclick="this.parentNode.style.display='none'" title="Hide">✕</button>
+    <div class="tts-cap">🍀 Celtics</div>
+    <div id="tt-score-body"></div>
+  </div>
+
+  <script>
+    /* 4) Live scoreboard — fetch the Celtics schedule and show last result + next game. */
+    (function () {
+      var box = document.getElementById("tt-score"), body = document.getElementById("tt-score-body");
+      if (!box || !body) return;
+      function scoreOf(t) { var v = t.score; if (v == null) return ""; return (typeof v === "object") ? (v.displayValue || v.value) : v; }
+      function parseG(ev) {
+        var comp = ev.competitions && ev.competitions[0]; if (!comp) return null;
+        var cs = comp.competitors || [];
+        var bos = cs.filter(function (c) { return c.team && c.team.abbreviation === "BOS"; })[0];
+        var opp = cs.filter(function (c) { return c !== bos; })[0];
+        if (!bos || !opp) return null;
+        return { bos: scoreOf(bos), opp: scoreOf(opp), oppName: (opp.team.shortDisplayName || opp.team.abbreviation || ""), home: bos.homeAway === "home" };
+      }
+      fetch("https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/bos/schedule")
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          var events = (data.events || []).slice().sort(function (a, b) { return new Date(a.date) - new Date(b.date); });
+          var now = Date.now(), last = null, next = null;
+          events.forEach(function (ev) {
+            var t = new Date(ev.date).getTime(), comp = ev.competitions && ev.competitions[0];
+            var done = comp && comp.status && comp.status.type && comp.status.type.completed;
+            if (done || t < now) last = ev; else if (!next) next = ev;
+          });
+          var html = "";
+          if (last) { var g = parseG(last); if (g) { var win = parseInt(g.bos, 10) > parseInt(g.opp, 10);
+            html += '<div class="tts-h">' + (win ? "W" : "L") + " · Last Result</div><div class=\"tts-line\">Celtics " + g.bos + " " + (g.home ? "vs" : "@") + " " + g.oppName + " " + g.opp + "</div>"; } }
+          if (next) { var n = parseG(next); if (n) { var d = new Date(next.date);
+            html += '<div class="tts-h">Next Game</div><div class="tts-sub">' + (n.home ? "vs" : "@") + " " + n.oppName + " · " + d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }) + " " + d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + "</div>"; } }
+          else { html += '<div class="tts-h">Next Game</div><div class="tts-sub">Offseason — schedule coming soon ☘️</div>'; }
+          if (html) { body.innerHTML = html; box.style.display = "block"; }
+        })
+        .catch(function () { /* stay hidden if ESPN is unreachable */ });
+    })();
+
+    /* 5) Auto-fill today's date on a new post (Dan can still change it; never touches an existing date). */
+    (function () {
+      var M = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      function today() { var d = new Date(); return M[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear(); }
+      function setVal(el, v) {
+        var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+        setter.call(el, v);
+        el.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+      setInterval(function () {
+        try {
+          document.querySelectorAll("label").forEach(function (lb) {
+            if (lb.textContent && lb.textContent.trim().toLowerCase() === "date") {
+              var input = null, node = lb, hops = 0;
+              while (node && hops < 3 && !input) { node = node.parentNode; if (node) input = node.querySelector('input[type="text"], input:not([type])'); hops++; }
+              if (input && !input.value && !input.dataset.ttDate) { input.dataset.ttDate = "1"; setVal(input, today()); }
+            }
+          });
+        } catch (e) {}
+      }, 800);
+    })();
   </script>
 </body>
 </html>

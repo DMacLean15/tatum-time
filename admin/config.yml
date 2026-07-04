@@ -19,11 +19,12 @@ public_folder: "/images/uploads"
 # The live site address (used for the CMS preview links).
 site_url: https://tatumtime.net
 display_url: https://tatumtime.net
+logo_url: /logo.svg     # Tatum Time logo shown on the login screen
 
 collections:
   - name: "blog"
     label: "📝 Blog Posts"
-    description: "Write, edit, reorder, and delete Tatum Time posts."
+    description: "Write, edit, reorder, and delete Tatum Time posts. Newest post goes at the TOP. Stuck on formatting? Click the green 'Formatting Help' button in the bottom-right corner anytime."
     editor:
       preview: true           # live preview pane, styled to match the blog (see admin/index.html)
     files:
@@ -64,6 +65,7 @@ collections:
                 label: "Game Box-Score Link (optional)"
                 widget: "string"
                 required: false
+                pattern: ['^$|^https?://.+', 'Paste a full web address starting with http:// (or leave it blank)']
                 hint: "Paste an NBA.com box-score web address to show a green 'See full game stats' button. Leave blank for no button."
 
               - name: "body"
