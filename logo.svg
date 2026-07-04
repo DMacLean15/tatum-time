@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="70" viewBox="0 0 320 70">
+  <!-- shamrock -->
+  <g fill="#16c45b">
+    <circle cx="24" cy="22" r="12"/>
+    <circle cx="44" cy="22" r="12"/>
+    <circle cx="34" cy="38" r="12"/>
+  </g>
+  <path d="M34 44 q1 13 -8 20" stroke="#007a33" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- wordmark -->
+  <text x="70" y="46" font-family="Arial Black, Arial, sans-serif" font-size="30" font-weight="900" letter-spacing="1" fill="#0f1d16">TATUM<tspan fill="#16c45b"> TIME</tspan></text>
+</svg>

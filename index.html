@@ -287,6 +287,12 @@
   .article .stat-pill{display:inline-block;background:rgba(22,196,91,.12);border:1px solid rgba(22,196,91,.25);color:var(--green-glow);padding:3px 10px;border-radius:8px;font-size:.82rem;font-weight:600;margin:2px 4px 2px 0}
   .article .game-link{display:inline-flex;align-items:center;gap:9px;margin:8px 0 2px;padding:12px 18px;border-radius:12px;background:rgba(22,196,91,.10);border:1px solid rgba(22,196,91,.32);color:var(--green-glow);font-weight:700;font-size:.92rem;transition:.16s}
   .article .game-link:hover{background:rgba(22,196,91,.2);border-color:var(--green-glow);transform:translateY(-2px);box-shadow:0 10px 22px -12px var(--green-glow)}
+  /* box score card (inserted from the CMS "Box Score" button) */
+  .article .post-score{display:inline-flex;flex-direction:column;gap:2px;background:linear-gradient(165deg,var(--card),#0a1510);border:1px solid var(--line);border-radius:14px;padding:12px 22px;margin:18px 0}
+  .article .post-score .ps-row{display:flex;align-items:center;justify-content:space-between;gap:30px;padding:5px 0;color:var(--muted)}
+  .article .post-score .ps-team{font-weight:700;font-size:1.02rem}
+  .article .post-score .ps-score{font-family:'Anton',sans-serif;font-size:1.45rem;color:var(--muted);min-width:46px;text-align:right;letter-spacing:1px}
+  .article .post-score .ps-win .ps-team,.article .post-score .ps-win .ps-score{color:var(--green-glow)}
   /* auto-sized images so big uploads don't dominate the page */
   .article img{max-width:100%;height:auto;max-height:540px;width:auto;border-radius:12px;border:1px solid var(--line);margin:18px auto;display:block}
   /* responsive YouTube embeds */
