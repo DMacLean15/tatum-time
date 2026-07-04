@@ -22,7 +22,7 @@
 <meta name="twitter:image" content="https://tatumtime.net/og.png" />
 <!-- Google Search Console verification -->
 <meta name="google-site-verification" content="5e5o-y8jat0Xg_sQDSC59t7F7mBKTePcDdK8sDI67CY" />
-<!-- Canonical (consolidates netlify.app + www onto the real domain) -->
+<!-- Canonical (consolidates www onto the real domain) -->
 <link rel="canonical" href="https://tatumtime.net/" />
 <!-- Structured data for Google -->
 <script type="application/ld+json">
@@ -1255,7 +1255,7 @@ async function initBlog(){
   renderThisDay();  // Fact of the Day + On This Day cards
   renderTimeline(); // championship timeline (static, no network)
   wireTabs();       // tabs — Standings/Players fetch only when first opened
-  wireNewsletter(); // newsletter signup (Netlify Forms)
+  wireNewsletter(); // newsletter signup (Supabase)
   // Roster is the default Franchise tab — load it once that section nears view
   const fr=document.getElementById('franchise');
   if(fr && 'IntersectionObserver' in window){

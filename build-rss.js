@@ -1,6 +1,6 @@
 /* Regenerates feed.xml from content/posts.json.
-   Netlify runs this on every deploy (including when Dan publishes a post)
-   if you set the build command to:  node build-rss.js
+   Cloudflare Pages runs this on every deploy (including when Dan publishes a post)
+   because the build command is set to:  node build-rss.js
    No npm packages needed. */
 const fs = require('fs');
 
