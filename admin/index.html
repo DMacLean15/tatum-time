@@ -4,11 +4,30 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tatum Time — Content Manager</title>
-  <!-- Login widget (Netlify Identity) -->
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
   <!-- The CMS itself -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script>
+    /* Style the live preview pane so it looks like the real Tatum Time blog. */
+    if (window.CMS) {
+      CMS.registerPreviewStyle(
+        "@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');" +
+        "body{background:#0b120e;color:#e8efe9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.65;padding:26px 30px;margin:0}" +
+        "h1,h2,h3,h4{color:#fff;font-family:'Anton',sans-serif;letter-spacing:.4px;line-height:1.15;margin:1.3em 0 .45em;text-transform:uppercase}" +
+        "h1{font-size:2rem}h2{font-size:1.55rem}h3{font-size:1.25rem}h4{font-size:1.05rem}" +
+        "p{margin:0 0 1em}" +
+        "a{color:#16c45b;text-decoration:none}a:hover{text-decoration:underline}" +
+        "strong,b{color:#fff}" +
+        "img{max-width:100%;height:auto;border-radius:12px;margin:16px 0;display:block}" +
+        "blockquote{border-left:3px solid #16c45b;margin:16px 0;padding:6px 18px;color:#9bb3a5;background:rgba(22,196,91,.06);border-radius:0 10px 10px 0}" +
+        "code{background:rgba(255,255,255,.08);padding:2px 6px;border-radius:6px;font-size:.9em}" +
+        "ul,ol{padding-left:1.35em;margin:0 0 1em}li{margin:.25em 0}" +
+        "hr{border:none;border-top:1px solid rgba(255,255,255,.12);margin:22px 0}" +
+        "iframe{max-width:100%;border-radius:12px;margin:16px 0}",
+        { raw: true }
+      );
+    }
+  </script>
 </body>
 </html>
