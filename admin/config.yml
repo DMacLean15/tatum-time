@@ -67,7 +67,7 @@ collections:
         hint: "Pick the post's date from the calendar. New posts default to today. (Stored in a sortable format; shows as 'Jul 1, 2026' on the site.)"
 
       - name: "gameLink"
-        label: "Game Box-Score Link (optional)"
+        label: "Game Box-Score Link"
         widget: "string"
         required: false
         pattern: ['^$|^https?://.+', 'Paste a full web address starting with http:// (or leave it blank)']
