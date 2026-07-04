@@ -1200,6 +1200,14 @@ let posts = fallbackPosts;
 let current = 0;
 let featuredIdx = 0;
 function dateNum(d){ const t=new Date(d).getTime(); return isNaN(t)?0:t; }
+/* show a date nicely whether it's ISO (2026-07-01) or a legacy string (Jul 1, 2026) */
+function fmtDisplayDate(s){
+  s=String(s||''); const iso=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  const d = iso ? new Date(+iso[1],+iso[2]-1,+iso[3]) : new Date(s);
+  if(isNaN(d)) return s;
+  const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return M[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();
+}
 const listBox = document.getElementById('postList');
 
 /* ==stat== shorthand -> green stat pill */
@@ -1228,7 +1236,7 @@ function buildList(){
     const it=document.createElement('button');
     it.className='post-item'; it.dataset.i=i;
     it.innerHTML=`<span class="pi-emoji" style="${thumbStyle(i)}">${p.emoji}</span>
-      <span class="pi-text"><b>${p.title}</b><small>${p.date} · ${p.cat}</small></span>`;
+      <span class="pi-text"><b>${p.title}</b><small>${fmtDisplayDate(p.date)} · ${p.cat}</small></span>`;
     it.onclick=()=>renderPost(i,true);
     listBox.appendChild(it);
   });
@@ -1239,7 +1247,7 @@ function setFeatured(){
   const f=posts[featuredIdx]; if(!f) return;
   const t=document.getElementById('feat-title'); if(t) t.textContent=f.title;
   const e=document.getElementById('feat-ex'); if(e) e.textContent=excerptFrom(f.body);
-  const m=document.getElementById('feat-meta'); if(m) m.textContent=f.date+' · '+f.cat;
+  const m=document.getElementById('feat-meta'); if(m) m.textContent=fmtDisplayDate(f.date)+' · '+f.cat;
 }
 
 async function initBlog(){
@@ -1281,7 +1289,7 @@ function renderPost(i, scroll, setHash=true){
   _tt.textContent='';
   const _em=document.createElement('span'); _em.className='t-emoji'; _em.textContent=p.emoji;
   _tt.appendChild(_em); _tt.appendChild(document.createTextNode(' '+p.title));
-  document.getElementById('readerMeta').textContent='Dan MacLean · '+p.date;
+  document.getElementById('readerMeta').textContent='Dan MacLean · '+fmtDisplayDate(p.date);
   document.getElementById('readerArticle').innerHTML=p.body;
   document.getElementById('readTime').textContent='⏱ '+p.readMins+' min read';
   buildShare(p); loadComments(p.slug); loadReactions(p.slug);
