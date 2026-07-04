@@ -16,7 +16,7 @@ local_backend: true
 media_folder: "images/uploads"
 public_folder: "/images/uploads"
 
-# 👉 After deploying, change these to your real Netlify address.
+# The live site address (used for the CMS preview links).
 site_url: https://tatumtime.net
 display_url: https://tatumtime.net
 
