@@ -3,7 +3,7 @@ title: "Blockbuster Deal: Celtics Send All-Star Jaylen Brown To 76ers For Paul G
 emoji: "💥"
 category: "News"
 featured: false
-date: "Jul 1, 2026"
+date: "2026-07-01"
 gameLink: ""
 ---
 ![](/images/uploads/img_0139.webp)

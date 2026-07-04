@@ -3,7 +3,7 @@ title: "Celtics Draft Grades By Pick"
 emoji: "🎓"
 category: "Draft"
 featured: false
-date: "Jun 25, 2026"
+date: "2026-06-25"
 gameLink: ""
 ---
 The 2026 NBA Draft is in the books, and Boston walked away with a pair of intriguing combo forwards. Here's how each pick grades out.

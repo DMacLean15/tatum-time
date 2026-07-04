@@ -3,7 +3,7 @@ title: "Jayson Tatum Drops 80 In The First Half!? APRIL FOOLS!"
 emoji: "🃏"
 category: "Recap"
 featured: false
-date: "Apr 2, 2026"
+date: "2026-04-02"
 gameLink: "https://www.nba.com/game/bos-vs-mia-0022501106/box-score"
 ---
 Did Jayson Tatum just drop 80 in the first half? ...April Fools! 🃏 But what actually happened was plenty fun: Boston drenched the Heat ==147–129==.

@@ -3,7 +3,7 @@ title: "New And Improved Site Up And Running! JJ Watson W/ The Assist"
 emoji: "☘️"
 category: "Milestone"
 featured: false
-date: "6/30/2026"
+date: "2026-06-30"
 gameLink: ""
 ---
 <https://www.youtube.com/watch?v=FE-kvFwarLI>

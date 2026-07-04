@@ -3,7 +3,7 @@ title: "Happy Easter!!! 🐣🏀💚"
 emoji: "🐣"
 category: "Recap"
 featured: false
-date: "Apr 5, 2026"
+date: "2026-04-05"
 gameLink: "https://www.nba.com/game/tor-vs-bos-0022501132/box-score"
 ---
 Happy Easter from Tatum Time! 🐣☘️

@@ -3,7 +3,7 @@ title: "Baylor Scheierman Proving His Worth Off The Bench"
 emoji: "🏀"
 category: "Roster"
 featured: false
-date: "Mar 29, 2026"
+date: "2026-03-29"
 gameLink: ""
 ---
 

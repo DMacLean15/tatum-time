@@ -3,7 +3,7 @@ title: "Bust Out The Brooms: 76ers And Lakers Both Swept!!!"
 emoji: "🧹"
 category: "Playoffs"
 featured: false
-date: "May 14, 2026"
+date: "2026-05-14"
 gameLink: ""
 ---
 Sometimes the basketball gods give you a perfect weekend. 🧹🧹

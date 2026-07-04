@@ -3,7 +3,7 @@ title: "The 2025–26 Season: Underrated Contributors"
 emoji: "🔍"
 category: "Roster"
 featured: false
-date: "Apr 13, 2026"
+date: "2026-04-13"
 gameLink: ""
 ---
 The season is in full swing, so let's shine a light on the names that don't always make the highlight reels but quietly move the needle for the C's.

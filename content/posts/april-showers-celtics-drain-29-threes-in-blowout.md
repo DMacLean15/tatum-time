@@ -3,7 +3,7 @@ title: "April Showers: Celtics Drain 29 Threes In Blowout"
 emoji: "🌧️"
 category: "Recap"
 featured: false
-date: "Apr 11, 2026"
+date: "2026-04-11"
 gameLink: "https://www.nba.com/game/nop-vs-bos-0022501174/box-score"
 ---
 April 10, 2026 was a downpour. The Celtics buried **29 three-pointers** — tying the NBA single-game record — in a ==144–118== demolition of the Pelicans, their 10th straight win.

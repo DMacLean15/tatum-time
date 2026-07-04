@@ -3,7 +3,7 @@ title: "Processing… Celtics Dealt Early Postseason Exit"
 emoji: "💔"
 category: "Playoffs"
 featured: false
-date: "May 4, 2026"
+date: "2026-05-04"
 gameLink: ""
 ---
 This one stings. As heavy favorites carrying the third-best championship odds in the league, the Celtics had the 76ers right where they wanted them — up **3–1** in the first round. Then it all came apart.

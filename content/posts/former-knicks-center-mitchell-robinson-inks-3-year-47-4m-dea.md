@@ -3,7 +3,7 @@ title: "Former Knicks Center Mitchell Robinson Inks 3-Year $47.4M Deal With Celt
 emoji: "🏆"
 category: "News"
 featured: false
-date: "July 1, 2026"
+date: "2026-07-01"
 gameLink: ""
 ---
 

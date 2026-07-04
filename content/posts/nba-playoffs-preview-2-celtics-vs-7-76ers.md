@@ -3,7 +3,7 @@ title: "NBA Playoffs Preview: (2) Celtics vs. (7) 76ers"
 emoji: "🆚"
 category: "Playoffs"
 featured: false
-date: "Apr 18, 2026"
+date: "2026-04-18"
 gameLink: ""
 ---
 The bracket is set, and the second-seeded Celtics ==56–26== draw the seventh-seeded 76ers ==45–37== in a first-round showdown. Boston opens as a massive **-12.5 favorite** in Game 1 and holds the third-best championship odds in the field.
