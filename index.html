@@ -790,7 +790,7 @@
         <img class="avatar" src="dan.jpg" alt="Dan MacLean" />
         <div><b style="color:#fff">Dan MacLean</b><br><span id="feat-meta" style="color:var(--muted);font-size:.82rem">Jun 25, 2026 · Draft</span></div>
       </div>
-      <button class="btn btn-primary" style="margin-top:20px" onclick="renderPost(0,true)">Read the breakdown ▸</button>
+      <button class="btn btn-primary" style="margin-top:20px" onclick="renderPost(featuredIdx,true)">Read the breakdown ▸</button>
     </div>
   </div>
 </section>
@@ -1198,6 +1198,8 @@ const legends = [
    directly from disk), we fall back to the built-in fallbackPosts above. */
 let posts = fallbackPosts;
 let current = 0;
+let featuredIdx = 0;
+function dateNum(d){ const t=new Date(d).getTime(); return isNaN(t)?0:t; }
 const listBox = document.getElementById('postList');
 
 /* ==stat== shorthand -> green stat pill */
@@ -1211,7 +1213,7 @@ function normalizePost(p){
   if(p.gameLink && p.gameLink.trim()){
     body += `<a class="game-link" href="${p.gameLink.trim()}" target="_blank" rel="noopener">📊 See full game stats here ↗</a>`;
   }
-  return { emoji:p.emoji||'🏀', cat:p.category||p.cat||'Post', date:p.date||'', title:p.title||'', body };
+  return { emoji:p.emoji||'🏀', cat:p.category||p.cat||'Post', date:p.date||'', title:p.title||'', body, featured:!!p.featured };
 }
 
 function excerptFrom(html){
@@ -1233,7 +1235,8 @@ function buildList(){
 }
 
 function setFeatured(){
-  const f=posts[0]; if(!f) return;
+  const fi=posts.findIndex(p=>p.featured); featuredIdx = fi>=0 ? fi : 0;   // pinned post, else newest
+  const f=posts[featuredIdx]; if(!f) return;
   const t=document.getElementById('feat-title'); if(t) t.textContent=f.title;
   const e=document.getElementById('feat-ex'); if(e) e.textContent=excerptFrom(f.body);
   const m=document.getElementById('feat-meta'); if(m) m.textContent=f.date+' · '+f.cat;
@@ -1250,7 +1253,7 @@ async function initBlog(){
       }
     }
   }catch(e){ /* offline / opened from disk — keep the built-in fallback */ }
-  posts = source.map(ensureMeta);
+  posts = source.map(ensureMeta).sort((a,b)=>dateNum(b.date)-dateNum(a.date));   // newest first — no manual reordering needed
   buildList(); buildTags(); setFeatured();
   const searchEl=document.getElementById('postSearch');
   if(searchEl) searchEl.addEventListener('input', applyFilter);
