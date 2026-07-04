@@ -1273,12 +1273,9 @@ async function initBlog(){
   renderTimeline(); // championship timeline (static, no network)
   wireTabs();       // tabs — Standings/Players fetch only when first opened
   wireNewsletter(); // newsletter signup (Supabase)
-  // Roster is the default Franchise tab — load it once that section nears view
-  const fr=document.getElementById('franchise');
-  if(fr && 'IntersectionObserver' in window){
-    const fo=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ loadRoster(); fo.disconnect(); } }); },{rootMargin:'300px'});
-    fo.observe(fr);
-  } else { loadRoster(); }
+  // Load the roster shortly after load (eager, not on-scroll) so it can't grow the
+  // page mid-scroll and throw off anchor jumps like "About".
+  setTimeout(loadRoster, 400);
 }
 
 function renderPost(i, scroll, setHash=true){
@@ -2231,28 +2228,12 @@ document.addEventListener('keydown',e=>{
 });
 function closeNav(){document.getElementById('navlinks').classList.remove('open');}
 
-/* ============ SMART IN-PAGE ANCHOR SCROLLING ============ */
-/* Offsets for the sticky nav, opens the latest post for "Read the latest",
-   and re-corrects the landing spot after lazy content (roster) loads and shifts the page. */
-function navHeight(){ const n=document.querySelector('header.nav'); return (n&&n.offsetHeight)||68; }
-function smartScroll(el){
-  const targetY=()=>Math.max(0, el.getBoundingClientRect().top+window.pageYOffset-navHeight()-12);
-  window.scrollTo({top:targetY(),behavior:'smooth'});
-  let cancelled=false;
-  const cancel=()=>{ cancelled=true; window.removeEventListener('wheel',cancel); window.removeEventListener('touchmove',cancel); window.removeEventListener('keydown',cancel); };
-  window.addEventListener('wheel',cancel,{passive:true});
-  window.addEventListener('touchmove',cancel,{passive:true});
-  window.addEventListener('keydown',cancel);
-  [400,900,1500].forEach(t=>setTimeout(()=>{ if(!cancelled) window.scrollTo({top:targetY(),behavior:'auto'}); },t));
-  setTimeout(cancel,1600);
-}
+/* ============ "Read the latest" opens the newest post ============ */
+/* Everything else uses the browser's native anchor scroll + scroll-padding-top (in CSS),
+   which is smooth and offsets for the sticky nav without any fighting/jumping. */
 document.addEventListener('click',function(e){
-  const a=e.target.closest('a[href^="#"]'); if(!a) return;
-  const href=a.getAttribute('href');
-  if(!href||href==='#'||href.charAt(1)==='/') return;   // ignore the blog reader's #/post/... routes
-  if(a.hasAttribute('data-open-latest')){ e.preventDefault(); closeNav(); renderPost(0,true); return; }
-  const target=document.querySelector(href); if(!target) return;
-  e.preventDefault(); closeNav(); smartScroll(target);
+  const a=e.target.closest('a[data-open-latest]'); if(!a) return;
+  e.preventDefault(); closeNav(); renderPost(0,true);
 });
 
 /* ============ SCROLL REVEAL ============ */
