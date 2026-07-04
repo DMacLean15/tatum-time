@@ -30,7 +30,11 @@ collections:
     create: true                  # allow creating new posts
     slug: "{{slug}}"              # filename comes from the headline
     summary: "{{fields.date}}  —  {{fields.title}}"
-    sortable_fields: ["title", "date"]
+    sortable_fields:
+      fields: ["date", "title"]
+      default:
+        field: "date"
+        direction: "descending"
     editor:
       preview: true               # live preview pane, styled to match the blog (see admin/index.html)
     fields:
@@ -59,8 +63,12 @@ collections:
 
       - name: "date"
         label: "Date"
-        widget: "string"
-        hint: "Shown exactly as you type it, e.g. Jul 1, 2026"
+        widget: "datetime"
+        format: "YYYY-MM-DD"
+        date_format: "MMM D, YYYY"
+        time_format: false
+        picker_utc: false
+        hint: "Pick the post's date from the calendar. New posts default to today. (Stored in a sortable format; shows as 'Jul 1, 2026' on the site.)"
 
       - name: "gameLink"
         label: "Game Box-Score Link (optional)"

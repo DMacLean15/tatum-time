@@ -270,28 +270,7 @@
         })
         .catch(function () { /* stay hidden if ESPN is unreachable */ });
     })();
-
-    /* 5) Auto-fill today's date on a new post (Dan can still change it; never touches an existing date). */
-    (function () {
-      var M = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-      function today() { var d = new Date(); return M[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear(); }
-      function setVal(el, v) {
-        var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
-        setter.call(el, v);
-        el.dispatchEvent(new Event("input", { bubbles: true }));
-      }
-      setInterval(function () {
-        try {
-          document.querySelectorAll("label").forEach(function (lb) {
-            if (lb.textContent && lb.textContent.trim().toLowerCase() === "date") {
-              var input = null, node = lb, hops = 0;
-              while (node && hops < 3 && !input) { node = node.parentNode; if (node) input = node.querySelector('input[type="text"], input:not([type])'); hops++; }
-              if (input && !input.value && !input.dataset.ttDate) { input.dataset.ttDate = "1"; setVal(input, today()); }
-            }
-          });
-        } catch (e) {}
-      }, 800);
-    })();
+    /* (Auto-date is now handled natively by the date picker's "default to today", so no script needed.) */
   </script>
 </body>
 </html>
