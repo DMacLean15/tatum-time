@@ -30,11 +30,7 @@ collections:
     create: true                  # allow creating new posts
     slug: "{{slug}}"              # filename comes from the headline
     summary: "{{fields.date}}  —  {{fields.title}}"
-    sortable_fields:
-      fields: ["date", "title"]
-      default:
-        field: "date"
-        direction: "descending"
+    sortable_fields: ["date", "title"]
     editor:
       preview: true               # live preview pane, styled to match the blog (see admin/index.html)
     fields:
