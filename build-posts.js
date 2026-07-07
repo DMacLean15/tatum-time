@@ -43,6 +43,7 @@ try {
         category: fm.category || 'Recap',
         featured: fm.featured === true,
         date: fm.date || '',
+        image: fm.image || '',
         gameLink: fm.gameLink || '',
         body: fm.body || ''
       });

@@ -284,6 +284,20 @@
   .article p{margin-bottom:14px}
   .article ul{margin:0 0 16px 20px}
   .article li{margin-bottom:6px;color:var(--muted)}
+  /* ---- auto-polish typography (applies to every post, no work for Dan) ---- */
+  /* larger "lead" intro + magazine drop-cap on the opening paragraph */
+  .article > p:first-child{font-size:1.14rem;line-height:1.62;color:#eaf1ec}
+  .article > p:first-child::first-letter{float:left;font-family:'Anton',sans-serif;font-size:3.4rem;line-height:.78;padding:6px 12px 2px 0;color:var(--green-glow);text-shadow:0 3px 16px rgba(22,196,91,.35)}
+  /* section headings from ## / ### get a green accent so sections stand out */
+  .article h2{color:#fff;font-family:'Anton',sans-serif;letter-spacing:.4px;font-size:1.5rem;margin:32px 0 10px;padding-left:14px;border-left:4px solid var(--green-glow);line-height:1.22}
+  .article h3{color:#fff;font-family:'Anton',sans-serif;letter-spacing:.3px;font-size:1.22rem;margin:26px 0 8px;line-height:1.25}
+  /* shamrock section divider (from a --- line) */
+  .article hr{border:0;height:1px;background:var(--line);margin:38px 0;overflow:visible}
+  .article hr::before{content:"☘";position:relative;top:-.72em;display:block;width:38px;margin:0 auto;text-align:center;color:var(--green-glow);background:#0d1912;font-size:1.05rem}
+  /* photo captions (from the image's description text) */
+  .article figure{margin:20px 0}
+  .article figure img{margin:0 auto 8px}
+  .article figcaption{text-align:center;color:var(--muted);font-size:.82rem;font-style:italic;line-height:1.4;padding:0 12px}
   .article .stat-pill{display:inline-block;background:rgba(22,196,91,.12);border:1px solid rgba(22,196,91,.25);color:var(--green-glow);padding:3px 10px;border-radius:8px;font-size:.82rem;font-weight:600;margin:2px 4px 2px 0}
   .article .game-link{display:inline-flex;align-items:center;gap:9px;margin:8px 0 2px;padding:12px 18px;border-radius:12px;background:rgba(22,196,91,.10);border:1px solid rgba(22,196,91,.32);color:var(--green-glow);font-weight:700;font-size:.92rem;transition:.16s}
   .article .game-link:hover{background:rgba(22,196,91,.2);border-color:var(--green-glow);transform:translateY(-2px);box-shadow:0 10px 22px -12px var(--green-glow)}
@@ -293,6 +307,18 @@
   .article .post-score .ps-team{font-weight:700;font-size:1.02rem}
   .article .post-score .ps-score{font-family:'Anton',sans-serif;font-size:1.45rem;color:var(--muted);min-width:46px;text-align:right;letter-spacing:1px}
   .article .post-score .ps-win .ps-team,.article .post-score .ps-win .ps-score{color:var(--green-glow)}
+  /* pull quote (CMS "Pull Quote" button) */
+  .article .pull-quote{margin:26px 0;padding:4px 0 4px 22px;border-left:4px solid var(--green-glow)}
+  .article .pull-quote p{font-size:1.35rem;line-height:1.42;color:#fff;font-weight:600;margin:0}
+  .article .pull-quote cite{display:block;margin-top:10px;color:var(--green-glow);font-style:normal;font-weight:700;font-size:.9rem;letter-spacing:.3px}
+  /* player stat line (CMS "Player Stat Line" button) */
+  .article .stat-line{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;background:linear-gradient(165deg,var(--card),#0a1510);border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin:18px 0}
+  .article .stat-line .sl-name{font-weight:800;color:#fff;font-size:1.05rem}
+  .article .stat-line .sl-stats{color:var(--green-glow);font-weight:700;letter-spacing:.3px}
+  /* callout / editor's note (CMS "Callout Box" button) */
+  .article .callout{display:flex;gap:12px;align-items:flex-start;background:rgba(191,161,90,.08);border:1px solid rgba(191,161,90,.3);border-radius:12px;padding:14px 16px;margin:18px 0}
+  .article .callout .co-ico{font-size:1.3rem;flex:0 0 auto;line-height:1.3}
+  .article .callout .co-text{color:var(--txt);line-height:1.55}
   /* auto-sized images so big uploads don't dominate the page */
   .article img{max-width:100%;height:auto;max-height:540px;width:auto;border-radius:12px;border:1px solid var(--line);margin:18px auto;display:block}
   /* responsive YouTube embeds */
@@ -301,6 +327,24 @@
   .modal-close{position:absolute;top:14px;right:14px;z-index:5;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.4);border:1px solid var(--line);color:#fff;font-size:1.3rem;cursor:pointer;display:grid;place-items:center;transition:.16s}
   .modal-close:hover{background:rgba(0,0,0,.7);transform:rotate(90deg)}
   .grade{display:inline-grid;place-items:center;width:48px;height:48px;border-radius:12px;font-family:'Anton',sans-serif;font-size:1.5rem;background:rgba(22,196,91,.14);color:var(--green-glow);border:1px solid rgba(22,196,91,.3)}
+  /* grade badge (CMS "Grade Badge" button) — big letter grade, colored by grade */
+  .article .grade-badge{display:flex;align-items:center;gap:16px;background:linear-gradient(165deg,var(--card),#0a1510);border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin:20px 0}
+  .article .grade-badge .gb-grade{font-family:'Anton',sans-serif;font-size:2.5rem;line-height:1;width:74px;height:74px;flex:0 0 auto;display:grid;place-items:center;border-radius:14px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.4)}
+  .article .grade-badge .gb-body{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .article .grade-badge .gb-label{font-weight:800;color:#fff;font-size:1.06rem}
+  .article .grade-badge .gb-note{color:var(--muted);font-size:.9rem;line-height:1.42}
+  .gb-a{background:linear-gradient(145deg,#16c45b,#04531f)}
+  .gb-b{background:linear-gradient(145deg,#39a86f,#0a3a24)}
+  .gb-c{background:linear-gradient(145deg,#bfa15a,#6e5a25)}
+  .gb-d{background:linear-gradient(145deg,#d98a3b,#7a4715)}
+  .gb-f{background:linear-gradient(145deg,#d95b5b,#7a1f1f)}
+  /* featured/hero photo at the top of an open post */
+  .reader-hero-img{width:100%;max-height:340px;object-fit:cover;display:block;border-bottom:1px solid var(--line)}
+  @media(max-width:560px){.reader-hero-img{max-height:210px}}
+  /* photo thumbnail in the post list (falls back to the emoji tile) */
+  .pi-photo{background-size:cover !important;background-position:center !important}
+  /* featured-card photo on the homepage */
+  .hero-card .feat-thumb{width:100%;height:158px;object-fit:cover;border-radius:12px;margin:0 0 14px;border:1px solid var(--line);display:block}
 
   /* ---------- FOOTER ---------- */
   footer{border-top:1px solid var(--line);padding:48px 0 36px;margin-top:30px}
@@ -783,6 +827,7 @@
       </div>
     </div>
     <div class="hero-card reveal">
+      <img id="feat-thumb" class="feat-thumb" alt="" style="display:none">
       <span class="tag">★ Featured Post</span>
       <h3 id="feat-title">Celtics Draft Grades By Pick</h3>
       <p id="feat-ex">Breaking down Boston's 2026 NBA Draft haul — from Chris Cenac Jr. at 27 to the second-round swing on Dillon Mitchell.</p>
@@ -874,6 +919,7 @@
       <div class="reader">
         <div class="reader-nav" id="readerNavTop"></div>
         <article class="reader-article">
+          <img id="readerHero" class="reader-hero-img" alt="" style="display:none">
           <div class="reader-content">
             <div class="cat" id="readerCat"></div>
             <h2 id="readerTitle"></h2>
@@ -1214,14 +1260,33 @@ const listBox = document.getElementById('postList');
 function pill(html){ return html.replace(/==([^=]+)==/g,'<span class="stat-pill">$1</span>'); }
 
 /* turn a CMS post (markdown + fields) into the internal {emoji,cat,date,title,body} shape */
+function captionImages(html){
+  // Wrap standalone photos in <figure>; turn the image's description into a caption.
+  return html.replace(/<p>\s*(<img[^>]*>)\s*<\/p>/gi, function(_, img){
+    const am = img.match(/\balt="([^"]*)"/i);
+    let cap = am ? am[1].trim() : '';
+    if(cap && /\.(jpe?g|png|gif|webp|avif)$/i.test(cap)) cap = '';   // skip auto-filled filenames
+    return cap ? '<figure>'+img+'<figcaption>'+cap+'</figcaption></figure>' : '<figure>'+img+'</figure>';
+  });
+}
 function normalizePost(p){
   let body = window.marked ? marked.parse(p.body||'') : (p.body||'');
   body = pill(body);
   body = embedYouTube(body);
+  // Hero photo: the CMS "Featured Photo" field if set, otherwise the first photo in
+  // the article (pulled out of the body so it isn't shown twice). Old posts get a
+  // hero automatically from their first image.
+  let hero = (p.image||'').trim();
+  if(!hero){
+    const m = body.match(/<p>\s*<img[^>]*\bsrc="([^"]+)"[^>]*>\s*<\/p>/i);
+    if(m){ hero = m[1]; body = body.replace(m[0], ''); }
+    else { const m2 = body.match(/<img[^>]*\bsrc="([^"]+)"[^>]*>/i); if(m2) hero = m2[1]; }
+  }
+  body = captionImages(body);
   if(p.gameLink && p.gameLink.trim()){
     body += `<a class="game-link" href="${p.gameLink.trim()}" target="_blank" rel="noopener">📊 See full game stats here ↗</a>`;
   }
-  return { emoji:p.emoji||'🏀', cat:p.category||p.cat||'Post', date:p.date||'', title:p.title||'', body, featured:!!p.featured };
+  return { emoji:p.emoji||'🏀', cat:p.category||p.cat||'Post', date:p.date||'', title:p.title||'', body, hero, featured:!!p.featured };
 }
 
 function excerptFrom(html){
@@ -1235,7 +1300,10 @@ function buildList(){
   posts.forEach((p,i)=>{
     const it=document.createElement('button');
     it.className='post-item'; it.dataset.i=i;
-    it.innerHTML=`<span class="pi-emoji" style="${thumbStyle(i)}">${p.emoji}</span>
+    const thumb = p.hero
+      ? `<span class="pi-emoji pi-photo" style="background-image:url('${p.hero}')"></span>`
+      : `<span class="pi-emoji" style="${thumbStyle(i)}">${p.emoji}</span>`;
+    it.innerHTML=`${thumb}
       <span class="pi-text"><b>${p.title}</b><small>${fmtDisplayDate(p.date)} · ${p.cat}</small></span>`;
     it.onclick=()=>renderPost(i,true);
     listBox.appendChild(it);
@@ -1248,6 +1316,8 @@ function setFeatured(){
   const t=document.getElementById('feat-title'); if(t) t.textContent=f.title;
   const e=document.getElementById('feat-ex'); if(e) e.textContent=excerptFrom(f.body);
   const m=document.getElementById('feat-meta'); if(m) m.textContent=fmtDisplayDate(f.date)+' · '+f.cat;
+  const th=document.getElementById('feat-thumb');
+  if(th){ if(f.hero){ th.src=f.hero; th.alt=f.title; th.style.display='block'; } else { th.style.display='none'; th.removeAttribute('src'); } }
 }
 
 async function initBlog(){
@@ -1287,6 +1357,8 @@ function renderPost(i, scroll, setHash=true){
   const _em=document.createElement('span'); _em.className='t-emoji'; _em.textContent=p.emoji;
   _tt.appendChild(_em); _tt.appendChild(document.createTextNode(' '+p.title));
   document.getElementById('readerMeta').textContent='Dan MacLean · '+fmtDisplayDate(p.date);
+  const heroEl=document.getElementById('readerHero');
+  if(heroEl){ if(p.hero){ heroEl.src=p.hero; heroEl.alt=p.title; heroEl.style.display='block'; } else { heroEl.style.display='none'; heroEl.removeAttribute('src'); } }
   document.getElementById('readerArticle').innerHTML=p.body;
   document.getElementById('readTime').textContent='⏱ '+p.readMins+' min read';
   buildShare(p); loadComments(p.slug); loadReactions(p.slug);
