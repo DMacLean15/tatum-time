@@ -299,6 +299,11 @@
   .article figure{margin:20px 0}
   .article figure img{margin:0 auto 8px}
   .article figcaption{text-align:center;color:var(--muted);font-size:.82rem;font-style:italic;line-height:1.4;padding:0 12px}
+  /* player-name links (jump to the player's Franchise card) */
+  .article .tt-plink{color:var(--green-glow);text-decoration:none;border-bottom:1px dotted rgba(22,196,91,.55);cursor:pointer;font-weight:600;transition:.15s}
+  .article .tt-plink:hover{border-bottom-style:solid;background:rgba(22,196,91,.10)}
+  .person.card-flash{animation:cardflash 2s ease}
+  @keyframes cardflash{0%,100%{box-shadow:0 0 0 0 rgba(22,196,91,0)}12%{box-shadow:0 0 0 3px rgba(22,196,91,.75)}}
   .article .stat-pill{display:inline-block;background:rgba(22,196,91,.12);border:1px solid rgba(22,196,91,.25);color:var(--green-glow);padding:3px 10px;border-radius:8px;font-size:.82rem;font-weight:600;margin:2px 4px 2px 0}
   .article .game-link{display:inline-flex;align-items:center;gap:9px;margin:8px 0 2px;padding:12px 18px;border-radius:12px;background:rgba(22,196,91,.10);border:1px solid rgba(22,196,91,.32);color:var(--green-glow);font-weight:700;font-size:.92rem;transition:.16s}
   .article .game-link:hover{background:rgba(22,196,91,.2);border-color:var(--green-glow);transform:translateY(-2px);box-shadow:0 10px 22px -12px var(--green-glow)}
@@ -1371,6 +1376,7 @@ function renderPost(i, scroll, setHash=true){
   const heroEl=document.getElementById('readerHero');
   if(heroEl){ if(p.hero){ heroEl.src=p.hero; heroEl.alt=p.title; heroEl.style.objectPosition=p.heroFocus||'50% 50%'; heroEl.style.display='block'; } else { heroEl.style.display='none'; heroEl.removeAttribute('src'); } }
   document.getElementById('readerArticle').innerHTML=p.body;
+  linkifyPlayers(document.getElementById('readerArticle'));
   document.getElementById('readTime').textContent='⏱ '+p.readMins+' min read';
   buildShare(p); loadComments(p.slug); loadReactions(p.slug);
   if(setHash && history.replaceState) history.replaceState(null,'','#/post/'+p.slug);
@@ -1446,6 +1452,60 @@ function embedYouTube(html){
 function slugify(s){ return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'post'; }
 function readingTime(html){ const d=document.createElement('div'); d.innerHTML=html; const w=(d.textContent||'').trim().split(/\s+/).filter(Boolean).length; return Math.max(1,Math.round(w/200)); }
 function ensureMeta(p){ p.slug=p.slug||slugify(p.title); p.readMins=p.readMins||readingTime(p.body); return p; }
+
+/* ---- Turn player/legend names in a post into links to their Franchise card ---- */
+const playerLinkIndex={};   // normalized full name -> {slug, tab, name}
+let PLAYER_RE=null;
+function cardSlug(name){ return slugify(normName(name)); }   // accent-safe, matches the card's data-card
+function addPlayerLink(name,tab){ const n=normName(name); if(!n||playerLinkIndex[n]) return; playerLinkIndex[n]={slug:cardSlug(name),tab:tab,name:name}; }
+function buildPlayerRe(){
+  const names=Object.values(playerLinkIndex).map(x=>x.name).sort((a,b)=>b.length-a.length);  // longest first so full names win
+  if(!names.length){ PLAYER_RE=null; return; }
+  const esc=names.map(n=>n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
+  PLAYER_RE=new RegExp('\\b('+esc.join('|')+')','g');
+}
+function linkifyPlayers(container){
+  if(!container||!PLAYER_RE) return;
+  const walker=document.createTreeWalker(container,NodeFilter.SHOW_TEXT,null,false), targets=[]; let node;
+  while((node=walker.nextNode())){
+    const pn=node.parentNode; if(!pn) continue;
+    const tag=pn.nodeName; if(tag==='A'||tag==='SCRIPT'||tag==='STYLE') continue;   // never link inside an existing link
+    PLAYER_RE.lastIndex=0; if(PLAYER_RE.test(node.nodeValue)) targets.push(node);
+  }
+  targets.forEach(function(n){
+    const text=n.nodeValue; PLAYER_RE.lastIndex=0;
+    const frag=document.createDocumentFragment(); let last=0,m;
+    while((m=PLAYER_RE.exec(text))){
+      const name=m[1], idx=m.index, info=playerLinkIndex[normName(name)];
+      if(idx>last) frag.appendChild(document.createTextNode(text.slice(last,idx)));
+      if(info){
+        const a=document.createElement('a');
+        a.className='tt-plink'; a.href='#franchise';
+        a.setAttribute('data-goto-player',info.slug);
+        a.setAttribute('data-goto-tab',info.tab);
+        a.textContent=name;
+        frag.appendChild(a);
+      } else { frag.appendChild(document.createTextNode(name)); }
+      last=idx+name.length;
+    }
+    if(last<text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+    n.parentNode.replaceChild(frag,n);
+  });
+}
+function gotoPlayerCard(slug,tab){
+  const section=document.getElementById('franchise'); if(!section) return;
+  const btn=section.querySelector('.tab[data-tab="'+tab+'"]'); if(btn) btn.click();   // open the right tab (Roster/Legends)
+  function reveal(){
+    const card=section.querySelector('[data-card="'+slug+'"]');
+    if(!card) return false;
+    card.scrollIntoView({behavior:'smooth',block:'center'});
+    card.classList.add('card-flash'); setTimeout(function(){ card.classList.remove('card-flash'); },2000);
+    return true;
+  }
+  if(reveal()) return;
+  if(tab==='f-roster' && typeof loadRoster==='function'){ Promise.resolve(loadRoster()).then(function(){ setTimeout(reveal,140); }); }
+  else setTimeout(reveal,220);
+}
 
 function buildTags(){
   const cats=['All',...Array.from(new Set(posts.map(p=>p.cat)))];
@@ -2153,6 +2213,7 @@ function initials(name){return name.split(' ').map(w=>w[0]).slice(0,2).join('').
 function personCard(p){
   const hasLinks=p.links&&p.links.length;
   const d=document.createElement(hasLinks?'div':'a'); d.className='person'+(p.isNew?' is-new':'');
+  if(p.name) d.dataset.card=cardSlug(p.name);
   const href = p.href || (p.id ? 'https://www.nba.com/stats/player/'+p.id : '');
   if(!hasLinks && href){ d.href=href; d.target='_blank'; d.rel='noopener'; }
   const src = p.imgUrl || (p.id ? 'https://cdn.nba.com/headshots/nba/latest/1040x760/'+p.id+'.png' : '');
@@ -2226,6 +2287,11 @@ const PLAYER_COUNTRY={
 };
 function normName(s){ return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim(); }
 function overrideCountry(name){ const n=normName(name); for(const k in PLAYER_COUNTRY){ if(normName(k)===n) return PLAYER_COUNTRY[k]; } return ''; }
+/* Seed the player-link index: legends + known roster names. The live roster
+   (from ESPN) augments this in loadRoster so newly-signed players link too. */
+legends.forEach(function(p){ addPlayerLink(p.name,'f-legends'); });
+Object.keys(rosterNotes).forEach(function(n){ addPlayerLink(n,'f-roster'); });
+buildPlayerRe();
 const COACH_PHOTOS={'2232684':'https://upload.wikimedia.org/wikipedia/commons/9/99/Celtics_at_Wizards_2024-12-046_%28cropped%29_%28cropped%29.jpg'};
 function renderCoach(co){
   const cc=document.getElementById('coachCard'); if(!cc) return;
@@ -2313,6 +2379,7 @@ async function loadRoster(){
       };
     });
     players.sort((a,b)=>b.salary-a.salary);   // ordered by salary; salary itself is not displayed
+    players.forEach(p=>addPlayerLink(p.name,'f-roster')); buildPlayerRe();   // so live roster names link in posts too
     rg.innerHTML='';
     players.forEach(p=>rg.appendChild(personCard(p)));
   }catch(e){ rg.innerHTML='<div class="no-results">Roster is unavailable right now.</div>'; }
@@ -2335,6 +2402,13 @@ function closeNav(){document.getElementById('navlinks').classList.remove('open')
 document.addEventListener('click',function(e){
   const a=e.target.closest('a[data-open-latest]'); if(!a) return;
   e.preventDefault(); closeNav(); renderPost(0,true);
+});
+
+/* ============ player-name links in posts → jump to their Franchise card ============ */
+document.addEventListener('click',function(e){
+  const a=e.target.closest('a[data-goto-player]'); if(!a) return;
+  e.preventDefault();
+  gotoPlayerCard(a.getAttribute('data-goto-player'), a.getAttribute('data-goto-tab')||'f-roster');
 });
 
 /* ============ SCROLL REVEAL ============ */
