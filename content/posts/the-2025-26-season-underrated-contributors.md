@@ -10,19 +10,19 @@ The season is in full swing, so let's shine a light on the names that don't alwa
 
 #### Luka Garza · C · 5th Season
 
-==7.8 PPG== ==4.0 RPG== ==58% FG== ==43% 3PT==
+<div class="stat-line"><span class="sl-name">Luka Garza</span><span class="sl-stats">7.8 PPG · 4.0 RPG · 58% FG · 43% 3PT</span></div>
 
 Boston has historically struggled to establish a dominant paint presence outside the Russell and Parish eras. Garza is helping change that. In roughly 16 minutes a night, his per-40 projection is a staggering **25.2 PPG, 9.9 RPG, 2.0 APG**. Toss out the meaningless finale against Orlando with rested starters, and his March–April efficiency has been elite.
 
 #### Jordan Walsh · G · 3rd Season
 
-==5.3 PPG== ==3.9 RPG== ==51.9% FG== ==39.5% 3P==
+<div class="stat-line"><span class="sl-name">Jordan Walsh</span><span class="sl-stats">5.3 PPG · 3.9 RPG · 51.9% FG · 39.5% 3P</span></div>
 
 Walsh has gone from afterthought to genuine rotation piece. His December was outstanding — **9.5 PPG, 4.9 RPG, 1.2 SPG on 69.6% FG, 86.7% FT and 54% from three**. Year over year he's added 23 games, nearly 10 minutes, +15.8% FG, +12.2% 3P and +17.2% FT. That's a leap.
 
 #### Hugo González · G · Rookie
 
-==3.9 PPG== ==3.3 RPG== ==46.7% FG==
+<div class="stat-line"><span class="sl-name">Hugo González</span><span class="sl-stats">3.9 PPG · 3.3 RPG · 46.7% FG</span></div>
 
 The 20-year-old Spaniard debuted for Real Madrid in the ACB at just 16, winning two titles (2024, 2025) before Boston took him 28th in the 2025 Draft. The counting stats are modest, but his March 2nd line against Milwaukee — **18 pts, 16 reb, 3 stl, 2 blk, 3 threes** — flashed exactly why the C's are excited.
 

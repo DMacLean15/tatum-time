@@ -8,6 +8,8 @@ gameLink: ""
 ---
 This one stings. As heavy favorites carrying the third-best championship odds in the league, the Celtics had the 76ers right where they wanted them — up **3–1** in the first round. Then it all came apart.
 
+<div class="timeline"><div class="tl-title">How It Slipped Away</div><div class="tl-item"><span class="tl-when">G1–4</span><span class="tl-what">Boston dominates and takes a commanding 3–1 series lead</span></div><div class="tl-item"><span class="tl-when">G5</span><span class="tl-what">Joel Embiid returns from injury and swings the series</span></div><div class="tl-item"><span class="tl-when">G7</span><span class="tl-what">Without Jayson Tatum, the season ends in the first round</span></div></div>
+
 Boston dominated Games 1 through 4, with Payton Pritchard delivering Game 4 heroics to push the series to the brink. But Philadelphia flipped the switch the moment **Joel Embiid** returned from injury. After sitting the first three games, Embiid was dominant down the stretch, and the supporting cast followed.
 
 - **Tyrese Maxey** — steady, relentless scoring all series.

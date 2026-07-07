@@ -12,9 +12,13 @@ The 2026 NBA Draft is in the books, and Boston walked away with a pair of intrig
 
 A 19-year-old forward out of Houston, Cenac Jr. averaged ==9.5 PPG== ==7.9 RPG== as a freshman. He profiles as a lanky three-point shooter and switchable defender with real upside — but taking him at 27 felt like a bit of a reach when better-fit options were on the board. The tools are there; the polish isn't yet.
 
+<div class="grade-badge"><span class="gb-grade gb-b">B-</span><span class="gb-body"><span class="gb-label">Chris Cenac Jr.</span><span class="gb-note">Round 1, Pick 27 · F, Houston</span></span></div>
+
 #### Round 2 — Dillon Mitchell (Grade: ==B+==)
 
 The 22-year-old out of Saint John's posted ==8.0 PPG== ==6.3 RPG==. He's a high-energy athlete who attacks the glass, though the jumper and free-throw stroke remain works in progress. Excellent value this late in the draft.
+
+<div class="grade-badge"><span class="gb-grade gb-b">B+</span><span class="gb-body"><span class="gb-label">Dillon Mitchell</span><span class="gb-note">Round 2 · F, Saint John's</span></span></div>
 
 #### The Verdict
 

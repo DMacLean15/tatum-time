@@ -8,6 +8,10 @@ gameLink: "https://www.nba.com/game/nop-vs-bos-0022501174/box-score"
 ---
 April 10, 2026 was a downpour. The Celtics buried **29 three-pointers** — tying the NBA single-game record — in a ==144–118== demolition of the Pelicans, their 10th straight win.
 
+<div class="stat-hero"><span class="sh-num">29</span><span class="sh-cap">Three-pointers — tying the NBA single-game record</span></div>
+
+<div class="post-score"><div class="ps-row ps-win"><span class="ps-team">Celtics</span><span class="ps-score">144</span></div><div class="ps-row"><span class="ps-team">Pelicans</span><span class="ps-score">118</span></div></div>
+
 #### Make It Rain ☔
 
 Sam Hauser led the barrage with **eight threes**. The distribution was absurd — eight different Celtics hit two or more from deep:

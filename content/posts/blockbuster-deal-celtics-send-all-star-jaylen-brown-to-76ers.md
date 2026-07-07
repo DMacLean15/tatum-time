@@ -30,4 +30,4 @@ The flip side of it is, he is a well-balanced veteran that can bring a lot to th
 
 Obviously, Brad and the men upstairs know what they are doing but only time will tell if this one works out.
 
-Big Dan's Trade Grade: C
+<div class="grade-badge"><span class="gb-grade gb-c">C</span><span class="gb-body"><span class="gb-label">Big Dan's Trade Grade</span><span class="gb-note">Jaylen Brown out; Paul George + four picks in — it all hinges on PG's health.</span></span></div>
