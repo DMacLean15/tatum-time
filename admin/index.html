@@ -69,11 +69,19 @@
     }
     #tt-help-close:hover{background:rgba(255,255,255,.14)}
     /* ---- Post Recipes + Roster: expandable dropdown menus (no blocking popup) ---- */
-    #tt-recipe-btn, #tt-roster-btn{position:fixed;right:20px;z-index:99998;display:inline-flex;align-items:center;gap:7px;background:#0f1d16;color:#e8efe9;font:700 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;border:1px solid rgba(191,161,90,.5);border-radius:999px;padding:10px 16px;cursor:pointer;box-shadow:0 6px 18px -6px rgba(0,0,0,.5);transition:.15s}
+    #tt-recipe-btn, #tt-roster-btn, #tt-emoji-btn, #tt-quicklinks-btn{position:fixed;right:20px;z-index:99998;display:inline-flex;align-items:center;gap:7px;background:#0f1d16;color:#e8efe9;font:700 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;border:1px solid rgba(191,161,90,.5);border-radius:999px;padding:10px 16px;cursor:pointer;box-shadow:0 6px 18px -6px rgba(0,0,0,.5);transition:.15s}
     #tt-recipe-btn{bottom:120px}
     #tt-roster-btn{bottom:168px}
-    #tt-recipe-btn:hover, #tt-roster-btn:hover{border-color:#bfa15a;background:#132a1f}
-    .tt-menu{position:fixed;right:20px;bottom:210px;z-index:99999;width:330px;max-width:calc(100vw - 40px);max-height:calc(100vh - 240px);overflow-y:auto;background:#0f1d16;border:1px solid rgba(22,196,91,.32);border-radius:14px;box-shadow:0 24px 60px -18px rgba(0,0,0,.8);color:#e8efe9;font:14px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:16px 18px 18px;display:none}
+    #tt-emoji-btn{bottom:216px}
+    #tt-quicklinks-btn{bottom:264px}
+    #tt-recipe-btn:hover, #tt-roster-btn:hover, #tt-emoji-btn:hover, #tt-quicklinks-btn:hover{border-color:#bfa15a;background:#132a1f}
+    .tt-menu{position:fixed;right:20px;bottom:320px;z-index:99999;width:330px;max-width:calc(100vw - 40px);max-height:calc(100vh - 350px);overflow-y:auto;background:#0f1d16;border:1px solid rgba(22,196,91,.32);border-radius:14px;box-shadow:0 24px 60px -18px rgba(0,0,0,.8);color:#e8efe9;font:14px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:16px 18px 18px;display:none}
+    .tt-emoji-grid{display:flex;flex-wrap:wrap;gap:6px}
+    .tt-emoji{font-size:1.35rem;line-height:1;cursor:pointer;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;width:40px;height:40px;display:grid;place-items:center;padding:0}
+    .tt-emoji:hover{background:rgba(22,196,91,.2);border-color:rgba(22,196,91,.4)}
+    .tt-qlink{display:block;color:#dff3e7;text-decoration:none;padding:9px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.08);margin-bottom:7px;font-weight:600;font-size:.9rem}
+    .tt-qlink:hover{background:rgba(22,196,91,.14);border-color:rgba(22,196,91,.35);color:#fff}
+    .tt-qlink small{display:block;color:#9bb3a5;font-weight:400;font-size:.75rem;margin-top:2px;line-height:1.4}
     .tt-menu.open{display:block}
     .tt-menu h4{margin:0 0 6px;color:#fff;font-size:1.02rem;display:flex;align-items:center;justify-content:space-between}
     .tt-menu .tt-menux{background:none;border:none;color:#9bb3a5;font-size:1rem;cursor:pointer;line-height:1;padding:2px 4px}
@@ -123,6 +131,31 @@
     #tt-help-panel .ex-hero{height:56px;border-radius:8px;background:linear-gradient(135deg,#0a3a24,#16351f);display:grid;place-items:center;color:#7fae95;font-size:.78rem;border:1px solid rgba(255,255,255,.08)}
     #tt-help-panel blockquote.ex-bq{border-left:3px solid #16c45b;margin:0;padding:6px 16px;color:#9bb3a5;background:rgba(22,196,91,.06);border-radius:0 8px 8px 0}
     #tt-help-panel a.ex-link{color:#16c45b;text-decoration:underline}
+    #tt-help-panel .stat-hero{text-align:center;background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px}
+    #tt-help-panel .stat-hero .sh-num{display:block;font-family:'Anton',sans-serif;font-size:2.8rem;line-height:1;color:#16c45b}
+    #tt-help-panel .stat-hero .sh-cap{display:block;margin-top:8px;color:#d7e2db;font-weight:600;font-size:.9rem}
+    #tt-help-panel .tale-tape{background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px 6px}
+    #tt-help-panel .tale-tape .tt-head{display:flex;justify-content:space-between;gap:8px;padding-bottom:8px;margin-bottom:6px;border-bottom:1px solid rgba(255,255,255,.1)}
+    #tt-help-panel .tale-tape .tt-a,#tt-help-panel .tale-tape .tt-b{font-weight:800;color:#fff;flex:1}
+    #tt-help-panel .tale-tape .tt-b{text-align:right}
+    #tt-help-panel .tale-tape .tt-vs{color:#16c45b;font-family:'Anton',sans-serif;letter-spacing:1px}
+    #tt-help-panel .tale-tape .tt-row{display:flex;justify-content:space-between;gap:8px;padding:5px 0}
+    #tt-help-panel .tale-tape .tt-va,#tt-help-panel .tale-tape .tt-vb{font-family:'Anton',sans-serif;font-size:1.05rem;color:#fff;flex:1}
+    #tt-help-panel .tale-tape .tt-vb{text-align:right}
+    #tt-help-panel .tale-tape .tt-stat{color:#9bb3a5;font-size:.62rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:0 4px}
+    #tt-help-panel .timeline .tl-title{font-family:'Anton',sans-serif;color:#fff;font-size:1rem;margin-bottom:10px}
+    #tt-help-panel .timeline .tl-item{position:relative;padding:0 0 12px 22px;border-left:2px solid rgba(22,196,91,.3)}
+    #tt-help-panel .timeline .tl-item:last-child{border-left-color:transparent}
+    #tt-help-panel .timeline .tl-item::before{content:"";position:absolute;left:-7px;top:2px;width:11px;height:11px;border-radius:50%;background:#16c45b}
+    #tt-help-panel .timeline .tl-when{color:#16c45b;font-weight:800;font-size:.68rem;letter-spacing:1px;text-transform:uppercase;margin-right:8px}
+    #tt-help-panel .timeline .tl-what{color:#d7e2db}
+    #tt-help-panel .rating{background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px}
+    #tt-help-panel .rating .rt-title{font-weight:800;color:#fff;margin-bottom:10px}
+    #tt-help-panel .rating .rt-row{display:flex;align-items:center;gap:10px;margin:7px 0}
+    #tt-help-panel .rating .rt-lbl{flex:0 0 84px;color:#9bb3a5;font-size:.8rem;font-weight:600}
+    #tt-help-panel .rating .rt-bar{flex:1;height:9px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
+    #tt-help-panel .rating .rt-fill{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#007a33,#16c45b)}
+    #tt-help-panel .rating .rt-val{font-family:'Anton',sans-serif;color:#fff;font-size:.85rem;min-width:40px;text-align:right}
   </style>
 </head>
 <body>
@@ -155,7 +188,11 @@
         ".callout{display:flex;gap:12px;align-items:flex-start;background:rgba(191,161,90,.08);border:1px solid rgba(191,161,90,.3);border-radius:12px;padding:14px 16px;margin:18px 0}.callout .co-ico{font-size:1.3rem}.callout .co-text{line-height:1.55}" +
         ".grade-badge{display:flex;align-items:center;gap:16px;background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px 20px;margin:20px 0}.grade-badge .gb-grade{font-family:'Anton',sans-serif;font-size:2.5rem;line-height:1;width:74px;height:74px;flex:0 0 auto;display:grid;place-items:center;border-radius:14px;color:#fff}.grade-badge .gb-body{display:flex;flex-direction:column;gap:3px}.grade-badge .gb-label{font-weight:800;color:#fff;font-size:1.06rem}.grade-badge .gb-note{color:#9bb3a5;font-size:.9rem}" +
         ".gb-a{background:linear-gradient(145deg,#16c45b,#04531f)}.gb-b{background:linear-gradient(145deg,#39a86f,#0a3a24)}.gb-c{background:linear-gradient(145deg,#bfa15a,#6e5a25)}.gb-d{background:linear-gradient(145deg,#d98a3b,#7a4715)}.gb-f{background:linear-gradient(145deg,#d95b5b,#7a1f1f)}" +
-        "figure{margin:20px 0}figure img{margin:0 auto 8px}figcaption{text-align:center;color:#9bb3a5;font-size:.82rem;font-style:italic;padding:0 12px}",
+        "figure{margin:20px 0}figure img{margin:0 auto 8px}figcaption{text-align:center;color:#9bb3a5;font-size:.82rem;font-style:italic;padding:0 12px}" +
+        ".stat-hero{text-align:center;background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:26px 20px;margin:22px 0}.stat-hero .sh-num{display:block;font-family:'Anton',sans-serif;font-size:4rem;line-height:1;color:#16c45b}.stat-hero .sh-cap{display:block;margin-top:10px;color:#d7e2db;font-weight:600}" +
+        ".tale-tape{background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:14px 18px 8px;margin:22px 0}.tale-tape .tt-head{display:flex;justify-content:space-between;gap:10px;padding-bottom:12px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.1)}.tale-tape .tt-a,.tale-tape .tt-b{font-weight:800;color:#fff;flex:1}.tale-tape .tt-b{text-align:right}.tale-tape .tt-vs{color:#16c45b;font-family:'Anton',sans-serif;letter-spacing:1.5px}.tale-tape .tt-row{display:flex;justify-content:space-between;gap:10px;padding:7px 0}.tale-tape .tt-va,.tale-tape .tt-vb{font-family:'Anton',sans-serif;font-size:1.2rem;color:#fff;flex:1}.tale-tape .tt-vb{text-align:right}.tale-tape .tt-stat{color:#9bb3a5;font-size:.68rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;padding:0 6px}" +
+        ".timeline{margin:22px 0}.timeline .tl-title{font-family:'Anton',sans-serif;color:#fff;font-size:1.15rem;margin-bottom:14px}.timeline .tl-item{position:relative;padding:0 0 16px 24px;border-left:2px solid rgba(22,196,91,.3)}.timeline .tl-item:last-child{border-left-color:transparent}.timeline .tl-item::before{content:'';position:absolute;left:-7px;top:3px;width:12px;height:12px;border-radius:50%;background:#16c45b}.timeline .tl-when{color:#16c45b;font-weight:800;font-size:.72rem;letter-spacing:1px;text-transform:uppercase;margin-right:9px}.timeline .tl-what{color:#d7e2db}" +
+        ".rating{background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px 18px;margin:22px 0}.rating .rt-title{font-weight:800;color:#fff;margin-bottom:12px}.rating .rt-row{display:flex;align-items:center;gap:12px;margin:9px 0}.rating .rt-lbl{flex:0 0 100px;color:#9bb3a5;font-size:.85rem;font-weight:600}.rating .rt-bar{flex:1;height:10px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}.rating .rt-fill{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#007a33,#16c45b)}.rating .rt-val{font-family:'Anton',sans-serif;color:#fff;min-width:44px;text-align:right}",
         { raw: true }
       );
 
@@ -174,7 +211,7 @@
         }
       });
 
-      /* Box Score button — inserts a styled final-score card (winner highlighted green). */
+      /* Game Score button — inserts a styled final-score card (winner highlighted green). */
       function scoreCard(o) {
         var a = parseInt(o.scoreA, 10), b = parseInt(o.scoreB, 10);
         var aw = (a > b) ? " ps-win" : "", bw = (b > a) ? " ps-win" : "";
@@ -185,7 +222,7 @@
       }
       CMS.registerEditorComponent({
         id: "boxscore",
-        label: "Box Score",
+        label: "Game Score",
         fields: [
           { name: "teamA", label: "Team A", widget: "string", default: "Celtics" },
           { name: "scoreA", label: "Team A score", widget: "number" },
@@ -280,6 +317,132 @@
         toBlock: function (o) { return (o.grade && o.grade.trim()) ? gradeHtml(o) : ""; },
         toPreview: function (o) { return gradeHtml(o); }
       });
+
+      /* Big Stat — a giant number with a caption. */
+      function statHeroHtml(o) {
+        return '<div class="stat-hero"><span class="sh-num">' + (o.num || "") + '</span><span class="sh-cap">' + (o.caption || "") + "</span></div>";
+      }
+      CMS.registerEditorComponent({
+        id: "stathero",
+        label: "Big Stat",
+        fields: [
+          { name: "num", label: "Big number / stat (e.g. 29)", widget: "string" },
+          { name: "caption", label: "Caption", widget: "string" }
+        ],
+        pattern: /^<div class="stat-hero"><span class="sh-num">([\s\S]*?)<\/span><span class="sh-cap">([\s\S]*?)<\/span><\/div>$/,
+        fromBlock: function (m) { return { num: m[1], caption: m[2] }; },
+        toBlock: function (o) { return (o.num && o.num.trim()) ? statHeroHtml(o) : ""; },
+        toPreview: function (o) { return statHeroHtml(o); }
+      });
+
+      /* Head-to-Head — a two-column "Tale of the Tape" stat compare. */
+      function h2hHtml(o) {
+        var rows = "";
+        for (var i = 1; i <= 4; i++) {
+          var s = o["stat" + i];
+          if (s && s.trim()) rows += '<div class="tt-row"><span class="tt-va">' + (o["a" + i] || "") + '</span><span class="tt-stat">' + s + '</span><span class="tt-vb">' + (o["b" + i] || "") + "</span></div>";
+        }
+        return '<div class="tale-tape"><div class="tt-head"><span class="tt-a">' + (o.nameA || "") + '</span><span class="tt-vs">vs</span><span class="tt-b">' + (o.nameB || "") + "</span></div>" + rows + "</div>";
+      }
+      CMS.registerEditorComponent({
+        id: "headtohead",
+        label: "Head-to-Head",
+        fields: [
+          { name: "nameA", label: "Left name", widget: "string", default: "Celtics" },
+          { name: "nameB", label: "Right name", widget: "string" },
+          { name: "stat1", label: "Stat 1 label (e.g. PPG)", widget: "string", required: false },
+          { name: "a1", label: "Stat 1 — left value", widget: "string", required: false },
+          { name: "b1", label: "Stat 1 — right value", widget: "string", required: false },
+          { name: "stat2", label: "Stat 2 label", widget: "string", required: false },
+          { name: "a2", label: "Stat 2 — left", widget: "string", required: false },
+          { name: "b2", label: "Stat 2 — right", widget: "string", required: false },
+          { name: "stat3", label: "Stat 3 label", widget: "string", required: false },
+          { name: "a3", label: "Stat 3 — left", widget: "string", required: false },
+          { name: "b3", label: "Stat 3 — right", widget: "string", required: false },
+          { name: "stat4", label: "Stat 4 label", widget: "string", required: false },
+          { name: "a4", label: "Stat 4 — left", widget: "string", required: false },
+          { name: "b4", label: "Stat 4 — right", widget: "string", required: false }
+        ],
+        pattern: /^<div class="tale-tape"><div class="tt-head"><span class="tt-a">([\s\S]*?)<\/span><span class="tt-vs">vs<\/span><span class="tt-b">([\s\S]*?)<\/span><\/div>([\s\S]*?)<\/div>$/,
+        fromBlock: function (m) {
+          var o = { nameA: m[1], nameB: m[2] }, re = /<div class="tt-row"><span class="tt-va">([\s\S]*?)<\/span><span class="tt-stat">([\s\S]*?)<\/span><span class="tt-vb">([\s\S]*?)<\/span><\/div>/g, x, i = 1;
+          while ((x = re.exec(m[3])) && i <= 4) { o["a" + i] = x[1]; o["stat" + i] = x[2]; o["b" + i] = x[3]; i++; }
+          return o;
+        },
+        toBlock: function (o) { return (o.nameA && o.nameB) ? h2hHtml(o) : ""; },
+        toPreview: function (o) { return h2hHtml(o); }
+      });
+
+      /* Key Moments — a vertical timeline of game moments. */
+      function timelineHtml(o) {
+        var items = "";
+        for (var i = 1; i <= 5; i++) {
+          var t = o["what" + i];
+          if (t && t.trim()) items += '<div class="tl-item"><span class="tl-when">' + (o["when" + i] || "") + '</span><span class="tl-what">' + t + "</span></div>";
+        }
+        return '<div class="timeline"><div class="tl-title">' + (o.title || "Key Moments") + "</div>" + items + "</div>";
+      }
+      CMS.registerEditorComponent({
+        id: "timeline",
+        label: "Key Moments",
+        fields: [
+          { name: "title", label: "Title", widget: "string", default: "Key Moments" },
+          { name: "when1", label: "Moment 1 — when (e.g. Q1)", widget: "string", required: false },
+          { name: "what1", label: "Moment 1 — what happened", widget: "string", required: false },
+          { name: "when2", label: "Moment 2 — when", widget: "string", required: false },
+          { name: "what2", label: "Moment 2 — what happened", widget: "string", required: false },
+          { name: "when3", label: "Moment 3 — when", widget: "string", required: false },
+          { name: "what3", label: "Moment 3 — what happened", widget: "string", required: false },
+          { name: "when4", label: "Moment 4 — when", widget: "string", required: false },
+          { name: "what4", label: "Moment 4 — what happened", widget: "string", required: false },
+          { name: "when5", label: "Moment 5 — when", widget: "string", required: false },
+          { name: "what5", label: "Moment 5 — what happened", widget: "string", required: false }
+        ],
+        pattern: /^<div class="timeline"><div class="tl-title">([\s\S]*?)<\/div>([\s\S]*?)<\/div>$/,
+        fromBlock: function (m) {
+          var o = { title: m[1] }, re = /<div class="tl-item"><span class="tl-when">([\s\S]*?)<\/span><span class="tl-what">([\s\S]*?)<\/span><\/div>/g, x, i = 1;
+          while ((x = re.exec(m[2])) && i <= 5) { o["when" + i] = x[1]; o["what" + i] = x[2]; i++; }
+          return o;
+        },
+        toBlock: function (o) { return (o.what1 && o.what1.trim()) ? timelineHtml(o) : ""; },
+        toPreview: function (o) { return timelineHtml(o); }
+      });
+
+      /* Rating Meter — labeled 0-10 bars. */
+      function ratingHtml(o) {
+        var rows = "";
+        for (var i = 1; i <= 4; i++) {
+          var l = o["lbl" + i], s = parseInt(o["score" + i], 10);
+          if (l && l.trim() && !isNaN(s)) {
+            var w = Math.max(0, Math.min(10, s)) * 10;
+            rows += '<div class="rt-row"><span class="rt-lbl">' + l + '</span><span class="rt-bar"><span class="rt-fill" style="width:' + w + '%"></span></span><span class="rt-val">' + s + '/10</span></div>';
+          }
+        }
+        return '<div class="rating"><div class="rt-title">' + (o.title || "") + "</div>" + rows + "</div>";
+      }
+      CMS.registerEditorComponent({
+        id: "rating",
+        label: "Rating Meter",
+        fields: [
+          { name: "title", label: "Title (e.g. Tatum's Night)", widget: "string" },
+          { name: "lbl1", label: "Row 1 label", widget: "string", required: false },
+          { name: "score1", label: "Row 1 score (0-10)", widget: "number", required: false },
+          { name: "lbl2", label: "Row 2 label", widget: "string", required: false },
+          { name: "score2", label: "Row 2 score (0-10)", widget: "number", required: false },
+          { name: "lbl3", label: "Row 3 label", widget: "string", required: false },
+          { name: "score3", label: "Row 3 score (0-10)", widget: "number", required: false },
+          { name: "lbl4", label: "Row 4 label", widget: "string", required: false },
+          { name: "score4", label: "Row 4 score (0-10)", widget: "number", required: false }
+        ],
+        pattern: /^<div class="rating"><div class="rt-title">([\s\S]*?)<\/div>([\s\S]*?)<\/div>$/,
+        fromBlock: function (m) {
+          var o = { title: m[1] }, re = /<div class="rt-row"><span class="rt-lbl">([\s\S]*?)<\/span><span class="rt-bar"><span class="rt-fill"[^>]*><\/span><\/span><span class="rt-val">(\d+)\/10<\/span><\/div>/g, x, i = 1;
+          while ((x = re.exec(m[2])) && i <= 4) { o["lbl" + i] = x[1]; o["score" + i] = parseInt(x[2], 10); i++; }
+          return o;
+        },
+        toBlock: function (o) { return (o.lbl1 && o.lbl1.trim()) ? ratingHtml(o) : ""; },
+        toPreview: function (o) { return ratingHtml(o); }
+      });
     }
 
     /* 3) Render ==stat== as a green tag in the live preview (best-effort; harmless if it can't reach the frame). */
@@ -342,7 +505,7 @@
       <h3>🚀 One-click helpers</h3>
       <ul>
         <li><b>📋 Post Recipes</b> (button, bottom-right) — ready-made post structures (Game Recap, Trade Reaction, Player Spotlight, Power Rankings, Hot Take). Hit <b>Copy</b>, paste into the <b>Article</b>, and fill in the blanks. The same panel lists the <b>current roster</b> — click a name to copy it (spelled right, it auto-links to the player's card).</li>
-        <li><b>📋 Copy last game as a Box Score</b> — on the Celtics scoreboard (bottom-left), turns the real last game into a score card you can paste straight into a recap.</li>
+        <li><b>📋 Copy last game as a Game Score</b> — on the Celtics scoreboard (bottom-left), turns the real last game into a score card you can paste straight into a recap.</li>
         <li><b>🌐 View Live Site</b> (button, bottom-right) — opens the published site in a new tab to check your work.</li>
         <li class="tt-note">Recipes and blocks paste cleanest in the editor's <b>Markdown</b> view (the toggle at the top of the writing box). Switch back to normal view anytime.</li>
       </ul>
@@ -426,7 +589,7 @@
       <h3>➕ Special blocks (the "+" menu in the editor)</h3>
       <p class="tt-note">Click the <b>"+"</b> in the editor to drop any of these in.</p>
 
-      <p><b>Box Score</b> — a clean final-score card (winner shown in green). Shortcut: "Copy last game as a Box Score" on the scoreboard.</p>
+      <p><b>Game Score</b> — a clean final-score card (winner shown in green). Shortcut: "Copy last game as a Game Score" on the scoreboard.</p>
       <div class="tt-ex"><div class="exlbl">Example</div>
         <div class="post-score"><div class="ps-row ps-win"><span class="ps-team">Celtics</span><span class="ps-score">120</span></div><div class="ps-row"><span class="ps-team">Lakers</span><span class="ps-score">110</span></div></div>
       </div>
@@ -454,6 +617,26 @@
       <p><b>YouTube Video</b> — paste a link and it embeds.</p>
       <div class="tt-ex"><div class="exlbl">Example</div>
         <div class="ex-yt">▶</div>
+      </div>
+
+      <p><b>Big Stat</b> — a giant number for the one stat that defines the post.</p>
+      <div class="tt-ex"><div class="exlbl">Example</div>
+        <div class="stat-hero"><span class="sh-num">29</span><span class="sh-cap">Threes — tied the NBA single-game record</span></div>
+      </div>
+
+      <p><b>Head-to-Head</b> — a side-by-side "tale of the tape" stat compare.</p>
+      <div class="tt-ex"><div class="exlbl">Example</div>
+        <div class="tale-tape"><div class="tt-head"><span class="tt-a">Tatum</span><span class="tt-vs">vs</span><span class="tt-b">P. George</span></div><div class="tt-row"><span class="tt-va">28.3</span><span class="tt-stat">PPG</span><span class="tt-vb">18.1</span></div><div class="tt-row"><span class="tt-va">8.1</span><span class="tt-stat">RPG</span><span class="tt-vb">5.4</span></div></div>
+      </div>
+
+      <p><b>Key Moments</b> — a vertical timeline of a game's turning points.</p>
+      <div class="tt-ex"><div class="exlbl">Example</div>
+        <div class="timeline"><div class="tl-title">Key Moments</div><div class="tl-item"><span class="tl-when">Q1</span><span class="tl-what">Hauser sparks a 12-0 run</span></div><div class="tl-item"><span class="tl-when">Q4</span><span class="tl-what">White's dagger three</span></div></div>
+      </div>
+
+      <p><b>Rating Meter</b> — labeled 0–10 bars scoring a performance.</p>
+      <div class="tt-ex"><div class="exlbl">Example</div>
+        <div class="rating"><div class="rt-title">Tatum's Night</div><div class="rt-row"><span class="rt-lbl">Scoring</span><span class="rt-bar"><span class="rt-fill" style="width:90%"></span></span><span class="rt-val">9/10</span></div><div class="rt-row"><span class="rt-lbl">Defense</span><span class="rt-bar"><span class="rt-fill" style="width:80%"></span></span><span class="rt-val">8/10</span></div></div>
       </div>
 
       <h3>🏀 "See full game stats" button</h3>
@@ -487,6 +670,21 @@
     <div class="tt-sub">Click a name to copy it. Spelled this way, names link to the player's card <b>on the published site</b>.</div>
     <div id="tt-roster-chips">Loading roster…</div>
   </div>
+  <button id="tt-emoji-btn" class="tt-menu-btn" onclick="ttToggleMenu('tt-emoji-menu')">😀 Emojis</button>
+  <button id="tt-quicklinks-btn" class="tt-menu-btn" onclick="ttToggleMenu('tt-quicklinks-menu')">🔗 Links</button>
+  <div id="tt-emoji-menu" class="tt-menu">
+    <h4>😀 Emojis <button class="tt-menux" onclick="document.getElementById('tt-emoji-menu').classList.remove('open')" aria-label="Close">✕</button></h4>
+    <div class="tt-sub">Click one to copy it — paste into the <b>Banner Emoji</b> field or drop it into your writing.</div>
+    <div class="tt-emoji-grid" id="tt-emoji-grid"></div>
+  </div>
+  <div id="tt-quicklinks-menu" class="tt-menu">
+    <h4>🔗 Quick Links <button class="tt-menux" onclick="document.getElementById('tt-quicklinks-menu').classList.remove('open')" aria-label="Close">✕</button></h4>
+    <div class="tt-sub">Look up a game or stats (opens in a new tab).</div>
+    <a class="tt-qlink" href="https://www.nba.com/celtics/schedule" target="_blank" rel="noopener">🏀 NBA.com — Celtics schedule<small>Open a finished game → Box Score → copy that web address for the "See full game stats" button.</small></a>
+    <a class="tt-qlink" href="https://www.nba.com/scores" target="_blank" rel="noopener">📊 NBA.com — Scores &amp; box scores<small>Recent results across the league.</small></a>
+    <a class="tt-qlink" href="https://www.espn.com/nba/team/_/name/bos/boston-celtics" target="_blank" rel="noopener">📰 ESPN — Celtics team page<small>News, roster and stats.</small></a>
+    <a class="tt-qlink" href="https://www.basketball-reference.com/teams/BOS/2026.html" target="_blank" rel="noopener">📈 Basketball Reference — Celtics<small>Deep stats, splits and history.</small></a>
+  </div>
 
   <script>
     /* clipboard helper shared by recipes, roster chips, and the scoreboard */
@@ -500,7 +698,7 @@
     /* expandable menus: toggle one open (closing the other), close on outside-click or Escape */
     function ttToggleMenu(id){
       var target=document.getElementById(id), wasOpen=target&&target.classList.contains('open');
-      ['tt-recipe-menu','tt-roster-menu'].forEach(function(m){ var el=document.getElementById(m); if(el) el.classList.remove('open'); });
+      document.querySelectorAll('.tt-menu').forEach(function(el){ el.classList.remove('open'); });   // close any open menu
       if(target&&!wasOpen) target.classList.add('open');
     }
     document.addEventListener('click',function(e){
@@ -519,7 +717,7 @@
       lines.forEach(function(line){
         var ts=line.trim();
         if(ts===''){ closeList(); return; }
-        if(ts.charAt(0)==='<'){ closeList(); out.push(ts); return; }            // raw HTML block (box score / grade / stat line)
+        if(ts.charAt(0)==='<'){ closeList(); out.push(ts); return; }            // raw HTML block (game score / grade / stat line)
         var h=ts.match(/^(#{2,3})\s+(.*)$/);
         if(h){ closeList(); var lv=h[1].length; out.push('<h'+lv+'>'+inl(h[2])+'</h'+lv+'>'); return; }
         var ol=ts.match(/^\d+\.\s+(.*)$/);
@@ -558,7 +756,19 @@
       {icon:"🔢",name:"Power Rankings",desc:"A ranked list with a takeaway",
        text:"## The List\n1. **[Team or Player]** — [one-line why]\n2. **[Team or Player]** — [one-line why]\n3. **[Team or Player]** — [one-line why]\n\n## The Takeaway\n[Your overall read.]"},
       {icon:"🔥",name:"Hot Take",desc:"Bold opinion → the case → bottom line",
-       text:"## The Take\n[State your bold opinion up front — no hedging.]\n\n## The Case\n[Two or three reasons that back it up, with ==a stat== or two for weight.]\n\n## Bottom Line\n[Land it.]"}
+       text:"## The Take\n[State your bold opinion up front — no hedging.]\n\n## The Case\n[Two or three reasons that back it up, with ==a stat== or two for weight.]\n\n## Bottom Line\n[Land it.]"},
+      {icon:"🔮",name:"Game Preview",desc:"Matchup → keys → prediction",
+       text:"## The Matchup\nThe Celtics [record] [host / visit] the [OPPONENT] [record] — [date], [time] on [TV].\n\n## Keys to the Game\n- **[Key 1]** — [why it matters]\n- **[Key 2]** — [why it matters]\n- **Matchup to watch:** [Player] vs [Player]\n\n## Prediction\n[Your call — final score and why.]"},
+      {icon:"📅",name:"Week in Review",desc:"The week's games + what's ahead",
+       text:"## The Week That Was\nBoston went ==[W]–[L]== this week. Here's how it broke down.\n\n## Game by Game\n- **vs [Opponent]** — [W/L], [score] — [one line]\n- **vs [Opponent]** — [W/L], [score] — [one line]\n\n## Standout\n[Player] led the way — [key stats].\n\n## Looking Ahead\n[Next week's slate or storyline.]"},
+      {icon:"🏥",name:"Injury / Roster Update",desc:"The news → what it means → status",
+       text:"## The News\n[Who's in, out, or back — the update in a sentence or two.]\n\n## What It Means\n[How it affects the rotation and the team.]\n\n## Status\n- **[Player]** — [Out / Day-to-day / Questionable / Returning]\n- **[Player]** — [status]"},
+      {icon:"🎬",name:"Full Game Breakdown",desc:"Score → story → big stat → timeline → grades",
+       text:"Boston [beat / fell to] the [OPPONENT] on [date].\n\n<div class=\"post-score\"><div class=\"ps-row ps-win\"><span class=\"ps-team\">Celtics</span><span class=\"ps-score\">000</span></div><div class=\"ps-row\"><span class=\"ps-team\">[Opponent]</span><span class=\"ps-score\">000</span></div></div>\n\n## How It Went\n[A paragraph on the flow of the game — the run that decided it.]\n\nThe number that told the story:\n\n<div class=\"stat-hero\"><span class=\"sh-num\">00</span><span class=\"sh-cap\">[what the number means]</span></div>\n\n<div class=\"timeline\"><div class=\"tl-title\">Key Moments</div><div class=\"tl-item\"><span class=\"tl-when\">Q1</span><span class=\"tl-what\">[what happened]</span></div><div class=\"tl-item\"><span class=\"tl-when\">Q3</span><span class=\"tl-what\">[what happened]</span></div><div class=\"tl-item\"><span class=\"tl-when\">Q4</span><span class=\"tl-what\">[what happened]</span></div></div>\n\n## Grading The Standout\n[A line on the top performer.]\n\n<div class=\"rating\"><div class=\"rt-title\">[Player]'s Night</div><div class=\"rt-row\"><span class=\"rt-lbl\">Scoring</span><span class=\"rt-bar\"><span class=\"rt-fill\" style=\"width:80%\"></span></span><span class=\"rt-val\">8/10</span></div><div class=\"rt-row\"><span class=\"rt-lbl\">Defense</span><span class=\"rt-bar\"><span class=\"rt-fill\" style=\"width:70%\"></span></span><span class=\"rt-val\">7/10</span></div><div class=\"rt-row\"><span class=\"rt-lbl\">Playmaking</span><span class=\"rt-bar\"><span class=\"rt-fill\" style=\"width:80%\"></span></span><span class=\"rt-val\">8/10</span></div></div>"},
+      {icon:"🥊",name:"Matchup Preview",desc:"Tale of the tape → keys → prediction",
+       text:"## The Matchup\nThe Celtics [record] [host / visit] the [OPPONENT] [record] — [date], [time] on [TV].\n\n<div class=\"tale-tape\"><div class=\"tt-head\"><span class=\"tt-a\">Celtics</span><span class=\"tt-vs\">vs</span><span class=\"tt-b\">[Opponent]</span></div><div class=\"tt-row\"><span class=\"tt-va\">[val]</span><span class=\"tt-stat\">PPG</span><span class=\"tt-vb\">[val]</span></div><div class=\"tt-row\"><span class=\"tt-va\">[val]</span><span class=\"tt-stat\">RPG</span><span class=\"tt-vb\">[val]</span></div><div class=\"tt-row\"><span class=\"tt-va\">[val]</span><span class=\"tt-stat\">APG</span><span class=\"tt-vb\">[val]</span></div></div>\n\n## Keys to the Game\n- **[Key 1]** — [why it matters]\n- **[Key 2]** — [why it matters]\n\n## Prediction\n[Your call — final score and why.]"},
+      {icon:"📊",name:"Player Performance",desc:"Big stat → stat line → rating grades",
+       text:"## [Player]'s Night\n[What stood out — a quick paragraph.]\n\n<div class=\"stat-hero\"><span class=\"sh-num\">00</span><span class=\"sh-cap\">[his signature number tonight]</span></div>\n\n<div class=\"stat-line\"><span class=\"sl-name\">[Player]</span><span class=\"sl-stats\">[PPG] · [RPG] · [APG]</span></div>\n\n<div class=\"rating\"><div class=\"rt-title\">[Player]'s Grades</div><div class=\"rt-row\"><span class=\"rt-lbl\">Scoring</span><span class=\"rt-bar\"><span class=\"rt-fill\" style=\"width:80%\"></span></span><span class=\"rt-val\">8/10</span></div><div class=\"rt-row\"><span class=\"rt-lbl\">Defense</span><span class=\"rt-bar\"><span class=\"rt-fill\" style=\"width:70%\"></span></span><span class=\"rt-val\">7/10</span></div></div>\n\n## Bottom Line\n[Your take on the performance.]"}
     ];
     (function(){
       var list=document.getElementById('tt-recipe-list'); if(!list) return;
@@ -583,6 +793,17 @@
           names.forEach(function(n){ var c=document.createElement('button'); c.className='tt-chip'; c.type='button'; c.textContent=n; c.title='Click to copy'; c.addEventListener('click',function(){ ttCopyText(n, c, n); }); box.appendChild(c); });
         })
         .catch(function(){ box.textContent='Roster unavailable right now.'; });
+    })();
+
+    /* Emoji quick-pick — click to copy */
+    (function(){
+      var g=document.getElementById('tt-emoji-grid'); if(!g) return;
+      var EM=["🏀","🍀","🔥","🏆","🎯","💚","☘️","🐣","🃏","🧹","💥","🗣️","😤","🙌","💯","📈","🔒","⭐","😏","🚨","👀","🐐"];
+      EM.forEach(function(e){
+        var b=document.createElement('button'); b.className='tt-emoji'; b.type='button'; b.textContent=e; b.title='Click to copy';
+        b.addEventListener('click',function(){ ttCopyText(e, null, null); var o=b.textContent; b.textContent='✓'; setTimeout(function(){ b.textContent=o; },900); });
+        g.appendChild(b);
+      });
     })();
   </script>
 
@@ -625,10 +846,10 @@
           if (next) { var n = parseG(next); if (n) { var d = new Date(next.date);
             html += '<div class="tts-h">Next Game</div><div class="tts-sub">' + (n.home ? "vs" : "@") + " " + n.oppName + " · " + d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }) + " " + d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + "</div>"; } }
           else { html += '<div class="tts-h">Next Game</div><div class="tts-sub">Offseason — schedule coming soon ☘️</div>'; }
-          if (lastBox) html += '<button class="tts-copy" id="tts-copybox" type="button">📋 Copy last game as a Box Score</button>';
+          if (lastBox) html += '<button class="tts-copy" id="tts-copybox" type="button">📋 Copy last game as a Game Score</button>';
           if (html) { body.innerHTML = html; box.style.display = "block";
             var cb = document.getElementById("tts-copybox");
-            if (cb && typeof ttCopyText === "function") cb.addEventListener("click", function () { ttCopyText(lastBox, cb, "📋 Copy last game as a Box Score"); });
+            if (cb && typeof ttCopyText === "function") cb.addEventListener("click", function () { ttCopyText(lastBox, cb, "📋 Copy last game as a Game Score"); });
           }
         })
         .catch(function () { /* stay hidden if ESPN is unreachable */ });
