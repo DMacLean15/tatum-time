@@ -2287,10 +2287,10 @@ const PLAYER_COUNTRY={
 };
 function normName(s){ return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim(); }
 function overrideCountry(name){ const n=normName(name); for(const k in PLAYER_COUNTRY){ if(normName(k)===n) return PLAYER_COUNTRY[k]; } return ''; }
-/* Seed the player-link index: legends + known roster names. The live roster
-   (from ESPN) augments this in loadRoster so newly-signed players link too. */
+/* Seed the player-link index with legends. Current players are added ONLY from
+   the live ESPN roster (in loadRoster) — so traded-away players never get a
+   dead link, and it self-corrects on every roster move. */
 legends.forEach(function(p){ addPlayerLink(p.name,'f-legends'); });
-Object.keys(rosterNotes).forEach(function(n){ addPlayerLink(n,'f-roster'); });
 buildPlayerRe();
 const COACH_PHOTOS={'2232684':'https://upload.wikimedia.org/wikipedia/commons/9/99/Celtics_at_Wizards_2024-12-046_%28cropped%29_%28cropped%29.jpg'};
 function renderCoach(co){
@@ -2379,7 +2379,9 @@ async function loadRoster(){
       };
     });
     players.sort((a,b)=>b.salary-a.salary);   // ordered by salary; salary itself is not displayed
-    players.forEach(p=>addPlayerLink(p.name,'f-roster')); buildPlayerRe();   // so live roster names link in posts too
+    players.forEach(p=>addPlayerLink(p.name,'f-roster')); buildPlayerRe();   // links come only from the live roster (no dead links for traded players)
+    const _art=document.getElementById('readerArticle');   // re-link the open post now that the roster is loaded
+    if(_art && posts[current]){ _art.innerHTML=posts[current].body; linkifyPlayers(_art); }
     rg.innerHTML='';
     players.forEach(p=>rg.appendChild(personCard(p)));
   }catch(e){ rg.innerHTML='<div class="no-results">Roster is unavailable right now.</div>'; }
