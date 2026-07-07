@@ -51,14 +51,15 @@
       padding:26px 28px 30px;position:relative;
     }
     #tt-help-panel h2{margin:0 0 4px;color:#fff;font-size:1.5rem;letter-spacing:.3px}
-    #tt-help-panel .tt-sub{color:#9bb3a5;font-size:.9rem;margin-bottom:18px}
+    #tt-help-panel .tt-sub{color:#b3c8bc;font-size:.9rem;margin-bottom:18px}
     #tt-help-panel h3{color:#16c45b;font-size:.95rem;margin:20px 0 6px;letter-spacing:.3px}
+    #tt-help-panel, #tt-help-panel p, #tt-help-panel li, #tt-help-panel ul, #tt-help-panel div{color:#eaf2ec}
     #tt-help-panel p{margin:0 0 8px}
     #tt-help-panel code{background:rgba(255,255,255,.08);color:#ffd76b;padding:2px 7px;border-radius:6px;font-size:.9em;font-family:ui-monospace,monospace}
     #tt-help-panel ul{margin:0 0 8px;padding-left:1.2em}
     #tt-help-panel li{margin:.3em 0}
     #tt-help-panel .tt-tag{background:rgba(22,196,91,.16);color:#16c45b;font-weight:700;border:1px solid rgba(22,196,91,.3);padding:1px 8px;border-radius:6px}
-    #tt-help-panel .tt-note{color:#9bb3a5;font-size:.86rem}
+    #tt-help-panel .tt-note{color:#b3c8bc;font-size:.86rem}
     #tt-help-panel .tt-tips{background:rgba(191,161,90,.08);border:1px solid rgba(191,161,90,.28);border-radius:12px;padding:14px 16px;margin-top:6px}
     #tt-help-panel .tt-tips h3{margin-top:0;color:#bfa15a}
     #tt-help-close{
@@ -67,25 +68,25 @@
       border-radius:50%;cursor:pointer;font-size:1.1rem;line-height:1;
     }
     #tt-help-close:hover{background:rgba(255,255,255,.14)}
-    /* ---- Post Recipes button + panel + roster chips ---- */
-    #tt-recipe-btn{position:fixed;right:20px;bottom:120px;z-index:99998;display:inline-flex;align-items:center;gap:7px;background:#0f1d16;color:#e8efe9;font:700 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;border:1px solid rgba(191,161,90,.5);border-radius:999px;padding:10px 16px;cursor:pointer;box-shadow:0 6px 18px -6px rgba(0,0,0,.5);transition:.15s}
-    #tt-recipe-btn:hover{border-color:#bfa15a;background:#132a1f}
-    #tt-recipe-overlay{position:fixed;inset:0;z-index:99999;display:none;background:rgba(2,8,5,.72);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:24px}
-    #tt-recipe-overlay.open{display:flex}
-    #tt-recipe-panel{width:100%;max-width:640px;max-height:88vh;overflow-y:auto;background:#0f1d16;border:1px solid rgba(22,196,91,.3);border-radius:18px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8);color:#e8efe9;font:15px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:26px 28px 30px;position:relative}
-    #tt-recipe-panel h2{margin:0 0 4px;color:#fff;font-size:1.5rem}
-    #tt-recipe-panel h3{color:#16c45b;font-size:.95rem;margin:22px 0 8px}
-    #tt-recipe-panel .tt-sub{color:#9bb3a5;font-size:.9rem;margin-bottom:14px}
-    .tt-recipe{display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;margin-bottom:9px}
-    .tt-recipe b{color:#fff;font-size:.98rem}
-    .tt-recipe small{display:block;color:#9bb3a5;font-size:.8rem;margin-top:2px}
-    .tt-copy{flex:0 0 auto;background:linear-gradient(145deg,#16c45b,#007a33);color:#052012;border:none;border-radius:999px;padding:8px 15px;font-weight:700;font-size:.82rem;cursor:pointer}
+    /* ---- Post Recipes + Roster: expandable dropdown menus (no blocking popup) ---- */
+    #tt-recipe-btn, #tt-roster-btn{position:fixed;right:20px;z-index:99998;display:inline-flex;align-items:center;gap:7px;background:#0f1d16;color:#e8efe9;font:700 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;border:1px solid rgba(191,161,90,.5);border-radius:999px;padding:10px 16px;cursor:pointer;box-shadow:0 6px 18px -6px rgba(0,0,0,.5);transition:.15s}
+    #tt-recipe-btn{bottom:120px}
+    #tt-roster-btn{bottom:168px}
+    #tt-recipe-btn:hover, #tt-roster-btn:hover{border-color:#bfa15a;background:#132a1f}
+    .tt-menu{position:fixed;right:20px;bottom:210px;z-index:99999;width:330px;max-width:calc(100vw - 40px);max-height:calc(100vh - 240px);overflow-y:auto;background:#0f1d16;border:1px solid rgba(22,196,91,.32);border-radius:14px;box-shadow:0 24px 60px -18px rgba(0,0,0,.8);color:#e8efe9;font:14px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:16px 18px 18px;display:none}
+    .tt-menu.open{display:block}
+    .tt-menu h4{margin:0 0 6px;color:#fff;font-size:1.02rem;display:flex;align-items:center;justify-content:space-between}
+    .tt-menu .tt-menux{background:none;border:none;color:#9bb3a5;font-size:1rem;cursor:pointer;line-height:1;padding:2px 4px}
+    .tt-menu .tt-menux:hover{color:#fff}
+    .tt-menu .tt-sub{color:#b3c8bc;font-size:.82rem;margin-bottom:12px;line-height:1.45}
+    .tt-recipe{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:11px 13px;margin-bottom:8px}
+    .tt-recipe b{color:#fff;font-size:.95rem}
+    .tt-recipe small{display:block;color:#b3c8bc;font-size:.78rem;margin-top:2px}
+    .tt-copy{flex:0 0 auto;background:linear-gradient(145deg,#16c45b,#007a33);color:#052012;border:none;border-radius:999px;padding:8px 14px;font-weight:700;font-size:.82rem;cursor:pointer}
     .tt-copy:hover{filter:brightness(1.08)}
     #tt-roster-chips{display:flex;flex-wrap:wrap;gap:7px}
     .tt-chip{background:rgba(22,196,91,.12);border:1px solid rgba(22,196,91,.3);color:#dff3e7;border-radius:8px;padding:5px 10px;font-size:.82rem;cursor:pointer;font-weight:600}
     .tt-chip:hover{background:rgba(22,196,91,.24);color:#fff}
-    .tt-x{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:1.1rem;line-height:1}
-    .tt-x:hover{background:rgba(255,255,255,.14)}
     .tts-copy{margin-top:2px;width:100%;background:rgba(22,196,91,.14);border:1px solid rgba(22,196,91,.4);color:#16c45b;border-radius:8px;padding:7px;font-weight:700;font-size:.74rem;cursor:pointer}
     .tts-copy:hover{background:rgba(22,196,91,.24);color:#fff}
     /* ---- little rendered examples inside the cheat sheet ---- */
@@ -207,7 +208,7 @@
         label: "Pull Quote",
         fields: [
           { name: "text", label: "Quote", widget: "string" },
-          { name: "cite", label: "Who said it (optional)", widget: "string", required: false }
+          { name: "cite", label: "Who said it", widget: "string", required: false }
         ],
         pattern: /^<div class="pull-quote"><p>([\s\S]*?)<\/p>(?:<cite>— ([\s\S]*?)<\/cite>)?<\/div>$/,
         fromBlock: function (m) { return { text: m[1], cite: m[2] || "" }; },
@@ -228,7 +229,7 @@
           { name: "stat1", label: "Stat 1 (e.g. 28.3 PPG)", widget: "string", required: false },
           { name: "stat2", label: "Stat 2 (e.g. 8.1 RPG)", widget: "string", required: false },
           { name: "stat3", label: "Stat 3 (e.g. 5.4 APG)", widget: "string", required: false },
-          { name: "stat4", label: "Stat 4 (optional)", widget: "string", required: false }
+          { name: "stat4", label: "Stat 4", widget: "string", required: false }
         ],
         pattern: /^<div class="stat-line"><span class="sl-name">(.*?)<\/span><span class="sl-stats">(.*?)<\/span><\/div>$/,
         fromBlock: function (m) {
@@ -272,7 +273,7 @@
         fields: [
           { name: "grade", label: "Grade (A+, B, C-…)", widget: "string" },
           { name: "label", label: "What it's grading (e.g. Trade Grade)", widget: "string" },
-          { name: "note", label: "One-line note (optional)", widget: "string", required: false }
+          { name: "note", label: "One-line note", widget: "string", required: false }
         ],
         pattern: /^<div class="grade-badge"><span class="gb-grade gb-[a-f]">(.*?)<\/span><span class="gb-body"><span class="gb-label">(.*?)<\/span>(?:<span class="gb-note">(.*?)<\/span>)?<\/span><\/div>$/,
         fromBlock: function (m) { return { grade: m[1], label: m[2], note: m[3] || "" }; },
@@ -350,7 +351,7 @@
       <ul>
         <li><b>Headline</b> — the post's title.</li>
         <li><b>Banner Emoji</b> — one emoji shown on the post's card (🏀 🍀 🔥 🏆 🎯).</li>
-        <li><b>Featured Photo</b> — the big photo at the top of the post (details below). Optional.</li>
+        <li><b>Hero Photo</b> — the big photo at the top of the post (details below). Optional.</li>
         <li><b>Hero Photo Focus</b> — which part of that photo to keep when it crops to a banner (Center / Top / Bottom / Left / Right).</li>
         <li><b>Category</b> — pick one: Recap, Analysis, News, Playoffs, Draft, Roster, or Milestone. It shows as a tag and powers the category filter buttons.</li>
         <li><b>⭐ Feature this post</b> — turn ON to pin it to the big "Featured Post" spot on the homepage. Leave OFF and your newest post is featured automatically. Only turn it on for one post.</li>
@@ -412,40 +413,52 @@
         <div class="ex-figcap">Your photo's description shows here as a caption.</div>
       </div>
 
-      <h3>🖼️ Featured Photo</h3>
-      <p>Set a <b>Featured Photo</b> (field near the top) and it shows big at the top of the post and on the post cards. Leave it blank and the <b>first photo in your article</b> is used automatically — so old posts already look great.</p>
+      <h3>🖼️ Hero Photo</h3>
+      <p>Set a <b>Hero Photo</b> (field near the top) and it shows big at the top of the post and on the post cards. Leave it blank and the <b>first photo in your article</b> is used automatically — so old posts already look great.</p>
       <p>The top photo crops to a wide banner. If it cuts off the important part, use <b>Hero Photo Focus</b> to pick which part to keep in view (e.g. <b>Top</b> to keep a face). Most photos look best on <b>Center</b>.</p>
       <div class="tt-ex"><div class="exlbl">Example — wide banner at the top of the post</div>
         <div class="ex-hero">🖼️ your featured photo, cropped to a wide banner</div>
       </div>
 
       <h3>▶️ YouTube videos</h3>
-      <p>Two ways: paste a link on its <b>own line</b>, OR click the <b>"+"</b> in the editor → <b>"YouTube Video"</b> and paste the link.</p>
-      <div class="tt-ex"><div class="exlbl">Example</div><div class="ex-yt">▶</div></div>
+      <p>Two ways: paste a link on its <b>own line</b>, OR click the <b>"+"</b> in the editor → <b>"YouTube Video"</b> and paste the link. (See the example under Special blocks below.)</p>
 
       <h3>➕ Special blocks (the "+" menu in the editor)</h3>
-      <ul>
-        <li><b>Box Score</b> — a clean final-score card (winner shown in green). Shortcut: "Copy last game as a Box Score" on the scoreboard.</li>
-        <li><b>Pull Quote</b> — a big emphasized quote, with optional attribution.</li>
-        <li><b>Player Stat Line</b> — a card like "Tatum — 28.3 PPG · 8.1 RPG · 5.4 APG".</li>
-        <li><b>Grade Badge</b> — a big letter grade (A+, B-…) for trade/draft/game grades — colors itself (green A/B, gold C, red D/F).</li>
-        <li><b>Callout Box</b> — a highlighted "Editor's note / fun fact" box.</li>
-        <li><b>YouTube Video</b> — paste a link and it embeds.</li>
-      </ul>
-      <div class="tt-ex"><div class="exlbl">How the blocks look</div>
+      <p class="tt-note">Click the <b>"+"</b> in the editor to drop any of these in.</p>
+
+      <p><b>Box Score</b> — a clean final-score card (winner shown in green). Shortcut: "Copy last game as a Box Score" on the scoreboard.</p>
+      <div class="tt-ex"><div class="exlbl">Example</div>
         <div class="post-score"><div class="ps-row ps-win"><span class="ps-team">Celtics</span><span class="ps-score">120</span></div><div class="ps-row"><span class="ps-team">Lakers</span><span class="ps-score">110</span></div></div>
-        <div style="height:14px"></div>
+      </div>
+
+      <p><b>Pull Quote</b> — a big emphasized quote, with optional attribution.</p>
+      <div class="tt-ex"><div class="exlbl">Example</div>
         <div class="pull-quote"><p>This team is built to win now.</p><cite>— Dan MacLean</cite></div>
-        <div style="height:14px"></div>
+      </div>
+
+      <p><b>Player Stat Line</b> — a card like "Tatum — 28.3 PPG · 8.1 RPG · 5.4 APG".</p>
+      <div class="tt-ex"><div class="exlbl">Example</div>
         <div class="stat-line"><span class="sl-name">Jayson Tatum</span><span class="sl-stats">28.3 PPG · 8.1 RPG · 5.4 APG</span></div>
-        <div style="height:14px"></div>
+      </div>
+
+      <p><b>Grade Badge</b> — a big letter grade (A+, B-…) for trade/draft/game grades — colors itself (green A/B, gold C, red D/F).</p>
+      <div class="tt-ex"><div class="exlbl">Example</div>
         <div class="grade-badge"><span class="gb-grade gb-a">A+</span><span><span class="gb-label">Trade Grade</span><br><span class="gb-note">Boston fleeced them.</span></span></div>
-        <div style="height:14px"></div>
+      </div>
+
+      <p><b>Callout Box</b> — a highlighted "Editor's note / fun fact" box.</p>
+      <div class="tt-ex"><div class="exlbl">Example</div>
         <div class="callout"><span class="co-ico">💡</span><span class="co-text">Fun fact: this is a callout box.</span></div>
+      </div>
+
+      <p><b>YouTube Video</b> — paste a link and it embeds.</p>
+      <div class="tt-ex"><div class="exlbl">Example</div>
+        <div class="ex-yt">▶</div>
       </div>
 
       <h3>🏀 "See full game stats" button</h3>
       <p>Fill in the <b>Game Box-Score Link</b> field with an NBA.com box-score web address, and a green button appears on the post. Leave it blank for none.</p>
+      <p class="tt-note">It should look like: <code>https://www.nba.com/game/lal-vs-bos-0022500123/box-score</code></p>
 
       <h3>💬 Reactions &amp; comments <span class="tt-note">(automatic — you add nothing)</span></h3>
       <p>Every post gets <b>emoji reactions</b> and a <b>comment section</b> on its own. You'll get an <b>email</b> whenever someone comments on a post or subscribes to the newsletter.</p>
@@ -461,18 +474,18 @@
     </div>
   </div>
 
-  <!-- Post Recipes + current-roster reference -->
-  <button id="tt-recipe-btn" onclick="document.getElementById('tt-recipe-overlay').classList.add('open')">📋 Post Recipes</button>
-  <div id="tt-recipe-overlay" onclick="if(event.target===this)this.classList.remove('open')">
-    <div id="tt-recipe-panel">
-      <button class="tt-x" onclick="document.getElementById('tt-recipe-overlay').classList.remove('open')" aria-label="Close">✕</button>
-      <h2>📋 Post Recipes</h2>
-      <div class="tt-sub">No more blank page. Pick a structure, hit <b>Copy</b>, click into the <b>Article</b>, and paste — then fill in the blanks. If a heading pastes as plain text, click the editor's <b>Markdown</b> toggle and paste there instead.</div>
-      <div id="tt-recipe-list"></div>
-      <h3>🏀 Current Roster — click a name to copy</h3>
-      <div class="tt-sub">Spell names like this and they auto-link to the player's card on the site.</div>
-      <div id="tt-roster-chips">Loading roster…</div>
-    </div>
+  <!-- Post Recipes + Roster: expandable dropdown menus (no blocking popup) -->
+  <button id="tt-recipe-btn" class="tt-menu-btn" onclick="ttToggleMenu('tt-recipe-menu')">📋 Post Recipes</button>
+  <button id="tt-roster-btn" class="tt-menu-btn" onclick="ttToggleMenu('tt-roster-menu')">🏀 Roster</button>
+  <div id="tt-recipe-menu" class="tt-menu">
+    <h4>📋 Post Recipes <button class="tt-menux" onclick="document.getElementById('tt-recipe-menu').classList.remove('open')" aria-label="Close">✕</button></h4>
+    <div class="tt-sub">Click <b>Copy</b>, then paste into the <b>Article</b> — headings &amp; cards come through, then fill in the <b>[blanks]</b>. If a card doesn't appear, paste in the editor's <b>Markdown</b> view.</div>
+    <div id="tt-recipe-list"></div>
+  </div>
+  <div id="tt-roster-menu" class="tt-menu">
+    <h4>🏀 Current Roster <button class="tt-menux" onclick="document.getElementById('tt-roster-menu').classList.remove('open')" aria-label="Close">✕</button></h4>
+    <div class="tt-sub">Click a name to copy it. Spelled this way, names link to the player's card <b>on the published site</b>.</div>
+    <div id="tt-roster-chips">Loading roster…</div>
   </div>
 
   <script>
@@ -484,14 +497,64 @@
     }
     function ttFallbackCopy(str){ try{ var ta=document.createElement('textarea'); ta.value=str; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }catch(e){} }
 
+    /* expandable menus: toggle one open (closing the other), close on outside-click or Escape */
+    function ttToggleMenu(id){
+      var target=document.getElementById(id), wasOpen=target&&target.classList.contains('open');
+      ['tt-recipe-menu','tt-roster-menu'].forEach(function(m){ var el=document.getElementById(m); if(el) el.classList.remove('open'); });
+      if(target&&!wasOpen) target.classList.add('open');
+    }
+    document.addEventListener('click',function(e){
+      if(e.target.closest('.tt-menu')||e.target.closest('.tt-menu-btn')) return;   // clicks inside a menu / on a toggle button don't dismiss
+      document.querySelectorAll('.tt-menu.open').forEach(function(el){ el.classList.remove('open'); });
+    });
+    document.addEventListener('keydown',function(e){
+      if(e.key==='Escape') document.querySelectorAll('.tt-menu.open').forEach(function(el){ el.classList.remove('open'); });
+    });
+
+    /* markdown -> HTML, so recipes paste as real headings/bold/lists even in Rich Text mode */
+    function ttMdToHtml(md){
+      var lines=md.split('\n'), out=[], listType=null;
+      function closeList(){ if(listType){ out.push('</'+listType+'>'); listType=null; } }
+      function inl(s){ return s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/_([^_]+)_/g,'<em>$1</em>'); }
+      lines.forEach(function(line){
+        var ts=line.trim();
+        if(ts===''){ closeList(); return; }
+        if(ts.charAt(0)==='<'){ closeList(); out.push(ts); return; }            // raw HTML block (box score / grade / stat line)
+        var h=ts.match(/^(#{2,3})\s+(.*)$/);
+        if(h){ closeList(); var lv=h[1].length; out.push('<h'+lv+'>'+inl(h[2])+'</h'+lv+'>'); return; }
+        var ol=ts.match(/^\d+\.\s+(.*)$/);
+        if(ol){ if(listType!=='ol'){ closeList(); out.push('<ol>'); listType='ol'; } out.push('<li>'+inl(ol[1])+'</li>'); return; }
+        var li=ts.match(/^[-*]\s+(.*)$/);
+        if(li){ if(listType!=='ul'){ closeList(); out.push('<ul>'); listType='ul'; } out.push('<li>'+inl(li[1])+'</li>'); return; }
+        closeList(); out.push('<p>'+inl(ts)+'</p>');
+      });
+      closeList();
+      return out.join('');
+    }
+    /* copy a recipe as BOTH rich HTML and markdown, so it pastes right in either editor mode */
+    function ttCopyRich(md, btn, restore){
+      function done(){ if(btn){ btn.textContent='Copied ✓'; setTimeout(function(){ btn.textContent=restore; },1400); } }
+      try{
+        if(navigator.clipboard && window.ClipboardItem){
+          var item=new ClipboardItem({
+            'text/html': new Blob([ttMdToHtml(md)], {type:'text/html'}),
+            'text/plain': new Blob([md], {type:'text/plain'})
+          });
+          navigator.clipboard.write([item]).then(done, function(){ ttCopyText(md, btn, restore); });
+          return;
+        }
+      }catch(e){}
+      ttCopyText(md, btn, restore);   // fallback: plain markdown
+    }
+
     /* Post Recipes — one-click starting structures */
     var TT_RECIPES=[
-      {icon:"🏀",name:"Game Recap",desc:"Score → how it happened → standouts → what's next",
-       text:"Boston [beat / fell to] the [OPPONENT] ==FINAL SCORE== on [date].\n\n## How It Happened\n[The flow of the game — the run that decided it, the turning point.]\n\n## Standout Performers\n- **[Player]** — ==PTS== ==REB== ==AST==\n- **[Player]** — ==key stat==\n\n## What's Next\n[The next game, or what this result means going forward.]\n\n_Tip: add a Box Score block with the '+' button, and paste the NBA box-score link in the Game Box-Score Link field._"},
-      {icon:"📰",name:"Trade / News Reaction",desc:"What happened → why it matters → your verdict",
-       text:"## What Happened\n[The move in a sentence or two — who's in, who's out, the terms.]\n\n## Why It Matters\n[What it changes for the Celtics — the fit, the need it fills (or ignores).]\n\n## The Verdict\n[Your take — a win, a gamble, or a head-scratcher?]\n\n_Tip: add a Grade Badge block for your trade grade (A+, B-, ...)._"},
-      {icon:"⭐",name:"Player Spotlight",desc:"Intro → the numbers → why he matters",
-       text:"## Meet [Player]\n[Quick intro — his role, background, and why he's worth watching right now.]\n\n## The Numbers\n- ==PPG== ==RPG== ==APG==\n- [One line on what the numbers actually say.]\n\n## Why He Matters\n[His impact — what Boston gets when he's rolling.]\n\n_Tip: add a Player Stat Line block for his key numbers._"},
+      {icon:"🏀",name:"Game Recap",desc:"Score card → how it happened → standouts → what's next",
+       text:"Boston [beat / fell to] the [OPPONENT] ==FINAL SCORE== on [date].\n\n<div class='post-score'><div class='ps-row ps-win'><span class='ps-team'>Celtics</span><span class='ps-score'>000</span></div><div class='ps-row'><span class='ps-team'>[Opponent]</span><span class='ps-score'>000</span></div></div>\n\n## How It Happened\n[The flow of the game — the run that decided it, the turning point.]\n\n## Standout Performers\n- **[Player]** — ==PTS== ==REB== ==AST==\n- **[Player]** — ==key stat==\n\n## What's Next\n[The next game, or what this result means going forward.]"},
+      {icon:"📰",name:"Trade / News Reaction",desc:"What happened → why it matters → your grade",
+       text:"## What Happened\n[The move in a sentence or two — who's in, who's out, the terms.]\n\n## Why It Matters\n[What it changes for the Celtics — the fit, the need it fills (or ignores).]\n\n## The Verdict\n[Your take — a win, a gamble, or a head-scratcher?]\n\n<div class='grade-badge'><span class='gb-grade gb-b'>B+</span><span class='gb-body'><span class='gb-label'>Trade Grade</span><span class='gb-note'>[your one-line take]</span></span></div>"},
+      {icon:"⭐",name:"Player Spotlight",desc:"Intro → stat card → why he matters",
+       text:"## Meet [Player]\n[Quick intro — his role, background, and why he's worth watching right now.]\n\n<div class='stat-line'><span class='sl-name'>[Player]</span><span class='sl-stats'>[PPG] · [RPG] · [APG]</span></div>\n\n## The Numbers\n[One line on what the numbers actually say.]\n\n## Why He Matters\n[His impact — what Boston gets when he's rolling.]"},
       {icon:"🔢",name:"Power Rankings",desc:"A ranked list with a takeaway",
        text:"## The List\n1. **[Team or Player]** — [one-line why]\n2. **[Team or Player]** — [one-line why]\n3. **[Team or Player]** — [one-line why]\n\n## The Takeaway\n[Your overall read.]"},
       {icon:"🔥",name:"Hot Take",desc:"Bold opinion → the case → bottom line",
@@ -503,7 +566,7 @@
         var row=document.createElement('div'); row.className='tt-recipe';
         var info=document.createElement('div'); info.innerHTML='<b>'+r.icon+' '+r.name+'</b><small>'+r.desc+'</small>';
         var b=document.createElement('button'); b.className='tt-copy'; b.type='button'; b.textContent='Copy';
-        b.addEventListener('click',function(){ ttCopyText(r.text, b, 'Copy'); });
+        b.addEventListener('click',function(){ ttCopyRich(r.text, b, 'Copy'); });
         row.appendChild(info); row.appendChild(b); list.appendChild(row);
       });
     })();

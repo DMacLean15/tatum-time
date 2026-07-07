@@ -45,11 +45,11 @@ collections:
         hint: "One emoji shown on the post's banner — e.g. 🏀 🍀 🔥 🏆 🎯 🐣 🃏"
 
       - name: "image"
-        label: "Featured Photo (optional)"
+        label: "Hero Photo"
         widget: "image"
         required: false
         choose_url: false
-        hint: "Big photo shown at the top of the post and on the post cards. Leave blank and the first photo in your article is used automatically."
+        hint: "Big photo shown at the top of the post and on the post cards. Leave blank and the first photo in your article is used automatically. Use Hero Photo Focus below to control how it crops."
 
       - name: "imageFocus"
         label: "Hero Photo Focus"
@@ -77,16 +77,15 @@ collections:
         widget: "datetime"
         format: "YYYY-MM-DD"
         date_format: "MMM D, YYYY"
-        time_format: false
         picker_utc: false
-        hint: "Pick the post's date from the calendar. New posts default to today. (Stored in a sortable format; shows as 'Jul 1, 2026' on the site.)"
+        hint: "New posts fill in today automatically — only change it to backdate a post. (A time may show in the editor; ignore it, the site only uses the date and shows it as 'Jul 1, 2026'.)"
 
       - name: "gameLink"
         label: "Game Box-Score Link"
         widget: "string"
         required: false
         pattern: ['^$|^https?://.+', 'Paste a full web address starting with http:// (or leave it blank)']
-        hint: "Paste an NBA.com box-score web address to show a green 'See full game stats' button. Leave blank for no button."
+        hint: "Paste an NBA.com box-score web address to show a green 'See full game stats' button. It should look like this: https://www.nba.com/game/lal-vs-bos-0022500123/box-score — leave blank for no button."
 
       - name: "body"
         label: "Article"
