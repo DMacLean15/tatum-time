@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tatum Time — Content Manager</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
     /* ---- Floating "Formatting Help" cheat sheet (self-contained, won't touch the editor) ---- */
     #tt-help-btn{
       position:fixed;right:20px;bottom:20px;z-index:99998;
@@ -66,6 +67,61 @@
       border-radius:50%;cursor:pointer;font-size:1.1rem;line-height:1;
     }
     #tt-help-close:hover{background:rgba(255,255,255,.14)}
+    /* ---- Post Recipes button + panel + roster chips ---- */
+    #tt-recipe-btn{position:fixed;right:20px;bottom:120px;z-index:99998;display:inline-flex;align-items:center;gap:7px;background:#0f1d16;color:#e8efe9;font:700 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;border:1px solid rgba(191,161,90,.5);border-radius:999px;padding:10px 16px;cursor:pointer;box-shadow:0 6px 18px -6px rgba(0,0,0,.5);transition:.15s}
+    #tt-recipe-btn:hover{border-color:#bfa15a;background:#132a1f}
+    #tt-recipe-overlay{position:fixed;inset:0;z-index:99999;display:none;background:rgba(2,8,5,.72);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:24px}
+    #tt-recipe-overlay.open{display:flex}
+    #tt-recipe-panel{width:100%;max-width:640px;max-height:88vh;overflow-y:auto;background:#0f1d16;border:1px solid rgba(22,196,91,.3);border-radius:18px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8);color:#e8efe9;font:15px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:26px 28px 30px;position:relative}
+    #tt-recipe-panel h2{margin:0 0 4px;color:#fff;font-size:1.5rem}
+    #tt-recipe-panel h3{color:#16c45b;font-size:.95rem;margin:22px 0 8px}
+    #tt-recipe-panel .tt-sub{color:#9bb3a5;font-size:.9rem;margin-bottom:14px}
+    .tt-recipe{display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;margin-bottom:9px}
+    .tt-recipe b{color:#fff;font-size:.98rem}
+    .tt-recipe small{display:block;color:#9bb3a5;font-size:.8rem;margin-top:2px}
+    .tt-copy{flex:0 0 auto;background:linear-gradient(145deg,#16c45b,#007a33);color:#052012;border:none;border-radius:999px;padding:8px 15px;font-weight:700;font-size:.82rem;cursor:pointer}
+    .tt-copy:hover{filter:brightness(1.08)}
+    #tt-roster-chips{display:flex;flex-wrap:wrap;gap:7px}
+    .tt-chip{background:rgba(22,196,91,.12);border:1px solid rgba(22,196,91,.3);color:#dff3e7;border-radius:8px;padding:5px 10px;font-size:.82rem;cursor:pointer;font-weight:600}
+    .tt-chip:hover{background:rgba(22,196,91,.24);color:#fff}
+    .tt-x{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:1.1rem;line-height:1}
+    .tt-x:hover{background:rgba(255,255,255,.14)}
+    .tts-copy{margin-top:2px;width:100%;background:rgba(22,196,91,.14);border:1px solid rgba(22,196,91,.4);color:#16c45b;border-radius:8px;padding:7px;font-weight:700;font-size:.74rem;cursor:pointer}
+    .tts-copy:hover{background:rgba(22,196,91,.24);color:#fff}
+    /* ---- little rendered examples inside the cheat sheet ---- */
+    #tt-help-panel .tt-ex{margin:6px 0 12px;padding:14px 16px;background:#0b1712;border:1px solid rgba(255,255,255,.08);border-radius:10px;color:#d7e2db;font-size:.9rem}
+    #tt-help-panel .tt-ex .exlbl{font-size:.62rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#6f8578;margin-bottom:9px}
+    #tt-help-panel .ex-lead{margin:0;font-size:1.02rem;color:#eaf1ec}
+    #tt-help-panel .ex-lead::first-letter{float:left;font-family:'Anton',sans-serif;font-size:2.4rem;line-height:.8;padding:4px 9px 0 0;color:#16c45b}
+    #tt-help-panel .ex-h{margin:14px 0 6px;color:#fff;font-family:'Anton',sans-serif;font-size:1.05rem;letter-spacing:.4px;padding-left:12px;border-left:4px solid #16c45b}
+    #tt-help-panel .ex-hr{height:1px;background:rgba(255,255,255,.1);margin:16px 0;position:relative}
+    #tt-help-panel .ex-hr::before{content:"☘";position:absolute;top:-.7em;left:50%;transform:translateX(-50%);background:#0b1712;padding:0 12px;color:#16c45b}
+    #tt-help-panel .ex-plink{color:#16c45b;border-bottom:1px dotted rgba(22,196,91,.55);font-weight:600}
+    #tt-help-panel .pull-quote{margin:0;padding:2px 0 2px 18px;border-left:4px solid #16c45b}
+    #tt-help-panel .pull-quote p{font-size:1.1rem;line-height:1.4;color:#fff;font-weight:600;margin:0}
+    #tt-help-panel .pull-quote cite{display:block;margin-top:8px;color:#16c45b;font-style:normal;font-weight:700;font-size:.82rem}
+    #tt-help-panel .stat-line{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 14px}
+    #tt-help-panel .stat-line .sl-name{font-weight:800;color:#fff}
+    #tt-help-panel .stat-line .sl-stats{color:#16c45b;font-weight:700}
+    #tt-help-panel .grade-badge{display:flex;align-items:center;gap:14px;background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px}
+    #tt-help-panel .grade-badge .gb-grade{font-family:'Anton',sans-serif;font-size:1.9rem;width:56px;height:56px;flex:0 0 auto;display:grid;place-items:center;border-radius:12px;color:#fff}
+    #tt-help-panel .grade-badge .gb-label{font-weight:800;color:#fff}
+    #tt-help-panel .grade-badge .gb-note{color:#9bb3a5;font-size:.84rem}
+    #tt-help-panel .gb-a{background:linear-gradient(145deg,#16c45b,#04531f)}
+    #tt-help-panel .callout{display:flex;gap:10px;align-items:flex-start;background:rgba(191,161,90,.08);border:1px solid rgba(191,161,90,.3);border-radius:10px;padding:12px 14px}
+    #tt-help-panel .callout .co-ico{font-size:1.2rem}
+    #tt-help-panel .callout .co-text{color:#d7e2db;line-height:1.5}
+    #tt-help-panel .post-score{display:inline-flex;flex-direction:column;gap:2px;background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 18px}
+    #tt-help-panel .post-score .ps-row{display:flex;justify-content:space-between;gap:26px;padding:4px 0;color:#9bb3a5}
+    #tt-help-panel .post-score .ps-team{font-weight:700}
+    #tt-help-panel .post-score .ps-score{font-family:'Anton',sans-serif;font-size:1.3rem;min-width:40px;text-align:right}
+    #tt-help-panel .post-score .ps-win .ps-team,#tt-help-panel .post-score .ps-win .ps-score{color:#16c45b}
+    #tt-help-panel .ex-figimg{height:64px;border-radius:8px;background:linear-gradient(135deg,#16351f,#0a1510);display:grid;place-items:center;color:#4b6a58;font-size:.78rem}
+    #tt-help-panel .ex-figcap{text-align:center;color:#9bb3a5;font-size:.8rem;font-style:italic;margin-top:6px}
+    #tt-help-panel .ex-yt{height:70px;border-radius:8px;background:#000;display:grid;place-items:center;color:#ff5b5b;font-size:1.6rem;border:1px solid rgba(255,255,255,.1)}
+    #tt-help-panel .ex-hero{height:56px;border-radius:8px;background:linear-gradient(135deg,#0a3a24,#16351f);display:grid;place-items:center;color:#7fae95;font-size:.78rem;border:1px solid rgba(255,255,255,.08)}
+    #tt-help-panel blockquote.ex-bq{border-left:3px solid #16c45b;margin:0;padding:6px 16px;color:#9bb3a5;background:rgba(22,196,91,.06);border-radius:0 8px 8px 0}
+    #tt-help-panel a.ex-link{color:#16c45b;text-decoration:underline}
   </style>
 </head>
 <body>
@@ -277,10 +333,33 @@
           <li>Keep paragraphs <b>short</b>. Break up long posts with <b>headings</b>.</li>
           <li>Add a <b>photo or YouTube clip</b> — posts with visuals get read more.</li>
           <li>Sprinkle in <b>green stat tags</b> for the key numbers.</li>
+          <li>Emojis work <b>anywhere</b> in your writing, not just the banner. 🍀🔥</li>
+          <li>Blank page? Start from a <b>📋 Post Recipe</b> instead (see below).</li>
         </ul>
       </div>
 
-      <h3>📋 Post starters <span class="tt-note">(optional structures to riff on)</span></h3>
+      <h3>🚀 One-click helpers</h3>
+      <ul>
+        <li><b>📋 Post Recipes</b> (button, bottom-right) — ready-made post structures (Game Recap, Trade Reaction, Player Spotlight, Power Rankings, Hot Take). Hit <b>Copy</b>, paste into the <b>Article</b>, and fill in the blanks. The same panel lists the <b>current roster</b> — click a name to copy it (spelled right, it auto-links to the player's card).</li>
+        <li><b>📋 Copy last game as a Box Score</b> — on the Celtics scoreboard (bottom-left), turns the real last game into a score card you can paste straight into a recap.</li>
+        <li><b>🌐 View Live Site</b> (button, bottom-right) — opens the published site in a new tab to check your work.</li>
+        <li class="tt-note">Recipes and blocks paste cleanest in the editor's <b>Markdown</b> view (the toggle at the top of the writing box). Switch back to normal view anytime.</li>
+      </ul>
+
+      <h3>📝 The fields at the top — what each one does</h3>
+      <ul>
+        <li><b>Headline</b> — the post's title.</li>
+        <li><b>Banner Emoji</b> — one emoji shown on the post's card (🏀 🍀 🔥 🏆 🎯).</li>
+        <li><b>Featured Photo</b> — the big photo at the top of the post (details below). Optional.</li>
+        <li><b>Hero Photo Focus</b> — which part of that photo to keep when it crops to a banner (Center / Top / Bottom / Left / Right).</li>
+        <li><b>Category</b> — pick one: Recap, Analysis, News, Playoffs, Draft, Roster, or Milestone. It shows as a tag and powers the category filter buttons.</li>
+        <li><b>⭐ Feature this post</b> — turn ON to pin it to the big "Featured Post" spot on the homepage. Leave OFF and your newest post is featured automatically. Only turn it on for one post.</li>
+        <li><b>Date</b> — pick from the calendar (new posts default to today). <b>This is what orders your posts</b> — no dragging needed.</li>
+        <li><b>Game Box-Score Link</b> — adds a "See full game stats" button (see below).</li>
+        <li><b>Article</b> — the post body, where you write.</li>
+      </ul>
+
+      <h3>📋 Post starters <span class="tt-note">(the structures behind the Recipes button)</span></h3>
       <p><b>🏀 Game recap:</b> Final score → 1–2 standout performers (with <span class="tt-tag">stat tags</span>) → the turning point → what's next.</p>
       <p><b>📰 Trade / news reaction:</b> What happened → why it matters for the C's → your grade or hot take.</p>
       <p><b>⭐ Player spotlight:</b> Quick intro → the numbers that pop → why he matters to the team.</p>
@@ -291,44 +370,158 @@
       <p class="tt-note">Heads up: in the preview it shows as plain <code>==28.3 PPG==</code>, but it turns green on the published site.</p>
 
       <h3>✍️ Formatting toolbar</h3>
-      <p>Use the toolbar above the writing box for <b>bold</b>, <i>italics</i>, Headings, bullet/numbered lists, links, and quotes.</p>
+      <p>Use the toolbar above the writing box for <b>bold</b>, <i>italics</i>, <b>Headings</b>, bullet/numbered lists, links, and quotes. Use Headings to break a longer post into clear sections.</p>
+      <ul>
+        <li><b>Add a link:</b> select some words, click the <b>link</b> button, and paste any web address — a news article, an NBA page, or even one of your own Tatum Time posts.</li>
+        <li><b>Quote button</b> (") — makes a short quote with a green bar, great for quoting a player or reporter. For a big emphasis quote, use the <b>Pull Quote</b> block instead.</li>
+        <li><b>Prefer typing?</b> You can type markdown directly: <code>## Heading</code>, <code>**bold**</code>, <code>- list item</code>, <code>&gt; quote</code>.</li>
+      </ul>
+      <div class="tt-ex"><div class="exlbl">Example</div>
+        Read the <a class="ex-link" href="#">full story here</a> — that's a link.
+        <blockquote class="ex-bq" style="margin-top:10px">"We're built for this moment." — a short quote with the green bar.</blockquote>
+        <div style="margin-top:10px">Typing markdown works too: <code>**bold**</code> → <b>bold</b>, &nbsp;<code>*italics*</code> → <i>italics</i>, &nbsp;<code>## Heading</code> → a section heading.</div>
+      </div>
+
+      <h3>✨ Automatic styling <span class="tt-note">(happens on its own — you do nothing)</span></h3>
+      <ul>
+        <li>The first letter of your post gets a big green magazine-style <b>drop cap</b>, and the opening paragraph shows a bit larger — so intros pop.</li>
+        <li>Your <b>Headings</b> get a green accent bar automatically.</li>
+        <li>Type <code>---</code> on its own line to drop a <b>shamrock divider</b> ☘ between sections.</li>
+      </ul>
+      <div class="tt-ex"><div class="exlbl">Example</div>
+        <p class="ex-lead">This opening line gets the big green drop cap and a slightly larger intro.</p>
+        <div class="ex-h">A Section Heading</div>
+        <div class="ex-hr"></div>
+      </div>
+
+      <h3>🔗 Player names link themselves</h3>
+      <p>Type a <b>current player's or legend's full name</b> and it turns into a green link that jumps to their card in the Franchise section — no effort needed. Spell names using the <b>roster list</b> inside 📋 Post Recipes. <span class="tt-note">(Only current-roster players and listed legends link — traded-away players won't, so there are no dead links.)</span></p>
+      <div class="tt-ex"><div class="exlbl">Example</div>Boston's <span class="ex-plink">Jayson Tatum</span> leads the way. → the name becomes a clickable link.</div>
 
       <h3>📸 Photos</h3>
       <ul>
         <li>Click the image button and upload — it auto-resizes to fit.</li>
         <li>Type a <b>description</b> when you add a photo and it shows as a small <b>caption</b> underneath it on the site.</li>
         <li>The little thumbnail sometimes doesn't show while attaching — that's cosmetic. Check the <b>preview</b> to confirm the photo's there.</li>
+        <li><b>Reuse a photo:</b> the image button remembers past uploads — pick one from the list instead of uploading it again.</li>
+        <li>You can add <b>several photos</b> in one post.</li>
         <li>Shrink huge phone photos before uploading so the site stays fast.</li>
       </ul>
+      <div class="tt-ex"><div class="exlbl">Example</div>
+        <div class="ex-figimg">🏀 your photo</div>
+        <div class="ex-figcap">Your photo's description shows here as a caption.</div>
+      </div>
 
       <h3>🖼️ Featured Photo</h3>
       <p>Set a <b>Featured Photo</b> (field near the top) and it shows big at the top of the post and on the post cards. Leave it blank and the <b>first photo in your article</b> is used automatically — so old posts already look great.</p>
       <p>The top photo crops to a wide banner. If it cuts off the important part, use <b>Hero Photo Focus</b> to pick which part to keep in view (e.g. <b>Top</b> to keep a face). Most photos look best on <b>Center</b>.</p>
+      <div class="tt-ex"><div class="exlbl">Example — wide banner at the top of the post</div>
+        <div class="ex-hero">🖼️ your featured photo, cropped to a wide banner</div>
+      </div>
 
       <h3>▶️ YouTube videos</h3>
       <p>Two ways: paste a link on its <b>own line</b>, OR click the <b>"+"</b> in the editor → <b>"YouTube Video"</b> and paste the link.</p>
+      <div class="tt-ex"><div class="exlbl">Example</div><div class="ex-yt">▶</div></div>
 
       <h3>➕ Special blocks (the "+" menu in the editor)</h3>
       <ul>
-        <li><b>Box Score</b> — a clean final-score card (winner shown in green).</li>
+        <li><b>Box Score</b> — a clean final-score card (winner shown in green). Shortcut: "Copy last game as a Box Score" on the scoreboard.</li>
         <li><b>Pull Quote</b> — a big emphasized quote, with optional attribution.</li>
         <li><b>Player Stat Line</b> — a card like "Tatum — 28.3 PPG · 8.1 RPG · 5.4 APG".</li>
         <li><b>Grade Badge</b> — a big letter grade (A+, B-…) for trade/draft/game grades — colors itself (green A/B, gold C, red D/F).</li>
         <li><b>Callout Box</b> — a highlighted "Editor's note / fun fact" box.</li>
         <li><b>YouTube Video</b> — paste a link and it embeds.</li>
       </ul>
+      <div class="tt-ex"><div class="exlbl">How the blocks look</div>
+        <div class="post-score"><div class="ps-row ps-win"><span class="ps-team">Celtics</span><span class="ps-score">120</span></div><div class="ps-row"><span class="ps-team">Lakers</span><span class="ps-score">110</span></div></div>
+        <div style="height:14px"></div>
+        <div class="pull-quote"><p>This team is built to win now.</p><cite>— Dan MacLean</cite></div>
+        <div style="height:14px"></div>
+        <div class="stat-line"><span class="sl-name">Jayson Tatum</span><span class="sl-stats">28.3 PPG · 8.1 RPG · 5.4 APG</span></div>
+        <div style="height:14px"></div>
+        <div class="grade-badge"><span class="gb-grade gb-a">A+</span><span><span class="gb-label">Trade Grade</span><br><span class="gb-note">Boston fleeced them.</span></span></div>
+        <div style="height:14px"></div>
+        <div class="callout"><span class="co-ico">💡</span><span class="co-text">Fun fact: this is a callout box.</span></div>
+      </div>
 
       <h3>🏀 "See full game stats" button</h3>
       <p>Fill in the <b>Game Box-Score Link</b> field with an NBA.com box-score web address, and a green button appears on the post. Leave it blank for none.</p>
 
-      <h3>🍀 Banner emoji &amp; publishing</h3>
+      <h3>💬 Reactions &amp; comments <span class="tt-note">(automatic — you add nothing)</span></h3>
+      <p>Every post gets <b>emoji reactions</b> and a <b>comment section</b> on its own. You'll get an <b>email</b> whenever someone comments on a post or subscribes to the newsletter.</p>
+
+      <h3>🍀 Publishing &amp; ordering</h3>
       <ul>
-        <li>The <b>Banner Emoji</b> you pick shows on the post's banner card.</li>
-        <li>Drag your newest post to the <b>TOP</b> of the list.</li>
-        <li>Get it looking right in the preview, then hit <b>Publish</b> once. Edit as much as you want — it's free and unlimited.</li>
+        <li>Posts <b>sort themselves by Date</b>, newest first — no dragging. To reorder, just change a post's <b>Date</b> field.</li>
+        <li>Use <b>⭐ Feature this post</b> to pin one post to the homepage's Featured spot.</li>
+        <li>Each post is its own entry — use the <b>search box</b> in the post list to find one fast.</li>
+        <li><b>Edit or delete a post:</b> open it from the list — <b>Delete entry</b> is at the top of the editor. Your change goes live after you hit Publish.</li>
+        <li>Get it looking right in the <b>preview</b>, then hit <b>Publish</b> once. Edit as much as you want afterward — it's free and unlimited.</li>
       </ul>
     </div>
   </div>
+
+  <!-- Post Recipes + current-roster reference -->
+  <button id="tt-recipe-btn" onclick="document.getElementById('tt-recipe-overlay').classList.add('open')">📋 Post Recipes</button>
+  <div id="tt-recipe-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+    <div id="tt-recipe-panel">
+      <button class="tt-x" onclick="document.getElementById('tt-recipe-overlay').classList.remove('open')" aria-label="Close">✕</button>
+      <h2>📋 Post Recipes</h2>
+      <div class="tt-sub">No more blank page. Pick a structure, hit <b>Copy</b>, click into the <b>Article</b>, and paste — then fill in the blanks. If a heading pastes as plain text, click the editor's <b>Markdown</b> toggle and paste there instead.</div>
+      <div id="tt-recipe-list"></div>
+      <h3>🏀 Current Roster — click a name to copy</h3>
+      <div class="tt-sub">Spell names like this and they auto-link to the player's card on the site.</div>
+      <div id="tt-roster-chips">Loading roster…</div>
+    </div>
+  </div>
+
+  <script>
+    /* clipboard helper shared by recipes, roster chips, and the scoreboard */
+    function ttCopyText(str, btn, restore){
+      function done(){ if(btn){ btn.textContent='Copied ✓'; setTimeout(function(){ btn.textContent=restore; },1400); } }
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(str).then(done, function(){ ttFallbackCopy(str); done(); }); }
+      else { ttFallbackCopy(str); done(); }
+    }
+    function ttFallbackCopy(str){ try{ var ta=document.createElement('textarea'); ta.value=str; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }catch(e){} }
+
+    /* Post Recipes — one-click starting structures */
+    var TT_RECIPES=[
+      {icon:"🏀",name:"Game Recap",desc:"Score → how it happened → standouts → what's next",
+       text:"Boston [beat / fell to] the [OPPONENT] ==FINAL SCORE== on [date].\n\n## How It Happened\n[The flow of the game — the run that decided it, the turning point.]\n\n## Standout Performers\n- **[Player]** — ==PTS== ==REB== ==AST==\n- **[Player]** — ==key stat==\n\n## What's Next\n[The next game, or what this result means going forward.]\n\n_Tip: add a Box Score block with the '+' button, and paste the NBA box-score link in the Game Box-Score Link field._"},
+      {icon:"📰",name:"Trade / News Reaction",desc:"What happened → why it matters → your verdict",
+       text:"## What Happened\n[The move in a sentence or two — who's in, who's out, the terms.]\n\n## Why It Matters\n[What it changes for the Celtics — the fit, the need it fills (or ignores).]\n\n## The Verdict\n[Your take — a win, a gamble, or a head-scratcher?]\n\n_Tip: add a Grade Badge block for your trade grade (A+, B-, ...)._"},
+      {icon:"⭐",name:"Player Spotlight",desc:"Intro → the numbers → why he matters",
+       text:"## Meet [Player]\n[Quick intro — his role, background, and why he's worth watching right now.]\n\n## The Numbers\n- ==PPG== ==RPG== ==APG==\n- [One line on what the numbers actually say.]\n\n## Why He Matters\n[His impact — what Boston gets when he's rolling.]\n\n_Tip: add a Player Stat Line block for his key numbers._"},
+      {icon:"🔢",name:"Power Rankings",desc:"A ranked list with a takeaway",
+       text:"## The List\n1. **[Team or Player]** — [one-line why]\n2. **[Team or Player]** — [one-line why]\n3. **[Team or Player]** — [one-line why]\n\n## The Takeaway\n[Your overall read.]"},
+      {icon:"🔥",name:"Hot Take",desc:"Bold opinion → the case → bottom line",
+       text:"## The Take\n[State your bold opinion up front — no hedging.]\n\n## The Case\n[Two or three reasons that back it up, with ==a stat== or two for weight.]\n\n## Bottom Line\n[Land it.]"}
+    ];
+    (function(){
+      var list=document.getElementById('tt-recipe-list'); if(!list) return;
+      TT_RECIPES.forEach(function(r){
+        var row=document.createElement('div'); row.className='tt-recipe';
+        var info=document.createElement('div'); info.innerHTML='<b>'+r.icon+' '+r.name+'</b><small>'+r.desc+'</small>';
+        var b=document.createElement('button'); b.className='tt-copy'; b.type='button'; b.textContent='Copy';
+        b.addEventListener('click',function(){ ttCopyText(r.text, b, 'Copy'); });
+        row.appendChild(info); row.appendChild(b); list.appendChild(row);
+      });
+    })();
+
+    /* Current roster reference (live from ESPN) */
+    (function(){
+      var box=document.getElementById('tt-roster-chips'); if(!box) return;
+      fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/bos/roster')
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          var names=(d.athletes||[]).map(function(a){ return a.displayName; }).filter(Boolean).sort();
+          if(!names.length){ box.textContent='Roster unavailable right now.'; return; }
+          box.innerHTML='';
+          names.forEach(function(n){ var c=document.createElement('button'); c.className='tt-chip'; c.type='button'; c.textContent=n; c.title='Click to copy'; c.addEventListener('click',function(){ ttCopyText(n, c, n); }); box.appendChild(c); });
+        })
+        .catch(function(){ box.textContent='Roster unavailable right now.'; });
+    })();
+  </script>
 
   <!-- Live Celtics scoreboard (last result + next game, straight from ESPN) -->
   <div id="tt-score" style="display:none">
@@ -361,13 +554,19 @@
             var done = comp && comp.status && comp.status.type && comp.status.type.completed;
             if (done || t < now) last = ev; else if (!next) next = ev;
           });
-          var html = "";
+          var html = "", lastBox = "";
           if (last) { var g = parseG(last); if (g) { var win = parseInt(g.bos, 10) > parseInt(g.opp, 10);
-            html += '<div class="tts-h">' + (win ? "W" : "L") + " · Last Result</div><div class=\"tts-line\">Celtics " + g.bos + " " + (g.home ? "vs" : "@") + " " + g.oppName + " " + g.opp + "</div>"; } }
+            html += '<div class="tts-h">' + (win ? "W" : "L") + " · Last Result</div><div class=\"tts-line\">Celtics " + g.bos + " " + (g.home ? "vs" : "@") + " " + g.oppName + " " + g.opp + "</div>";
+            var aw = win ? " ps-win" : "", bw = (parseInt(g.opp, 10) > parseInt(g.bos, 10)) ? " ps-win" : "";
+            lastBox = '<div class="post-score"><div class="ps-row' + aw + '"><span class="ps-team">Celtics</span><span class="ps-score">' + g.bos + '</span></div><div class="ps-row' + bw + '"><span class="ps-team">' + g.oppName + '</span><span class="ps-score">' + g.opp + '</span></div></div>'; } }
           if (next) { var n = parseG(next); if (n) { var d = new Date(next.date);
             html += '<div class="tts-h">Next Game</div><div class="tts-sub">' + (n.home ? "vs" : "@") + " " + n.oppName + " · " + d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }) + " " + d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + "</div>"; } }
           else { html += '<div class="tts-h">Next Game</div><div class="tts-sub">Offseason — schedule coming soon ☘️</div>'; }
-          if (html) { body.innerHTML = html; box.style.display = "block"; }
+          if (lastBox) html += '<button class="tts-copy" id="tts-copybox" type="button">📋 Copy last game as a Box Score</button>';
+          if (html) { body.innerHTML = html; box.style.display = "block";
+            var cb = document.getElementById("tts-copybox");
+            if (cb && typeof ttCopyText === "function") cb.addEventListener("click", function () { ttCopyText(lastBox, cb, "📋 Copy last game as a Box Score"); });
+          }
         })
         .catch(function () { /* stay hidden if ESPN is unreachable */ });
     })();
