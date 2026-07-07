@@ -241,6 +241,7 @@
   .person.noimg .headshot .fallback{display:block}
   .p-info{padding:14px 17px 16px}
   .person h4{color:#fff;font-size:1.12rem;margin:0 0 3px}
+  .person h4 .p-flag{display:inline-block;font-size:1.02em;margin-left:6px;vertical-align:baseline;cursor:default;filter:saturate(1.25) contrast(1.08) drop-shadow(0 1px 1.5px rgba(0,0,0,.4))}
   .person .pos{font-size:.78rem;color:var(--gold);text-transform:uppercase;letter-spacing:1px;font-weight:700}
   .person p{color:var(--muted);font-size:.83rem;margin-top:8px;line-height:1.4}
   .p-meta{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:5px 12px;font-size:.75rem;color:var(--muted)}
@@ -339,8 +340,7 @@
   .gb-d{background:linear-gradient(145deg,#d98a3b,#7a4715)}
   .gb-f{background:linear-gradient(145deg,#d95b5b,#7a1f1f)}
   /* featured/hero photo at the top of an open post */
-  .reader-hero-img{width:100%;max-height:340px;object-fit:cover;display:block;border-bottom:1px solid var(--line)}
-  @media(max-width:560px){.reader-hero-img{max-height:210px}}
+  .reader-hero-img{width:100%;aspect-ratio:2.2/1;max-height:360px;object-fit:cover;object-position:center;display:block;border-bottom:1px solid var(--line);background:#0a140f}
   /* photo thumbnail in the post list (falls back to the emoji tile) */
   .pi-photo{background-size:cover !important;background-position:center !important}
   /* featured-card photo on the homepage */
@@ -580,6 +580,8 @@
   .thisday .td-label{font-size:.66rem;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
   .thisday .td-text{color:var(--txt);font-size:.92rem;line-height:1.45}
   .thisday .td-text b{color:var(--green-glow)}
+  .thisday .td-quote{display:block;font-style:italic;color:#eaf1ec}
+  .thisday .td-cite{display:block;margin-top:6px;color:var(--green-glow);font-weight:700;font-size:.82rem;letter-spacing:.3px}
   /* Latest Celtics news */
   .news-list{display:grid;gap:12px}
   .news-item{display:flex;justify-content:space-between;align-items:center;gap:16px;background:linear-gradient(165deg,var(--card),#0a1510);border:1px solid var(--line);border-radius:14px;padding:15px 18px;transition:.16s}
@@ -1260,6 +1262,15 @@ const listBox = document.getElementById('postList');
 function pill(html){ return html.replace(/==([^=]+)==/g,'<span class="stat-pill">$1</span>'); }
 
 /* turn a CMS post (markdown + fields) into the internal {emoji,cat,date,title,body} shape */
+function focusPos(v){
+  switch(String(v||'').toLowerCase()){
+    case 'top': return '50% 0%';
+    case 'bottom': return '50% 100%';
+    case 'left': return '0% 50%';
+    case 'right': return '100% 50%';
+    default: return '50% 50%';   // Center
+  }
+}
 function captionImages(html){
   // Wrap standalone photos in <figure>; turn the image's description into a caption.
   return html.replace(/<p>\s*(<img[^>]*>)\s*<\/p>/gi, function(_, img){
@@ -1286,7 +1297,7 @@ function normalizePost(p){
   if(p.gameLink && p.gameLink.trim()){
     body += `<a class="game-link" href="${p.gameLink.trim()}" target="_blank" rel="noopener">📊 See full game stats here ↗</a>`;
   }
-  return { emoji:p.emoji||'🏀', cat:p.category||p.cat||'Post', date:p.date||'', title:p.title||'', body, hero, featured:!!p.featured };
+  return { emoji:p.emoji||'🏀', cat:p.category||p.cat||'Post', date:p.date||'', title:p.title||'', body, hero, heroFocus:focusPos(p.imageFocus), featured:!!p.featured };
 }
 
 function excerptFrom(html){
@@ -1317,7 +1328,7 @@ function setFeatured(){
   const e=document.getElementById('feat-ex'); if(e) e.textContent=excerptFrom(f.body);
   const m=document.getElementById('feat-meta'); if(m) m.textContent=fmtDisplayDate(f.date)+' · '+f.cat;
   const th=document.getElementById('feat-thumb');
-  if(th){ if(f.hero){ th.src=f.hero; th.alt=f.title; th.style.display='block'; } else { th.style.display='none'; th.removeAttribute('src'); } }
+  if(th){ if(f.hero){ th.src=f.hero; th.alt=f.title; th.style.objectPosition=f.heroFocus||'50% 50%'; th.style.display='block'; } else { th.style.display='none'; th.removeAttribute('src'); } }
 }
 
 async function initBlog(){
@@ -1358,7 +1369,7 @@ function renderPost(i, scroll, setHash=true){
   _tt.appendChild(_em); _tt.appendChild(document.createTextNode(' '+p.title));
   document.getElementById('readerMeta').textContent='Dan MacLean · '+fmtDisplayDate(p.date);
   const heroEl=document.getElementById('readerHero');
-  if(heroEl){ if(p.hero){ heroEl.src=p.hero; heroEl.alt=p.title; heroEl.style.display='block'; } else { heroEl.style.display='none'; heroEl.removeAttribute('src'); } }
+  if(heroEl){ if(p.hero){ heroEl.src=p.hero; heroEl.alt=p.title; heroEl.style.objectPosition=p.heroFocus||'50% 50%'; heroEl.style.display='block'; } else { heroEl.style.display='none'; heroEl.removeAttribute('src'); } }
   document.getElementById('readerArticle').innerHTML=p.body;
   document.getElementById('readTime').textContent='⏱ '+p.readMins+' min read';
   buildShare(p); loadComments(p.slug); loadReactions(p.slug);
@@ -1813,17 +1824,17 @@ const onThisDay=[
   {md:'02-12', text:'The greatest winner in team sports, <b>Bill Russell</b>, was born on <b>February 12, 1934</b>.'},
   {md:'10-13', text:'Celtics great <b>Paul Pierce</b> — "The Truth" — was born on <b>October 13, 1977</b>.'}
 ];
-const celticsFacts=[
-  'The Celtics have won <b>18</b> NBA championships — the most in league history.',
-  'Bill Russell won <b>11 titles in 13 seasons</b>, the most of any player in major North American team sports.',
-  'Boston has retired <b>23 numbers</b> — more than any other NBA franchise.',
-  'Larry Bird won <b>three straight MVP awards</b> from 1984 through 1986.',
-  'The Celtics and Lakers have met in the NBA Finals <b>12 times</b> — the league’s greatest rivalry.',
-  'Red Auerbach famously lit a <b>victory cigar</b> on the bench once a win was in hand.',
-  'Paul Pierce earned the nickname <b>“The Truth”</b> from Shaquille O’Neal back in 2001.',
-  'The 2008 “Big Three” of Garnett, Pierce and Allen delivered <b>Banner 17</b>.',
-  'Jayson Tatum and Jaylen Brown led Boston to <b>Banner 18</b> in 2024.',
-  'TD Garden’s lucky leprechaun mascot has cheered on the green for decades.'
+const celticsQuotes=[
+  {q:'The only important statistic is the final score.', who:'Bill Russell'},
+  {q:'The idea is not to block every shot. The idea is to make your opponent believe that you might block every one.', who:'Bill Russell'},
+  {q:'Concentration and mental toughness are the margins of victory.', who:'Bill Russell'},
+  {q:'Winning is a habit. Unfortunately, so is losing.', who:'Red Auerbach'},
+  {q:'It’s not what you tell your players that counts. It’s what they hear.', who:'Red Auerbach'},
+  {q:'Push yourself again and again. Don’t give an inch until the final buzzer sounds.', who:'Larry Bird'},
+  {q:'Leadership is getting players to believe in you.', who:'Larry Bird'},
+  {q:'A winner is someone who recognizes his talents, works his tail off to develop them, and uses them to reach his goals.', who:'Larry Bird'},
+  {q:'Anything is possible!', who:'Kevin Garnett'},
+  {q:'I am The Truth.', who:'Paul Pierce'}
 ];
 /* ---- Latest Celtics news (ESPN) + "Hear Dan's Take" when a post matches ---- */
 const NEWS_STOP=new Set('the and for with from over into onto after before amid among sources source report reports says said will could would that this these those their they them his her but are was were has have had who what why how new off out top get gets going per via agree agrees agreed deal deals sign signs signed trade trades traded celtics boston nba wnba season seasons game games team teams star update updates latest full former next year years night day days more back grade grades grading preview recap analysis takeaways ranking rankings winners losers buzz tracker roundup breakdown primer offseason agency signing signings extension extensions insider mock reaction reactions takes free questions question'.split(' '));
@@ -1880,8 +1891,9 @@ function fillDayCard(id,ico,label,text){
 function renderThisDay(){
   const now=new Date();
   const doy=Math.floor((now-new Date(now.getFullYear(),0,0))/864e5);
-  // Fact of the Day (rotates daily)
-  fillDayCard('factDay','☘️','Celtics Fact of the Day',celticsFacts[doy%celticsFacts.length]);
+  // Legend Quote of the Day (rotates daily)
+  const qt=celticsQuotes[doy%celticsQuotes.length];
+  fillDayCard('factDay','❝','Quote of the Day','<span class="td-quote">“'+qt.q+'”</span><span class="td-cite">— '+qt.who+'</span>');
   // On This Day — exact date match if we have one, else a rotating moment from Celtics history
   const md=String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
   const hit=onThisDay.find(x=>x.md===md);
@@ -2148,7 +2160,7 @@ function personCard(p){
       <span class="fallback">${initials(p.name)}</span>
     </div>
     <div class="p-info">
-      <h4>${p.name}</h4>
+      <h4>${p.name}${p.country?(' <span class="p-flag" title="'+p.country+'">'+flag(p.country)+'</span>'):''}</h4>
       <div class="pos">${p.pos||''}</div>
       ${p.note?('<p>'+p.note+'</p>'):''}
       ${metaHtml(p.meta)}
@@ -2168,7 +2180,7 @@ function metaHtml(m){
   return p.length?('<div class="p-meta">'+p.join('')+'</div>'):'';
 }
 const lg=document.getElementById('legendsGrid');
-legends.forEach(p=>lg.appendChild(personCard(p)));
+legends.forEach(p=>lg.appendChild(personCard({...p, country:p.country||'USA'})));
 
 /* full active roster — pulled live from ESPN, ordered by salary (salary not shown) */
 const rosterNotes={
@@ -2198,6 +2210,14 @@ const rosterNotes={
    players get the "New" badge automatically (first NBA season); ESPN doesn't
    expose trade dates for veterans, so add any recently-acquired vets here. */
 const newcomers = new Set(['Mike Conley','Mitchell Robinson']);
+/* Country fallback for players whose ESPN birthplace record has no country.
+   Only used when ESPN doesn't supply one; accent-insensitive on the name. */
+const PLAYER_COUNTRY={
+  'Hugo Gonzalez':'Spain','Neemias Queta':'Portugal','Dalano Banton':'Canada',
+  'Amari Williams':'England','Max Shulga':'Ukraine'
+};
+function normName(s){ return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim(); }
+function overrideCountry(name){ const n=normName(name); for(const k in PLAYER_COUNTRY){ if(normName(k)===n) return PLAYER_COUNTRY[k]; } return ''; }
 const COACH_PHOTOS={'2232684':'https://upload.wikimedia.org/wikipedia/commons/9/99/Celtics_at_Wizards_2024-12-046_%28cropped%29_%28cropped%29.jpg'};
 function renderCoach(co){
   const cc=document.getElementById('coachCard'); if(!cc) return;
@@ -2272,6 +2292,7 @@ async function loadRoster(){
       const plinks=[['Profile','playercard'],['Stats','stats'],['Game Log','gamelog']].map(z=>{const h=lk(z[1]);return h?{label:z[0],href:h}:null;}).filter(Boolean);
       return {
         name:a.displayName,
+        country:bp.country||overrideCountry(a.displayName),
         num:a.jersey?('#'+a.jersey):'',
         pos:pos,
         imgUrl:(a.headshot&&a.headshot.href)||'',

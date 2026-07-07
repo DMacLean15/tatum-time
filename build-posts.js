@@ -44,6 +44,7 @@ try {
         featured: fm.featured === true,
         date: fm.date || '',
         image: fm.image || '',
+        imageFocus: fm.imageFocus || 'Center',
         gameLink: fm.gameLink || '',
         body: fm.body || ''
       });
