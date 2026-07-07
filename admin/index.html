@@ -479,7 +479,7 @@
   <button id="tt-roster-btn" class="tt-menu-btn" onclick="ttToggleMenu('tt-roster-menu')">🏀 Roster</button>
   <div id="tt-recipe-menu" class="tt-menu">
     <h4>📋 Post Recipes <button class="tt-menux" onclick="document.getElementById('tt-recipe-menu').classList.remove('open')" aria-label="Close">✕</button></h4>
-    <div class="tt-sub">Click <b>Copy</b>, then paste into the <b>Article</b> — headings, bold &amp; green tags come through. Fill in the <b>[blanks]</b>. Want a styled <b>score/grade card</b>? Add it with the editor's <b>+</b> button, or paste the recipe in <b>Markdown</b> view.</div>
+    <div class="tt-sub">Recipes include styled score/grade <b>cards</b>, so paste in <b>Markdown</b> mode:<br>① flip the <b>Markdown</b> switch (top-right of the Article box) → ② hit <b>Copy</b> &amp; paste → ③ flip back to <b>Rich Text</b>. Then fill in the <b>[blanks]</b>.</div>
     <div id="tt-recipe-list"></div>
   </div>
   <div id="tt-roster-menu" class="tt-menu">
@@ -550,11 +550,11 @@
     /* Post Recipes — one-click starting structures */
     var TT_RECIPES=[
       {icon:"🏀",name:"Game Recap",desc:"Score card → how it happened → standouts → what's next",
-       text:"Boston [beat / fell to] the [OPPONENT] on [date].\n\n**Final — Celtics 000, [Opponent] 000**\n\n## How It Happened\n[The flow of the game — the run that decided it, the turning point.]\n\n## Standout Performers\n- **[Player]** — ==PTS== ==REB== ==AST==\n- **[Player]** — ==key stat==\n\n## What's Next\n[The next game, or what this result means going forward.]"},
+       text:"Boston [beat / fell to] the [OPPONENT] on [date].\n\n<div class=\"post-score\"><div class=\"ps-row ps-win\"><span class=\"ps-team\">Celtics</span><span class=\"ps-score\">000</span></div><div class=\"ps-row\"><span class=\"ps-team\">[Opponent]</span><span class=\"ps-score\">000</span></div></div>\n\n## How It Happened\n[The flow of the game — the run that decided it, the turning point.]\n\n## Standout Performers\n- **[Player]** — ==PTS== ==REB== ==AST==\n- **[Player]** — ==key stat==\n\n## What's Next\n[The next game, or what this result means going forward.]"},
       {icon:"📰",name:"Trade / News Reaction",desc:"What happened → why it matters → your grade",
-       text:"## What Happened\n[The move in a sentence or two — who's in, who's out, the terms.]\n\n## Why It Matters\n[What it changes for the Celtics — the fit, the need it fills (or ignores).]\n\n## The Verdict\n[Your take — a win, a gamble, or a head-scratcher?]\n\n**Trade Grade:** ==B+=="},
+       text:"## What Happened\n[The move in a sentence or two — who's in, who's out, the terms.]\n\n## Why It Matters\n[What it changes for the Celtics — the fit, the need it fills (or ignores).]\n\n## The Verdict\n[Your take — a win, a gamble, or a head-scratcher?]\n\n<div class=\"grade-badge\"><span class=\"gb-grade gb-b\">B+</span><span class=\"gb-body\"><span class=\"gb-label\">Trade Grade</span><span class=\"gb-note\">[your one-line take]</span></span></div>"},
       {icon:"⭐",name:"Player Spotlight",desc:"Intro → stat card → why he matters",
-       text:"## Meet [Player]\n[Quick intro — his role, background, and why he's worth watching right now.]\n\n**[Player] —** ==PPG== · ==RPG== · ==APG==\n\n## The Numbers\n[One line on what the numbers actually say.]\n\n## Why He Matters\n[His impact — what Boston gets when he's rolling.]"},
+       text:"## Meet [Player]\n[Quick intro — his role, background, and why he's worth watching right now.]\n\n<div class=\"stat-line\"><span class=\"sl-name\">[Player]</span><span class=\"sl-stats\">[PPG] · [RPG] · [APG]</span></div>\n\n## The Numbers\n[One line on what the numbers actually say.]\n\n## Why He Matters\n[His impact — what Boston gets when he's rolling.]"},
       {icon:"🔢",name:"Power Rankings",desc:"A ranked list with a takeaway",
        text:"## The List\n1. **[Team or Player]** — [one-line why]\n2. **[Team or Player]** — [one-line why]\n3. **[Team or Player]** — [one-line why]\n\n## The Takeaway\n[Your overall read.]"},
       {icon:"🔥",name:"Hot Take",desc:"Bold opinion → the case → bottom line",
