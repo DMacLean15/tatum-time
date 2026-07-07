@@ -1412,7 +1412,8 @@ function commentsReady(){ return commentsConfig.url && commentsConfig.anonKey &&
 const notifyConfig={
   publicKey:"owpiI42bIc3Bik97Q",   // EmailJS Public Key
   serviceId:"service_hcsoh6g",     // EmailJS Email Service
-  templateId:"template_57p8p2l"    // EmailJS Email Template
+  templateId:"template_57p8p2l",   // EmailJS template for NEW COMMENTS
+  subTemplateId:"template_khcpqeh"   // EmailJS template for NEW SUBSCRIBERS (see SETUP-COMMENTS.txt)
 };
 function notifyReady(){ return notifyConfig.publicKey && notifyConfig.serviceId && notifyConfig.templateId && !notifyConfig.publicKey.includes('YOUR_') && !notifyConfig.serviceId.includes('YOUR_') && !notifyConfig.templateId.includes('YOUR_'); }
 function notifyNewComment(name,body,slug){
@@ -1421,6 +1422,12 @@ function notifyNewComment(name,body,slug){
   try{ if(typeof posts!=='undefined'){ const p=posts.find(x=>x.slug===slug); if(p&&p.title) title=p.title; } }catch(e){}
   const params={ commenter:name, comment:body, post_title:title, post_url:location.origin+'/#/post/'+slug };
   try{ emailjs.send(notifyConfig.serviceId,notifyConfig.templateId,params,{publicKey:notifyConfig.publicKey}); }catch(e){}
+}
+function subNotifyReady(){ return notifyConfig.publicKey && notifyConfig.serviceId && notifyConfig.subTemplateId && !notifyConfig.publicKey.includes('YOUR_') && !notifyConfig.serviceId.includes('YOUR_') && !notifyConfig.subTemplateId.includes('YOUR_'); }
+function notifyNewSubscriber(email){
+  if(!window.emailjs||!subNotifyReady()) return;   // silently skip until the subscriber template is set up
+  const params={ subscriber_email:email, site_url:location.origin };
+  try{ emailjs.send(notifyConfig.serviceId,notifyConfig.subTemplateId,params,{publicKey:notifyConfig.publicKey}); }catch(e){}
 }
 
 /* turn YouTube links in a post into an embedded player */
@@ -2053,6 +2060,7 @@ function wireNewsletter(){
       body:JSON.stringify({email:email})
     }).then(function(r){
       if(!r.ok && r.status!==409) return Promise.reject();   // 409 = already subscribed (unique email)
+      if(r.ok) notifyNewSubscriber(email);   // email Dan only for a genuinely new signup (skips 409 duplicates)
       emailEl.value=''; msg.textContent='🎉 You’re in! Thanks for subscribing.';
     }).catch(function(){ msg.textContent='Hmm, that didn’t go through — please try again.'; });
   });
