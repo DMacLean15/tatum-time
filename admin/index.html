@@ -92,7 +92,13 @@
         ".post-score{display:inline-flex;flex-direction:column;gap:2px;background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:12px 22px;margin:18px 0}" +
         ".post-score .ps-row{display:flex;justify-content:space-between;gap:30px;padding:5px 0;color:#9bb3a5}" +
         ".post-score .ps-team{font-weight:700}.post-score .ps-score{font-family:'Anton',sans-serif;font-size:1.4rem;min-width:46px;text-align:right;letter-spacing:1px}" +
-        ".post-score .ps-win .ps-team,.post-score .ps-win .ps-score{color:#16c45b}",
+        ".post-score .ps-win .ps-team,.post-score .ps-win .ps-score{color:#16c45b}" +
+        ".pull-quote{margin:26px 0;padding:4px 0 4px 22px;border-left:4px solid #16c45b}.pull-quote p{font-size:1.35rem;line-height:1.42;color:#fff;font-weight:600;margin:0}.pull-quote cite{display:block;margin-top:10px;color:#16c45b;font-style:normal;font-weight:700;font-size:.9rem}" +
+        ".stat-line{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 18px;margin:18px 0}.stat-line .sl-name{font-weight:800;color:#fff}.stat-line .sl-stats{color:#16c45b;font-weight:700}" +
+        ".callout{display:flex;gap:12px;align-items:flex-start;background:rgba(191,161,90,.08);border:1px solid rgba(191,161,90,.3);border-radius:12px;padding:14px 16px;margin:18px 0}.callout .co-ico{font-size:1.3rem}.callout .co-text{line-height:1.55}" +
+        ".grade-badge{display:flex;align-items:center;gap:16px;background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px 20px;margin:20px 0}.grade-badge .gb-grade{font-family:'Anton',sans-serif;font-size:2.5rem;line-height:1;width:74px;height:74px;flex:0 0 auto;display:grid;place-items:center;border-radius:14px;color:#fff}.grade-badge .gb-body{display:flex;flex-direction:column;gap:3px}.grade-badge .gb-label{font-weight:800;color:#fff;font-size:1.06rem}.grade-badge .gb-note{color:#9bb3a5;font-size:.9rem}" +
+        ".gb-a{background:linear-gradient(145deg,#16c45b,#04531f)}.gb-b{background:linear-gradient(145deg,#39a86f,#0a3a24)}.gb-c{background:linear-gradient(145deg,#bfa15a,#6e5a25)}.gb-d{background:linear-gradient(145deg,#d98a3b,#7a4715)}.gb-f{background:linear-gradient(145deg,#d95b5b,#7a1f1f)}" +
+        "figure{margin:20px 0}figure img{margin:0 auto 8px}figcaption{text-align:center;color:#9bb3a5;font-size:.82rem;font-style:italic;padding:0 12px}",
         { raw: true }
       );
 
@@ -133,6 +139,89 @@
         fromBlock: function (m) { return { teamA: m[1], scoreA: m[2], teamB: m[3], scoreB: m[4] }; },
         toBlock: function (o) { return (o.scoreA === "" && o.scoreB === "") ? "" : scoreCard(o); },
         toPreview: function (o) { return scoreCard(o); }
+      });
+
+      /* Pull Quote button — a big styled emphasis quote with optional attribution. */
+      function quoteHtml(o) {
+        var cite = (o.cite && o.cite.trim()) ? "<cite>— " + o.cite + "</cite>" : "";
+        return '<div class="pull-quote"><p>' + (o.text || "") + "</p>" + cite + "</div>";
+      }
+      CMS.registerEditorComponent({
+        id: "pullquote",
+        label: "Pull Quote",
+        fields: [
+          { name: "text", label: "Quote", widget: "string" },
+          { name: "cite", label: "Who said it (optional)", widget: "string", required: false }
+        ],
+        pattern: /^<div class="pull-quote"><p>([\s\S]*?)<\/p>(?:<cite>— ([\s\S]*?)<\/cite>)?<\/div>$/,
+        fromBlock: function (m) { return { text: m[1], cite: m[2] || "" }; },
+        toBlock: function (o) { return (o.text && o.text.trim()) ? quoteHtml(o) : ""; },
+        toPreview: function (o) { return quoteHtml(o); }
+      });
+
+      /* Player Stat Line button — a clean "Name — 28.3 PPG · 8.1 RPG" card. */
+      function statHtml(o) {
+        var stats = [o.stat1, o.stat2, o.stat3, o.stat4].filter(function (s) { return s && s.trim(); }).join(" · ");
+        return '<div class="stat-line"><span class="sl-name">' + (o.name || "") + '</span><span class="sl-stats">' + stats + "</span></div>";
+      }
+      CMS.registerEditorComponent({
+        id: "statline",
+        label: "Player Stat Line",
+        fields: [
+          { name: "name", label: "Player", widget: "string" },
+          { name: "stat1", label: "Stat 1 (e.g. 28.3 PPG)", widget: "string", required: false },
+          { name: "stat2", label: "Stat 2 (e.g. 8.1 RPG)", widget: "string", required: false },
+          { name: "stat3", label: "Stat 3 (e.g. 5.4 APG)", widget: "string", required: false },
+          { name: "stat4", label: "Stat 4 (optional)", widget: "string", required: false }
+        ],
+        pattern: /^<div class="stat-line"><span class="sl-name">(.*?)<\/span><span class="sl-stats">(.*?)<\/span><\/div>$/,
+        fromBlock: function (m) {
+          var s = (m[2] || "").split(" · ");
+          return { name: m[1], stat1: s[0] || "", stat2: s[1] || "", stat3: s[2] || "", stat4: s[3] || "" };
+        },
+        toBlock: function (o) { return (o.name && o.name.trim()) ? statHtml(o) : ""; },
+        toPreview: function (o) { return statHtml(o); }
+      });
+
+      /* Callout Box button — a styled "Editor's note / Fun fact" box. */
+      function calloutHtml(o) {
+        return '<div class="callout"><span class="co-ico">' + (o.emoji || "☘️") + '</span><span class="co-text">' + (o.text || "") + "</span></div>";
+      }
+      CMS.registerEditorComponent({
+        id: "callout",
+        label: "Callout Box",
+        fields: [
+          { name: "emoji", label: "Icon", widget: "string", default: "☘️", hint: "One emoji, e.g. ☘️ 🔥 💡" },
+          { name: "text", label: "Note", widget: "string" }
+        ],
+        pattern: /^<div class="callout"><span class="co-ico">(.*?)<\/span><span class="co-text">(.*?)<\/span><\/div>$/,
+        fromBlock: function (m) { return { emoji: m[1], text: m[2] }; },
+        toBlock: function (o) { return (o.text && o.text.trim()) ? calloutHtml(o) : ""; },
+        toPreview: function (o) { return calloutHtml(o); }
+      });
+
+      /* Grade Badge button — a big letter-grade card (A+, B-, …), colored by grade. */
+      function gradeClass(g) {
+        var L = (String(g || "").trim().charAt(0) || "").toUpperCase();
+        return (L === "A" || L === "B" || L === "C" || L === "D" || L === "F") ? L.toLowerCase() : "b";
+      }
+      function gradeHtml(o) {
+        var note = (o.note && o.note.trim()) ? '<span class="gb-note">' + o.note + "</span>" : "";
+        return '<div class="grade-badge"><span class="gb-grade gb-' + gradeClass(o.grade) + '">' + (o.grade || "") +
+          '</span><span class="gb-body"><span class="gb-label">' + (o.label || "") + "</span>" + note + "</span></div>";
+      }
+      CMS.registerEditorComponent({
+        id: "grade",
+        label: "Grade Badge",
+        fields: [
+          { name: "grade", label: "Grade (A+, B, C-…)", widget: "string" },
+          { name: "label", label: "What it's grading (e.g. Trade Grade)", widget: "string" },
+          { name: "note", label: "One-line note (optional)", widget: "string", required: false }
+        ],
+        pattern: /^<div class="grade-badge"><span class="gb-grade gb-[a-f]">(.*?)<\/span><span class="gb-body"><span class="gb-label">(.*?)<\/span>(?:<span class="gb-note">(.*?)<\/span>)?<\/span><\/div>$/,
+        fromBlock: function (m) { return { grade: m[1], label: m[2], note: m[3] || "" }; },
+        toBlock: function (o) { return (o.grade && o.grade.trim()) ? gradeHtml(o) : ""; },
+        toPreview: function (o) { return gradeHtml(o); }
       });
     }
 
@@ -207,15 +296,26 @@
       <h3>📸 Photos</h3>
       <ul>
         <li>Click the image button and upload — it auto-resizes to fit.</li>
+        <li>Type a <b>description</b> when you add a photo and it shows as a small <b>caption</b> underneath it on the site.</li>
         <li>The little thumbnail sometimes doesn't show while attaching — that's cosmetic. Check the <b>preview</b> to confirm the photo's there.</li>
         <li>Shrink huge phone photos before uploading so the site stays fast.</li>
       </ul>
 
+      <h3>🖼️ Featured Photo</h3>
+      <p>Set a <b>Featured Photo</b> (field near the top) and it shows big at the top of the post and on the post cards. Leave it blank and the <b>first photo in your article</b> is used automatically — so old posts already look great.</p>
+
       <h3>▶️ YouTube videos</h3>
       <p>Two ways: paste a link on its <b>own line</b>, OR click the <b>"+"</b> in the editor → <b>"YouTube Video"</b> and paste the link.</p>
 
-      <h3>🏀 Box score card</h3>
-      <p>Click the <b>"+"</b> in the editor → <b>"Box Score"</b>, type the two teams and scores, and it drops in a clean final-score card (winner shown in green).</p>
+      <h3>➕ Special blocks (the "+" menu in the editor)</h3>
+      <ul>
+        <li><b>Box Score</b> — a clean final-score card (winner shown in green).</li>
+        <li><b>Pull Quote</b> — a big emphasized quote, with optional attribution.</li>
+        <li><b>Player Stat Line</b> — a card like "Tatum — 28.3 PPG · 8.1 RPG · 5.4 APG".</li>
+        <li><b>Grade Badge</b> — a big letter grade (A+, B-…) for trade/draft/game grades — colors itself (green A/B, gold C, red D/F).</li>
+        <li><b>Callout Box</b> — a highlighted "Editor's note / fun fact" box.</li>
+        <li><b>YouTube Video</b> — paste a link and it embeds.</li>
+      </ul>
 
       <h3>🏀 "See full game stats" button</h3>
       <p>Fill in the <b>Game Box-Score Link</b> field with an NBA.com box-score web address, and a green button appears on the post. Leave it blank for none.</p>

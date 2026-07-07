@@ -44,6 +44,13 @@ collections:
         default: "🏀"
         hint: "One emoji shown on the post's banner — e.g. 🏀 🍀 🔥 🏆 🎯 🐣 🃏"
 
+      - name: "image"
+        label: "Featured Photo (optional)"
+        widget: "image"
+        required: false
+        choose_url: false
+        hint: "Big photo shown at the top of the post and on the post cards. Leave blank and the first photo in your article is used automatically."
+
       - name: "category"
         label: "Category"
         widget: "select"
