@@ -51,6 +51,14 @@ collections:
         choose_url: false
         hint: "Big photo shown at the top of the post and on the post cards. Leave blank and the first photo in your article is used automatically."
 
+      - name: "imageFocus"
+        label: "Hero Photo Focus"
+        widget: "select"
+        default: "Center"
+        options: ["Center", "Top", "Bottom", "Left", "Right"]
+        required: false
+        hint: "The top photo crops to a wide banner. If it cuts off the important part, pick which part to keep in view — e.g. 'Top' to keep a face. Most photos look best on Center."
+
       - name: "category"
         label: "Category"
         widget: "select"
