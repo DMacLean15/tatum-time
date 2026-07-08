@@ -1,7 +1,7 @@
 ---
 title: Celtics Summer League Preview
 emoji: 🔥
-image: /images/uploads/img_0722.jpeg
+image: /images/uploads/boston_header.jpg
 imageFocus: Top
 category: News
 featured: true
