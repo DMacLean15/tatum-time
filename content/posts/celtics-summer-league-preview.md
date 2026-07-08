@@ -19,7 +19,7 @@ Wednesday July 15 vs. Sacramento Kings @ 8 PM ET (ESPN 2)
 
 TBD: A 5th game will be scheduled after July 15th depending on the preliminary standings, followed by potential playoff matchups.
 
-Key players include recent draft picks Chris Cenac Jr and Dillion Mitchell:
+Key players include recent draft picks Chris Cenac Jr. and Dillion Mitchell:
 
 ![](/images/uploads/img_0722.jpeg)
 
