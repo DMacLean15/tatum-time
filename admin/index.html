@@ -75,7 +75,7 @@
     #tt-emoji-btn{bottom:216px}
     #tt-quicklinks-btn{bottom:264px}
     #tt-recipe-btn:hover, #tt-roster-btn:hover, #tt-emoji-btn:hover, #tt-quicklinks-btn:hover{border-color:#bfa15a;background:#132a1f}
-    .tt-menu{position:fixed;right:20px;bottom:320px;z-index:99999;width:330px;max-width:calc(100vw - 40px);max-height:calc(100vh - 350px);overflow-y:auto;background:#0f1d16;border:1px solid rgba(22,196,91,.32);border-radius:14px;box-shadow:0 24px 60px -18px rgba(0,0,0,.8);color:#e8efe9;font:14px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:16px 18px 18px;display:none}
+    .tt-menu{position:fixed;right:20px;bottom:20px;z-index:99999;width:340px;max-width:calc(100vw - 40px);max-height:calc(100vh - 40px);overflow-y:auto;background:#0f1d16;border:1px solid rgba(22,196,91,.32);border-radius:14px;box-shadow:0 24px 60px -18px rgba(0,0,0,.8);color:#e8efe9;font:14px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:16px 18px 18px;display:none}
     .tt-emoji-grid{display:flex;flex-wrap:wrap;gap:6px}
     .tt-emoji{font-size:1.35rem;line-height:1;cursor:pointer;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;width:40px;height:40px;display:grid;place-items:center;padding:0}
     .tt-emoji:hover{background:rgba(22,196,91,.2);border-color:rgba(22,196,91,.4)}
@@ -87,6 +87,9 @@
     .tt-menu .tt-menux{background:none;border:none;color:#9bb3a5;font-size:1rem;cursor:pointer;line-height:1;padding:2px 4px}
     .tt-menu .tt-menux:hover{color:#fff}
     .tt-menu .tt-sub{color:#b3c8bc;font-size:.82rem;margin-bottom:12px;line-height:1.45}
+    .tt-menu .tt-warn{background:rgba(255,176,32,.13);border:1px solid rgba(255,176,32,.5);border-radius:10px;padding:11px 13px;margin-bottom:12px;color:#ffd98a;font-size:.86rem;line-height:1.5;font-weight:600}
+    .tt-menu .tt-warn b{color:#ffe8b0}
+    .tt-menu .tt-warn .tt-warn-hd{display:block;color:#ffd98a;font-size:.95rem;font-weight:800;margin-bottom:3px}
     .tt-recipe{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:11px 13px;margin-bottom:8px}
     .tt-recipe b{color:#fff;font-size:.95rem}
     .tt-recipe small{display:block;color:#b3c8bc;font-size:.78rem;margin-top:2px}
@@ -662,7 +665,8 @@
   <button id="tt-roster-btn" class="tt-menu-btn" onclick="ttToggleMenu('tt-roster-menu')">🏀 Roster</button>
   <div id="tt-recipe-menu" class="tt-menu">
     <h4>📋 Post Recipes <button class="tt-menux" onclick="document.getElementById('tt-recipe-menu').classList.remove('open')" aria-label="Close">✕</button></h4>
-    <div class="tt-sub">Recipes include styled score/grade <b>cards</b>, so paste in <b>Markdown</b> mode:<br>① flip the <b>Markdown</b> switch (top-right of the Article box) → ② hit <b>Copy</b> &amp; paste → ③ flip back to <b>Rich Text</b>. Then fill in the <b>[blanks]</b>.</div>
+    <div class="tt-warn"><span class="tt-warn-hd">⚠️ Paste in Markdown mode!</span>Flip the <b>Markdown</b> switch (top-right of the Article box) <b>before</b> you paste — otherwise the score &amp; grade cards won't appear. Flip back to <b>Rich Text</b> when you're done.</div>
+    <div class="tt-sub">Pick a recipe → <b>Copy</b> → paste into the <b>Article</b> → fill in the <b>[blanks]</b>.</div>
     <div id="tt-recipe-list"></div>
   </div>
   <div id="tt-roster-menu" class="tt-menu">
