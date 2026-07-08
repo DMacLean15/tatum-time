@@ -5,7 +5,13 @@
 const fs = require('fs');
 
 const SITE = 'https://tatumtime.net';   // live domain
-const posts = JSON.parse(fs.readFileSync('content/posts.json', 'utf8')).posts || [];
+const allPosts = JSON.parse(fs.readFileSync('content/posts.json', 'utf8')).posts || [];
+// Keep scheduled (future-dated) posts out of the feed until their day.
+const todayISO = new Date().toISOString().slice(0, 10);
+const posts = allPosts.filter(function (p) {
+  const pd = String(p.date || '').slice(0, 10);
+  return !/^\d{4}-\d{2}-\d{2}$/.test(pd) || pd <= todayISO;
+});
 
 const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const slugify = s => (String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60) || 'post');

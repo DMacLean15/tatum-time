@@ -374,6 +374,8 @@
   .article .rating .rt-bar{flex:1;height:10px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
   .article .rating .rt-fill{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--green),var(--green-glow))}
   .article .rating .rt-val{flex:0 0 auto;font-family:'Anton',sans-serif;color:#fff;font-size:.95rem;min-width:44px;text-align:right}
+  /* Game Calendar block reuses the Schedule .cal-* styles — just add spacing inside a post */
+  .article .cal-grid{margin:22px 0}
   /* featured/hero photo at the top of an open post */
   .reader-hero-img{width:100%;aspect-ratio:2.2/1;max-height:360px;object-fit:cover;object-position:center;display:block;border-bottom:1px solid var(--line);background:#0a140f}
   /* photo thumbnail in the post list (falls back to the emoji tile) */
@@ -1283,6 +1285,14 @@ let posts = fallbackPosts;
 let current = 0;
 let featuredIdx = 0;
 function dateNum(d){ const t=new Date(d).getTime(); return isNaN(t)?0:t; }
+/* Scheduled posts: a post dated in the future stays hidden until that calendar day
+   (checked per visit, in the visitor's local time, so it appears on its own). */
+function isPublished(p){
+  const pd=(p.date||'').slice(0,10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(pd)) return true;                 // unknown/legacy date → always show
+  const n=new Date(), today=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
+  return pd<=today;
+}
 /* show a date nicely whether it's ISO (2026-07-01) or a legacy string (Jul 1, 2026) */
 function fmtDisplayDate(s){
   s=String(s||''); const iso=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
@@ -1377,7 +1387,7 @@ async function initBlog(){
       }
     }
   }catch(e){ /* offline / opened from disk — keep the built-in fallback */ }
-  posts = source.map(ensureMeta).sort((a,b)=>dateNum(b.date)-dateNum(a.date));   // newest first — no manual reordering needed
+  posts = source.map(ensureMeta).filter(isPublished).sort((a,b)=>dateNum(b.date)-dateNum(a.date));   // newest first; hide future-dated (scheduled) posts until their day
   buildList(); buildTags(); setFeatured();
   const searchEl=document.getElementById('postSearch');
   if(searchEl) searchEl.addEventListener('input', applyFilter);
