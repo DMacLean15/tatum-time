@@ -1,7 +1,8 @@
 ---
 title: Celtics Summer League Preview
 emoji: 🔥
-imageFocus: Center
+image: /images/uploads/img_0722.jpeg
+imageFocus: Top
 category: News
 featured: true
 date: 2026-07-08
