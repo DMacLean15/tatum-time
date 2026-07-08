@@ -23,7 +23,7 @@ Key players include recent draft picks Chris Cenac Jr and Dillion Mitchell:
 
 ![](/images/uploads/img_0722.jpeg)
 
-They will be joined by returning prospects Hugo Gonzalez and Amari Williams:
+They will be joined by returning prospects Amari Williams and Hugo Gonzalez:
 
 ![](/images/uploads/img_0725.jpeg)
 
