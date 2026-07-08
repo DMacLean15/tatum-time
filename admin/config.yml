@@ -78,7 +78,7 @@ collections:
         format: "YYYY-MM-DD"
         date_format: "MMM D, YYYY"
         picker_utc: false
-        hint: "New posts fill in today automatically — only change it to backdate a post. (A time may show in the editor; ignore it, the site only uses the date and shows it as 'Jul 1, 2026'.)"
+        hint: "New posts fill in today automatically. Pick an earlier date to backdate, or a FUTURE date to schedule — a future-dated post stays hidden on the site until that day arrives, then appears on its own. (A time may show in the editor; ignore it.)"
 
       - name: "gameLink"
         label: "Game Box-Score Link"

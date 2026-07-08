@@ -159,6 +159,16 @@
     #tt-help-panel .rating .rt-bar{flex:1;height:9px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
     #tt-help-panel .rating .rt-fill{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#007a33,#16c45b)}
     #tt-help-panel .rating .rt-val{font-family:'Anton',sans-serif;color:#fff;font-size:.85rem;min-width:40px;text-align:right}
+    #tt-help-panel .cal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:9px;margin:2px 0}
+    #tt-help-panel .cal-card{background:linear-gradient(180deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+    #tt-help-panel .cal-top{background:linear-gradient(145deg,#16c45b,#007a33);color:#062a14;text-align:center;padding:4px;font-size:.6rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
+    #tt-help-panel .cal-day{font-family:'Anton',sans-serif;font-size:1.7rem;text-align:center;color:#fff;line-height:1;padding-top:6px}
+    #tt-help-panel .cal-match{display:flex;justify-content:center;gap:5px;padding:7px 5px 3px}
+    #tt-help-panel .cal-match .cal-vs{color:#9bb3a5;font-size:.66rem;font-weight:600}
+    #tt-help-panel .cal-match b{color:#fff;font-size:.76rem;font-weight:700}
+    #tt-help-panel .cal-res{text-align:center;font-family:'Anton',sans-serif;font-size:.85rem;padding:3px 5px 9px}
+    #tt-help-panel .cal-res.ww{color:#16c45b}#tt-help-panel .cal-res.ll{color:#ff7a7a}#tt-help-panel .cal-res.up{font-family:sans-serif;font-weight:700;font-size:.72rem;color:#bfa15a}
+    #tt-help-panel .cal-foot{margin-top:auto;padding:1px 5px 8px;display:flex;flex-direction:column;align-items:center;gap:1px}#tt-help-panel .cal-tv{font-size:.55rem;color:#9bb3a5;font-weight:700}
     /* Hide the floating toolbar + scoreboard until a GitHub login succeeds */
     body:not(.tt-authed) #tt-help-btn,
     body:not(.tt-authed) #tt-site-btn,
@@ -205,7 +215,8 @@
         ".stat-hero{text-align:center;background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:26px 20px;margin:22px 0}.stat-hero .sh-num{display:block;font-family:'Anton',sans-serif;font-size:4rem;line-height:1;color:#16c45b}.stat-hero .sh-cap{display:block;margin-top:10px;color:#d7e2db;font-weight:600}" +
         ".tale-tape{background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:14px 18px 8px;margin:22px 0}.tale-tape .tt-head{display:flex;justify-content:space-between;gap:10px;padding-bottom:12px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.1)}.tale-tape .tt-a,.tale-tape .tt-b{font-weight:800;color:#fff;flex:1}.tale-tape .tt-b{text-align:right}.tale-tape .tt-vs{color:#16c45b;font-family:'Anton',sans-serif;letter-spacing:1.5px}.tale-tape .tt-row{display:flex;justify-content:space-between;gap:10px;padding:7px 0}.tale-tape .tt-va,.tale-tape .tt-vb{font-family:'Anton',sans-serif;font-size:1.2rem;color:#fff;flex:1}.tale-tape .tt-vb{text-align:right}.tale-tape .tt-stat{color:#9bb3a5;font-size:.68rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;padding:0 6px}" +
         ".timeline{margin:22px 0}.timeline .tl-title{font-family:'Anton',sans-serif;color:#fff;font-size:1.15rem;margin-bottom:14px}.timeline .tl-item{position:relative;padding:0 0 16px 24px;border-left:2px solid rgba(22,196,91,.3)}.timeline .tl-item:last-child{border-left-color:transparent}.timeline .tl-item::before{content:'';position:absolute;left:-7px;top:3px;width:12px;height:12px;border-radius:50%;background:#16c45b}.timeline .tl-when{color:#16c45b;font-weight:800;font-size:.72rem;letter-spacing:1px;text-transform:uppercase;margin-right:9px}.timeline .tl-what{color:#d7e2db}" +
-        ".rating{background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px 18px;margin:22px 0}.rating .rt-title{font-weight:800;color:#fff;margin-bottom:12px}.rating .rt-row{display:flex;align-items:center;gap:12px;margin:9px 0}.rating .rt-lbl{flex:0 0 100px;color:#9bb3a5;font-size:.85rem;font-weight:600}.rating .rt-bar{flex:1;height:10px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}.rating .rt-fill{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#007a33,#16c45b)}.rating .rt-val{font-family:'Anton',sans-serif;color:#fff;min-width:44px;text-align:right}",
+        ".rating{background:linear-gradient(165deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px 18px;margin:22px 0}.rating .rt-title{font-weight:800;color:#fff;margin-bottom:12px}.rating .rt-row{display:flex;align-items:center;gap:12px;margin:9px 0}.rating .rt-lbl{flex:0 0 100px;color:#9bb3a5;font-size:.85rem;font-weight:600}.rating .rt-bar{flex:1;height:10px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}.rating .rt-fill{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#007a33,#16c45b)}.rating .rt-val{font-family:'Anton',sans-serif;color:#fff;min-width:44px;text-align:right}" +
+        ".cal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:12px;margin:22px 0}.cal-card{background:linear-gradient(180deg,#0f1d16,#0a1510);border:1px solid rgba(255,255,255,.1);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}.cal-top{background:linear-gradient(145deg,#16c45b,#007a33);color:#062a14;text-align:center;padding:5px;font-size:.66rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}.cal-day{font-family:'Anton',sans-serif;font-size:2.1rem;text-align:center;color:#fff;line-height:1;padding-top:8px}.cal-match{display:flex;align-items:center;justify-content:center;gap:5px;padding:9px 6px 4px}.cal-match .cal-vs{color:#9bb3a5;font-size:.72rem;font-weight:600}.cal-match b{color:#fff;font-size:.82rem;font-weight:700}.cal-res{text-align:center;font-family:'Anton',sans-serif;font-size:.95rem;letter-spacing:.5px;padding:4px 6px 11px}.cal-res.ww{color:#16c45b}.cal-res.ll{color:#ff7a7a}.cal-res.up{font-family:sans-serif;font-weight:700;font-size:.8rem;color:#bfa15a}.cal-foot{margin-top:auto;padding:2px 6px 10px;display:flex;flex-direction:column;align-items:center;gap:2px}.cal-tv{font-size:.6rem;color:#9bb3a5;font-weight:700}.cal-note{font-size:.56rem;color:#bfa15a;font-weight:800;text-transform:uppercase}",
         { raw: true }
       );
 
@@ -456,6 +467,61 @@
         toBlock: function (o) { return (o.lbl1 && o.lbl1.trim()) ? ratingHtml(o) : ""; },
         toPreview: function (o) { return ratingHtml(o); }
       });
+
+      /* Game Calendar — a schedule strip styled like the Celtics Central "Schedule" tab. */
+      function calHtml(o) {
+        var cards = "";
+        for (var i = 1; i <= 4; i++) {
+          var d = o["day" + i];
+          if (d != null && String(d).trim()) {
+            var m = (o["month" + i] || "").trim();
+            var match = (o["match" + i] || "").trim();
+            var parts = match.split(/\s+/), vs = parts[0] || "", opp = parts.slice(1).join(" ");
+            var res = (o["res" + i] || "").trim();
+            var rc = /^w/i.test(res) ? " ww" : /^l/i.test(res) ? " ll" : (res ? " up" : "");
+            var tv = (o["tv" + i] || "").trim();
+            var foot = tv ? '<div class="cal-foot"><span class="cal-tv">📺 ' + tv + '</span></div>' : '';
+            cards += '<div class="cal-card"><div class="cal-top">' + m + '</div><div class="cal-day">' + d +
+              '</div><div class="cal-match"><span class="cal-vs">' + vs + '</span> <b>' + opp +
+              '</b></div><div class="cal-res' + rc + '">' + res + "</div>" + foot + "</div>";
+          }
+        }
+        return '<div class="cal-grid">' + cards + "</div>";
+      }
+      CMS.registerEditorComponent({
+        id: "gamecalendar",
+        label: "Game Calendar",
+        fields: [
+          { name: "month1", label: "Game 1 — month (e.g. APR)", widget: "string", required: false },
+          { name: "day1", label: "Game 1 — day (e.g. 10)", widget: "string", required: false },
+          { name: "match1", label: "Game 1 — matchup (e.g. vs Pelicans or @ Heat)", widget: "string", required: false },
+          { name: "res1", label: "Game 1 — result or time (e.g. W 144-118 or 7:30 PM)", widget: "string", required: false },
+          { name: "tv1", label: "Game 1 — TV channel (optional, e.g. ESPN)", widget: "string", required: false },
+          { name: "month2", label: "Game 2 — month", widget: "string", required: false },
+          { name: "day2", label: "Game 2 — day", widget: "string", required: false },
+          { name: "match2", label: "Game 2 — matchup", widget: "string", required: false },
+          { name: "res2", label: "Game 2 — result or time", widget: "string", required: false },
+          { name: "tv2", label: "Game 2 — TV channel (optional)", widget: "string", required: false },
+          { name: "month3", label: "Game 3 — month", widget: "string", required: false },
+          { name: "day3", label: "Game 3 — day", widget: "string", required: false },
+          { name: "match3", label: "Game 3 — matchup", widget: "string", required: false },
+          { name: "res3", label: "Game 3 — result or time", widget: "string", required: false },
+          { name: "tv3", label: "Game 3 — TV channel (optional)", widget: "string", required: false },
+          { name: "month4", label: "Game 4 — month", widget: "string", required: false },
+          { name: "day4", label: "Game 4 — day", widget: "string", required: false },
+          { name: "match4", label: "Game 4 — matchup", widget: "string", required: false },
+          { name: "res4", label: "Game 4 — result or time", widget: "string", required: false },
+          { name: "tv4", label: "Game 4 — TV channel (optional)", widget: "string", required: false }
+        ],
+        pattern: /^<div class="cal-grid">([\s\S]*?)<\/div>$/,
+        fromBlock: function (m) {
+          var o = {}, re = /<div class="cal-card"><div class="cal-top">([\s\S]*?)<\/div><div class="cal-day">([\s\S]*?)<\/div><div class="cal-match"><span class="cal-vs">([\s\S]*?)<\/span> <b>([\s\S]*?)<\/b><\/div><div class="cal-res[^"]*">([\s\S]*?)<\/div>(?:<div class="cal-foot"><span class="cal-tv">📺 ([\s\S]*?)<\/span><\/div>)?<\/div>/g, x, i = 1;
+          while ((x = re.exec(m[1])) && i <= 4) { o["month" + i] = x[1]; o["day" + i] = x[2]; o["match" + i] = (x[3] + " " + x[4]).trim(); o["res" + i] = x[5]; o["tv" + i] = x[6] || ""; i++; }
+          return o;
+        },
+        toBlock: function (o) { return (o.day1 && String(o.day1).trim()) ? calHtml(o) : ""; },
+        toPreview: function (o) { return calHtml(o); }
+      });
     }
 
     /* 3) Render ==stat== as a green tag in the live preview (best-effort; harmless if it can't reach the frame). */
@@ -531,7 +597,7 @@
         <li><b>Hero Photo Focus</b> — which part of that photo to keep when it crops to a banner (Center / Top / Bottom / Left / Right).</li>
         <li><b>Category</b> — pick one: Recap, Analysis, News, Playoffs, Draft, Roster, or Milestone. It shows as a tag and powers the category filter buttons.</li>
         <li><b>⭐ Feature this post</b> — turn ON to pin it to the big "Featured Post" spot on the homepage. Leave OFF and your newest post is featured automatically. Only turn it on for one post.</li>
-        <li><b>Date</b> — pick from the calendar (new posts default to today). <b>This is what orders your posts</b> — no dragging needed.</li>
+        <li><b>Date</b> — pick from the calendar (new posts default to today). It <b>orders your posts</b>, and a <b>future date schedules the post</b> — it stays hidden on the site until that day.</li>
         <li><b>Game Box-Score Link</b> — adds a "See full game stats" button (see below).</li>
         <li><b>Article</b> — the post body, where you write.</li>
       </ul>
@@ -652,6 +718,11 @@
         <div class="rating"><div class="rt-title">Tatum's Night</div><div class="rt-row"><span class="rt-lbl">Scoring</span><span class="rt-bar"><span class="rt-fill" style="width:90%"></span></span><span class="rt-val">9/10</span></div><div class="rt-row"><span class="rt-lbl">Defense</span><span class="rt-bar"><span class="rt-fill" style="width:80%"></span></span><span class="rt-val">8/10</span></div></div>
       </div>
 
+      <p><b>Game Calendar</b> — a schedule strip like Celtics Central; add a few games (date, matchup, result/time, and an optional <b>📺 TV channel</b>). Results color themselves: <b>W</b> green, <b>L</b> red, a time shows gold.</p>
+      <div class="tt-ex"><div class="exlbl">Example</div>
+        <div class="cal-grid"><div class="cal-card"><div class="cal-top">APR</div><div class="cal-day">10</div><div class="cal-match"><span class="cal-vs">vs</span> <b>Pelicans</b></div><div class="cal-res ww">W 144-118</div><div class="cal-foot"><span class="cal-tv">📺 NBC</span></div></div><div class="cal-card"><div class="cal-top">APR</div><div class="cal-day">14</div><div class="cal-match"><span class="cal-vs">@</span> <b>Heat</b></div><div class="cal-res up">7:30 PM</div><div class="cal-foot"><span class="cal-tv">📺 ESPN</span></div></div></div>
+      </div>
+
       <h3>🏀 "See full game stats" button</h3>
       <p>Fill in the <b>Game Box-Score Link</b> field with an NBA.com box-score web address, and a green button appears on the post. Leave it blank for none.</p>
       <p class="tt-note">It should look like: <code>https://www.nba.com/game/lal-vs-bos-0022500123/box-score</code></p>
@@ -662,6 +733,7 @@
       <h3>🍀 Publishing &amp; ordering</h3>
       <ul>
         <li>Posts <b>sort themselves by Date</b>, newest first — no dragging. To reorder, just change a post's <b>Date</b> field.</li>
+        <li><b>📅 Schedule ahead:</b> set the <b>Date</b> to a future day and Publish — the post stays hidden on the site until that date arrives, then shows up on its own (no need to touch it again).</li>
         <li>Use <b>⭐ Feature this post</b> to pin one post to the homepage's Featured spot.</li>
         <li>Each post is its own entry — use the <b>search box</b> in the post list to find one fast.</li>
         <li><b>Edit or delete a post:</b> open it from the list — <b>Delete entry</b> is at the top of the editor. Your change goes live after you hit Publish.</li>
