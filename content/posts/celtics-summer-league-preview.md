@@ -23,11 +23,11 @@ Key players include recent draft picks Chris Cenac Jr. and Dillon Mitchell:
 
 ![](/images/uploads/img_0722.jpeg)
 
-They will be joined by returning prospects Amari Williams and Hugo Gonzalez:
+They will be joined by returning prospect Hugo Gonzalez:
 
-![](/images/uploads/img_0725.jpeg)
+![](/images/uploads/img_1098.webp)
 
-Other notables include: Milos Uzan (Houston), Day Day Thomas (Cincinnati), Nick Pringle (Arkansas) and Tucker DeVries (Indiana)
+Other notables include: Milos Uzan (Houston), Day Day Thomas (Cincinnati), Nick Pringle (Arkansas), Tucker DeVries (Indiana), Kyle Mangas (Indiana Wesleyan), Chauncey Wiggins (Florida St.)
 
 ![](/images/uploads/img_0728.jpeg)
 
@@ -37,4 +37,18 @@ Other notables include: Milos Uzan (Houston), Day Day Thomas (Cincinnati), Nick 
 
 ![](/images/uploads/img_0730.jpeg)
 
+![](/images/uploads/img_1095.png)
+
+![](/images/uploads/img_1100.jpeg)
+
+\
+TBD:
+
+Amari Williams
+
+Max Shulga
+
+John Tonje
+
+\
 Stay tuned for more updates!
