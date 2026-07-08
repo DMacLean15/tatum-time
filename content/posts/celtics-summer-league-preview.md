@@ -1,8 +1,7 @@
 ---
 title: Celtics Summer League Preview
 emoji: 🔥
-image: /images/uploads/boston_header.jpg
-imageFocus: Top
+imageFocus: Center
 category: News
 featured: true
 date: 2026-07-08
@@ -19,11 +18,11 @@ Wednesday July 15 vs. Sacramento Kings @ 8 PM ET (ESPN 2)
 
 TBD: A 5th game will be scheduled after July 15th depending on the preliminary standings, followed by potential playoff matchups.
 
-Key players include recent draft picks Chris Cenac Jr. and Dillion Mitchell:
+Key players include recent draft picks Chris Cenac Jr. and Dillon Mitchell:
 
 ![](/images/uploads/img_0722.jpeg)
 
-They will be joined by returning prospects Amari Williams and Hugo Gonzalez:
+They will be joined by returning prospects Hugo Gonzalez and Amari Williams:
 
 ![](/images/uploads/img_0725.jpeg)
 
