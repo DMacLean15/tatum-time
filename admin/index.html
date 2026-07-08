@@ -159,6 +159,16 @@
     #tt-help-panel .rating .rt-bar{flex:1;height:9px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
     #tt-help-panel .rating .rt-fill{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#007a33,#16c45b)}
     #tt-help-panel .rating .rt-val{font-family:'Anton',sans-serif;color:#fff;font-size:.85rem;min-width:40px;text-align:right}
+    /* Hide the floating toolbar + scoreboard until a GitHub login succeeds */
+    body:not(.tt-authed) #tt-help-btn,
+    body:not(.tt-authed) #tt-site-btn,
+    body:not(.tt-authed) #tt-recipe-btn,
+    body:not(.tt-authed) #tt-roster-btn,
+    body:not(.tt-authed) #tt-emoji-btn,
+    body:not(.tt-authed) #tt-quicklinks-btn,
+    body:not(.tt-authed) #tt-score,
+    body:not(.tt-authed) .tt-menu,
+    body:not(.tt-authed) #tt-help-overlay{display:none !important}
   </style>
 </head>
 <body>
@@ -859,6 +869,27 @@
         .catch(function () { /* stay hidden if ESPN is unreachable */ });
     })();
     /* (Auto-date is now handled natively by the date picker's "default to today", so no script needed.) */
+
+    /* Only reveal the floating toolbar + scoreboard once the user is logged in.
+       Uses Decap's login/logout events, plus a DOM check that also covers page
+       reloads with a saved session and hides again after logout. */
+    (function () {
+      function setAuthed(v) { document.body.classList.toggle("tt-authed", !!v); }
+      if (window.CMS && CMS.registerEventListener) {
+        try {
+          CMS.registerEventListener({ name: "login", handler: function () { setAuthed(true); } });
+          CMS.registerEventListener({ name: "logout", handler: function () { setAuthed(false); } });
+        } catch (e) {}
+      }
+      setInterval(function () {
+        var loginVisible = false, btns = document.querySelectorAll("button");
+        for (var i = 0; i < btns.length; i++) {
+          if ((btns[i].textContent || "").toLowerCase().indexOf("login with") > -1) { loginVisible = true; break; }
+        }
+        if (loginVisible) setAuthed(false);                                   // login screen showing
+        else if ((document.body.innerText || "").indexOf("Blog Posts") > -1) setAuthed(true);   // CMS collection is loaded => logged in
+      }, 600);
+    })();
   </script>
 </body>
 </html>
