@@ -43,11 +43,9 @@ Other notables include: Milos Uzan (Houston), Day Day Thomas (Cincinnati), Nick 
 
 ![](/images/uploads/img_1111.webp)
 
-![](/images/uploads/img_1111.webp)
+![]()
 
 ![](/images/uploads/img_1118.webp)
-
-
 
 ![](/images/uploads/img_1113.webp)
 
