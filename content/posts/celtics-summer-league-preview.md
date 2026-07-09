@@ -7,7 +7,7 @@ category: News
 featured: true
 date: 2026-07-08
 ---
-The Boston Celtics kick off the Las Vegas Summer league on July 10th. They are scheduled to play in 4 preliminary games:
+The Boston Celtics kick off the Las Vegas Summer league on July 10th. The official roster has been announced! They are scheduled to play in 4 preliminary games:
 
 <div class="stat-hero"><span class="sh-num">4</span><span class="sh-cap">Preliminary games in Las Vegas — with a 5th to be added</span></div>
 
@@ -19,11 +19,15 @@ Key players include recent draft picks Chris Cenac Jr. and Dillon Mitchell:
 
 ![](/images/uploads/img_0722.jpeg)
 
-They will be joined by returning prospect Hugo Gonzalez:
+They will be joined by returning prospects Hugo Gonzalez and Amari Williams:
 
 ![](/images/uploads/img_1098.webp)
 
-Other notables include: Milos Uzan (Houston), Day Day Thomas (Cincinnati), Nick Pringle (Arkansas), Tucker DeVries (Indiana), Kyle Mangas (Indiana Wesleyan), Chauncey Wiggins (Florida St.)
+![](/images/uploads/img_1117.jpeg)
+
+\
+\
+Other notables include: Milos Uzan (Houston), Day Day Thomas (Cincinnati), Nick Pringle (Arkansas), Tucker DeVries (Indiana), Kyle Mangas (Indiana Wesleyan), Chauncey Wiggins (Florida St.), Mohammad Amini (Nancy Basket/France), Caleb Grill (Greensboro - G League), Curtis Jones (Denver/NBA), Hank Morgan (Maine - G League), John Tonje (Boston/NBA) and Alondes Williams (Washington/NBA)
 
 ![](/images/uploads/img_0728.jpeg)
 
@@ -37,14 +41,20 @@ Other notables include: Milos Uzan (Houston), Day Day Thomas (Cincinnati), Nick 
 
 ![](/images/uploads/img_1100.jpeg)
 
+![](/images/uploads/img_1111.webp)
+
+![](/images/uploads/img_1111.webp)
+
+![](/images/uploads/img_1118.webp)
+
+
+
+![](/images/uploads/img_1113.webp)
+
+![](/images/uploads/img_1115.webp)
+
+![](/images/uploads/img_1116.jpeg)
+
 \
-TBD:
-
-Amari Williams
-
-Max Shulga
-
-John Tonje
-
 \
 Stay tuned for more updates!
