@@ -25,8 +25,6 @@ They will be joined by returning prospects Hugo Gonzalez and Amari Williams:
 
 ![](/images/uploads/img_1117.jpeg)
 
-\
-\
 Other notables include: Milos Uzan (Houston), Day Day Thomas (Cincinnati), Nick Pringle (Arkansas), Tucker DeVries (Indiana), Kyle Mangas (Indiana Wesleyan), Chauncey Wiggins (Florida St.), Mohammad Amini (Nancy Basket/France), Caleb Grill (Greensboro - G League), Curtis Jones (Denver/NBA), Hank Morgan (Maine - G League), John Tonje (Boston/NBA) and Alondes Williams (Washington/NBA)
 
 ![](/images/uploads/img_0728.jpeg)
@@ -42,8 +40,6 @@ Other notables include: Milos Uzan (Houston), Day Day Thomas (Cincinnati), Nick 
 ![](/images/uploads/img_1100.jpeg)
 
 ![](/images/uploads/img_1111.webp)
-
-
 
 ![](/images/uploads/img_1118.webp)
 
