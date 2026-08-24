@@ -423,6 +423,8 @@
 
   /* ---------- COURTSIDE TICKER (broadcast strip under the nav) ---------- */
   .shotclock-bar{display:none;background:#080d0a;border-bottom:1px solid var(--line)}
+  /* keep the countdown in view while scrolling (desktop; phones keep their space) */
+  @media(min-width:761px){ .shotclock-bar{position:sticky;top:68px;z-index:49} }
   .tk-inner{display:flex;align-items:center;gap:24px;min-height:44px;padding:8px 22px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
   .tk-inner::-webkit-scrollbar{display:none}
   @media(min-width:900px){.tk-inner{justify-content:center}}
@@ -746,6 +748,11 @@
   .stand-sub{margin:24px 0 10px;font-size:.72rem;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold)}
 
   /* ---------- SCHEDULE CALENDAR ---------- */
+  .cal-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:14px}
+  .cal-month{font-family:'Anton',sans-serif;color:#fff;font-size:1.15rem;letter-spacing:.5px;min-width:180px;text-align:center}
+  .cal-arrow{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--txt);font-size:1.25rem;cursor:pointer;transition:.15s;line-height:1;font-family:inherit}
+  .cal-arrow:hover:not(:disabled){border-color:var(--green-glow);color:#fff}
+  .cal-arrow:disabled{opacity:.3;cursor:default}
   .cal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:12px}
   .cal-card{background:linear-gradient(180deg,var(--card),#0a1510);border:1px solid var(--line);border-radius:12px;overflow:hidden;text-decoration:none;color:inherit;transition:.15s;display:flex;flex-direction:column}
   a.cal-card:hover{border-color:rgba(22,196,91,.45);transform:translateY(-3px)}
@@ -1923,19 +1930,32 @@ function renderSchedList(events){
       res+foot;
     return card;
   }
-  // upcoming games soonest-first, then played games most-recent-first
-  const upcoming=events.filter(ev=>!isDone(ev));
-  const played=events.filter(isDone).reverse();
-  box.className=''; box.innerHTML='';
-  function addGroup(label,list){
-    if(!list.length) return;
-    if(upcoming.length&&played.length){ const h=document.createElement('div'); h.className='stand-sub'; h.textContent=label; box.appendChild(h); }
+  // one month at a time with ‹ › arrows, instead of the whole season at once
+  const groups=[]; const gIdx={};
+  events.forEach(ev=>{
+    const d=new Date(ev.date); const k=d.getFullYear()*12+d.getMonth();
+    if(gIdx[k]==null){ gIdx[k]=groups.length; groups.push({label:d.toLocaleDateString(undefined,{month:'long',year:'numeric'}),events:[]}); }
+    groups[gIdx[k]].events.push(ev);
+  });
+  // open on the month holding the next game still to play (or the final month)
+  let page=groups.findIndex(g=>g.events.some(ev=>!isDone(ev)));
+  if(page<0) page=groups.length-1;
+  box.className='';
+  function draw(){
+    box.innerHTML='';
+    if(groups.length>1){
+      const nav=document.createElement('div'); nav.className='cal-nav';
+      const mk=(d,dis,lbl,txt)=>{ const b=document.createElement('button'); b.className='cal-arrow'; b.type='button'; b.disabled=dis; b.setAttribute('aria-label',lbl); b.textContent=txt; b.onclick=function(){ page+=d; draw(); }; return b; };
+      nav.appendChild(mk(-1,page<=0,'Earlier month','‹'));
+      const lab=document.createElement('span'); lab.className='cal-month'; lab.textContent=groups[page].label; nav.appendChild(lab);
+      nav.appendChild(mk(1,page>=groups.length-1,'Later month','›'));
+      box.appendChild(nav);
+    }
     const grid=document.createElement('div'); grid.className='cal-grid';
-    list.forEach(ev=>grid.appendChild(gameCard(ev)));
+    groups[page].events.forEach(ev=>grid.appendChild(gameCard(ev)));
     box.appendChild(grid);
   }
-  addGroup('Upcoming',upcoming);
-  addGroup('Results',played);
+  draw();
 }
 function shortNote(n){ return (n||'').replace(/Eastern Conference|Western Conference/gi,'').replace(/\bEast\b|\bWest\b/g,'').replace(/\s*-\s*/g,' · ').replace(/Game (\d)/gi,'G$1').replace(/\s+/g,' ').trim(); }
 
