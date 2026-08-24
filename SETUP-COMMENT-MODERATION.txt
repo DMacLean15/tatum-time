@@ -1,0 +1,46 @@
+================================================================
+  COMMENT MODERATION  (optional, ~5 min one time)
+================================================================
+
+Today, comments appear on the site the moment anyone posts them.
+This switches to "Dan approves first": new comments stay hidden
+until Dan flips a switch in Supabase, exactly like he already views
+subscribers there.
+
+Until you do BOTH steps below, nothing changes. Safe to skip.
+
+STEP 1 - RUN THIS IN SUPABASE
+  Supabase → your project → SQL Editor → New query → paste + Run:
+
+-------------------- copy from here --------------------
+alter table comments
+  add column if not exists approved boolean not null default false;
+
+-- existing comments stay visible
+update comments set approved = true;
+
+-- visitors can only read APPROVED comments
+drop policy if exists "public can read comments" on comments;
+create policy "public can read approved comments"
+  on comments for select
+  to anon
+  using ( approved = true );
+--------------------- to here --------------------------
+
+  (If your original read policy has a different name, check
+   Authentication → Policies on the comments table and drop the old
+   anon SELECT policy there instead.)
+
+STEP 2 - FLIP THE SWITCH IN THE SITE CODE
+  In index.html, find commentsConfig and change:
+
+    moderated:false     →     moderated:true
+
+  Commit + push. The comment form now tells fans "your comment will
+  appear once Dan approves it".
+
+DAN'S APPROVAL ROUTINE
+  He already gets an email for every new comment (EmailJS). To
+  approve one: Supabase → Table Editor → comments → tick the
+  "approved" box on that row. It appears on the site instantly -
+  no deploy needed. To reject: just delete the row.

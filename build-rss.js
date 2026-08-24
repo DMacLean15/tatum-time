@@ -32,7 +32,7 @@ const items = posts.map((p,i) => {
   const slug = slugify(p.title);
   return `    <item>
       <title>${esc(p.title)}</title>
-      <link>${SITE}/#/post/${slug}</link>
+      <link>${SITE}/post/${slug}/</link>
       <guid isPermaLink="false">${slug}</guid>
       <pubDate>${pubDate(p.date, i)}</pubDate>
       <category>${esc(p.category)}</category>
@@ -55,3 +55,8 @@ ${items}
 
 fs.writeFileSync('feed.xml', feed);
 console.log(`feed.xml regenerated with ${posts.length} posts`);
+
+// Also (re)generate the per-post pages + sitemap. Required from here so the
+// existing Cloudflare build command picks it up without any dashboard changes.
+try { require('./build-pages.js'); }
+catch (e) { console.error('build-pages failed (site still deploys):', e.message); }

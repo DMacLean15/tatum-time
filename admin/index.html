@@ -7,24 +7,26 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
     /* ---- Floating "Formatting Help" cheat sheet (self-contained, won't touch the editor) ---- */
-    #tt-help-btn{
+    /* ONE floating launcher instead of a stack of six buttons */
+    #tt-toolkit-btn{
       position:fixed;right:20px;bottom:20px;z-index:99998;
       display:inline-flex;align-items:center;gap:8px;
       background:linear-gradient(145deg,#16c45b,#007a33);color:#052012;
       font:700 14px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-      border:none;border-radius:999px;padding:12px 18px;cursor:pointer;
-      box-shadow:0 8px 22px -6px rgba(22,196,91,.6);transition:.15s;
+      border:none;border-radius:999px;padding:12px 20px;cursor:pointer;
+      box-shadow:0 8px 22px -6px rgba(22,196,91,.5);transition:.15s;
     }
-    #tt-help-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px -6px rgba(22,196,91,.85)}
-    #tt-site-btn{
-      position:fixed;right:20px;bottom:72px;z-index:99998;
-      display:inline-flex;align-items:center;gap:7px;
-      background:#0f1d16;color:#e8efe9;
-      font:700 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-      border:1px solid rgba(22,196,91,.4);border-radius:999px;padding:10px 16px;
-      text-decoration:none;box-shadow:0 6px 18px -6px rgba(0,0,0,.5);transition:.15s;
+    #tt-toolkit-btn:hover{transform:translateY(-2px)}
+    /* live word count while writing */
+    #tt-wordcount{
+      position:fixed;right:20px;bottom:72px;z-index:99997;display:none;
+      background:#0f1d16;border:1px solid rgba(255,255,255,.14);color:#9bb3a5;
+      border-radius:999px;padding:8px 14px;
+      font:600 12px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
     }
-    #tt-site-btn:hover{border-color:#16c45b;background:#132a1f}
+    #tt-wordcount b{color:#16c45b}
+    /* Celtics-green login screen instead of a plain page */
+    body:not(.tt-authed){background:radial-gradient(900px 480px at 75% -10%,rgba(22,196,91,.14),transparent 60%),#0c1410}
     #tt-score{
       position:fixed;left:16px;bottom:16px;z-index:99997;width:236px;
       background:#0f1d16;border:1px solid rgba(22,196,91,.28);border-radius:14px;padding:12px 14px 13px;
@@ -68,13 +70,21 @@
       border-radius:50%;cursor:pointer;font-size:1.1rem;line-height:1;
     }
     #tt-help-close:hover{background:rgba(255,255,255,.14)}
-    /* ---- Post Recipes + Roster: expandable dropdown menus (no blocking popup) ---- */
-    #tt-recipe-btn, #tt-roster-btn, #tt-emoji-btn, #tt-quicklinks-btn{position:fixed;right:20px;z-index:99998;display:inline-flex;align-items:center;gap:7px;background:#0f1d16;color:#e8efe9;font:700 13px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;border:1px solid rgba(191,161,90,.5);border-radius:999px;padding:10px 16px;cursor:pointer;box-shadow:0 6px 18px -6px rgba(0,0,0,.5);transition:.15s}
-    #tt-recipe-btn{bottom:120px}
-    #tt-roster-btn{bottom:168px}
-    #tt-emoji-btn{bottom:216px}
-    #tt-quicklinks-btn{bottom:264px}
-    #tt-recipe-btn:hover, #tt-roster-btn:hover, #tt-emoji-btn:hover, #tt-quicklinks-btn:hover{border-color:#bfa15a;background:#132a1f}
+    /* ---- Toolkit panel: tabbed home for Recipes / Roster / Emojis / Links / Ideas ---- */
+    #tt-toolkit{width:390px}
+    .tt-tk-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .tt-tk-head b{color:#fff;font-size:1.05rem}
+    .tt-tk-actions{display:flex;gap:8px;margin-bottom:12px}
+    .tt-tk-actions a,.tt-tk-actions button{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:rgba(22,196,91,.12);border:1px solid rgba(22,196,91,.35);color:#dff3e7;border-radius:9px;padding:9px 10px;font:700 12px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;cursor:pointer;text-decoration:none}
+    .tt-tk-actions a:hover,.tt-tk-actions button:hover{background:rgba(22,196,91,.22);color:#fff}
+    .tt-tabs{display:flex;gap:2px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:12px;flex-wrap:wrap}
+    .tt-tab{background:none;border:none;color:#9bb3a5;font:700 12px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:8px 9px;cursor:pointer;position:relative}
+    .tt-tab:hover{color:#fff}
+    .tt-tab.active{color:#16c45b}
+    .tt-tab.active::after{content:"";position:absolute;left:7px;right:7px;bottom:-1px;height:2px;background:#16c45b}
+    .tt-pane{display:none}
+    .tt-pane.active{display:block}
+    .tt-idea{background:rgba(22,196,91,.08);border:1px solid rgba(22,196,91,.28);border-radius:12px;padding:16px;margin-bottom:10px;color:#eaf2ec;font-size:.95rem;line-height:1.5;min-height:72px;display:flex;align-items:center}
     .tt-menu{position:fixed;right:20px;bottom:20px;z-index:99999;width:340px;max-width:calc(100vw - 40px);max-height:calc(100vh - 40px);overflow-y:auto;background:#0f1d16;border:1px solid rgba(22,196,91,.32);border-radius:14px;box-shadow:0 24px 60px -18px rgba(0,0,0,.8);color:#e8efe9;font:14px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:16px 18px 18px;display:none}
     .tt-emoji-grid{display:flex;flex-wrap:wrap;gap:6px}
     .tt-emoji{font-size:1.35rem;line-height:1;cursor:pointer;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;width:40px;height:40px;display:grid;place-items:center;padding:0}
@@ -170,12 +180,8 @@
     #tt-help-panel .cal-res.ww{color:#16c45b}#tt-help-panel .cal-res.ll{color:#ff7a7a}#tt-help-panel .cal-res.up{font-family:sans-serif;font-weight:700;font-size:.72rem;color:#bfa15a}
     #tt-help-panel .cal-foot{margin-top:auto;padding:1px 5px 8px;display:flex;flex-direction:column;align-items:center;gap:1px}#tt-help-panel .cal-tv{font-size:.55rem;color:#9bb3a5;font-weight:700}
     /* Hide the floating toolbar + scoreboard until a GitHub login succeeds */
-    body:not(.tt-authed) #tt-help-btn,
-    body:not(.tt-authed) #tt-site-btn,
-    body:not(.tt-authed) #tt-recipe-btn,
-    body:not(.tt-authed) #tt-roster-btn,
-    body:not(.tt-authed) #tt-emoji-btn,
-    body:not(.tt-authed) #tt-quicklinks-btn,
+    body:not(.tt-authed) #tt-toolkit-btn,
+    body:not(.tt-authed) #tt-wordcount,
     body:not(.tt-authed) #tt-score,
     body:not(.tt-authed) .tt-menu,
     body:not(.tt-authed) #tt-help-overlay{display:none !important}
@@ -560,9 +566,9 @@
     })();
   </script>
 
-  <!-- Quick "view the live site" shortcut + Formatting Help cheat sheet -->
-  <a id="tt-site-btn" href="https://tatumtime.net" target="_blank" rel="noopener">🌐 View Live Site ↗</a>
-  <button id="tt-help-btn" onclick="document.getElementById('tt-help-overlay').classList.add('open')">🍀 Formatting Help</button>
+  <!-- ONE launcher for everything (recipes, roster, emojis, links, ideas, help) -->
+  <button id="tt-toolkit-btn" class="tt-menu-btn" onclick="ttToggleMenu('tt-toolkit')">☘️ Toolkit</button>
+  <div id="tt-wordcount">✍️ <b id="tt-wc-words">0</b> words · <span id="tt-wc-mins">1 min read</span></div>
   <div id="tt-help-overlay" onclick="if(event.target===this)this.classList.remove('open')">
     <div id="tt-help-panel">
       <button id="tt-help-close" onclick="document.getElementById('tt-help-overlay').classList.remove('open')" aria-label="Close">✕</button>
@@ -577,15 +583,17 @@
           <li>Add a <b>photo or YouTube clip</b> — posts with visuals get read more.</li>
           <li>Sprinkle in <b>green stat tags</b> for the key numbers.</li>
           <li>Emojis work <b>anywhere</b> in your writing, not just the banner. 🍀🔥</li>
-          <li>Blank page? Start from a <b>📋 Post Recipe</b> instead (see below).</li>
+          <li>Blank page? Start from a <b>📋 Recipe</b> or shuffle <b>💡 Ideas</b> — both in the ☘️ Toolkit.</li>
         </ul>
       </div>
 
-      <h3>🚀 One-click helpers</h3>
+      <h3>🚀 One-click helpers — all inside ☘️ Toolkit (bottom-right)</h3>
       <ul>
-        <li><b>📋 Post Recipes</b> (button, bottom-right) — ready-made post structures (Game Recap, Trade Reaction, Player Spotlight, Power Rankings, Hot Take). Hit <b>Copy</b>, paste into the <b>Article</b>, and fill in the blanks. The same panel lists the <b>current roster</b> — click a name to copy it (spelled right, it auto-links to the player's card).</li>
-        <li><b>📋 Copy last game as a Game Score</b> — on the Celtics scoreboard (bottom-left), turns the real last game into a score card you can paste straight into a recap.</li>
-        <li><b>🌐 View Live Site</b> (button, bottom-right) — opens the published site in a new tab to check your work.</li>
+        <li><b>📋 Recipes</b> — ready-made post structures (Game Recap, Trade Reaction, Player Spotlight, Power Rankings, Hot Take…). Hit <b>Copy</b>, paste into the <b>Article</b>, and fill in the blanks.</li>
+        <li><b>🏀 Roster</b> — the current roster, live. Click a name to copy it (spelled right, it auto-links to the player's card on the site).</li>
+        <li><b>😀 Emojis / 🔗 Links / 💡 Ideas</b> — banner-emoji picker, stat-lookup shortcuts, and a story-idea shuffler for blank-page days.</li>
+        <li><b>Celtics scoreboard</b> (bottom-left) — two magic buttons: <b>Copy last game as a Game Score</b> (a ready score card for a recap) and <b>Copy last-game stats link</b> (paste it into the <b>Game Box-Score Link</b> field).</li>
+        <li><b>✍️ Word count</b> — appears above the Toolkit button while you write, with the read time your post will show.</li>
         <li class="tt-note">Recipes and blocks paste cleanest in the editor's <b>Markdown</b> view (the toggle at the top of the writing box). Switch back to normal view anytime.</li>
       </ul>
 
@@ -610,7 +618,7 @@
       <h3>🟢 Green stat tags</h3>
       <p>Wrap any stat in <code>==</code> to make a green highlight:</p>
       <p>Tatum went off for <code>==28.3 PPG==</code> → <span class="tt-tag">28.3 PPG</span> on the live site.</p>
-      <p class="tt-note">Heads up: in the preview it shows as plain <code>==28.3 PPG==</code>, but it turns green on the published site.</p>
+      <p class="tt-note">The preview usually paints these green as you type; if one ever shows as plain <code>==28.3 PPG==</code> there, don't worry — it always turns green on the published site.</p>
 
       <h3>✍️ Formatting toolbar</h3>
       <p>Use the toolbar above the writing box for <b>bold</b>, <i>italics</i>, <b>Headings</b>, bullet/numbered lists, links, and quotes. Use Headings to break a longer post into clear sections.</p>
@@ -755,34 +763,45 @@
     </div>
   </div>
 
-  <!-- Post Recipes + Roster: expandable dropdown menus (no blocking popup) -->
-  <button id="tt-recipe-btn" class="tt-menu-btn" onclick="ttToggleMenu('tt-recipe-menu')">📋 Post Recipes</button>
-  <button id="tt-roster-btn" class="tt-menu-btn" onclick="ttToggleMenu('tt-roster-menu')">🏀 Roster</button>
-  <div id="tt-recipe-menu" class="tt-menu">
-    <h4>📋 Post Recipes <button class="tt-menux" onclick="document.getElementById('tt-recipe-menu').classList.remove('open')" aria-label="Close">✕</button></h4>
-    <div class="tt-warn"><span class="tt-warn-hd">⚠️ Paste in Markdown mode!</span>Flip the <b>Markdown</b> switch (top-right of the Article box) <b>before</b> you paste — otherwise the score &amp; grade cards won't appear. Flip back to <b>Rich Text</b> when you're done.</div>
-    <div class="tt-sub">Pick a recipe → <b>Copy</b> → paste into the <b>Article</b> → fill in the <b>[blanks]</b>.</div>
-    <div id="tt-recipe-list"></div>
-  </div>
-  <div id="tt-roster-menu" class="tt-menu">
-    <h4>🏀 Current Roster <button class="tt-menux" onclick="document.getElementById('tt-roster-menu').classList.remove('open')" aria-label="Close">✕</button></h4>
-    <div class="tt-sub">Click a name to copy it. Spelled this way, names link to the player's card <b>on the published site</b>.</div>
-    <div id="tt-roster-chips">Loading roster…</div>
-  </div>
-  <button id="tt-emoji-btn" class="tt-menu-btn" onclick="ttToggleMenu('tt-emoji-menu')">😀 Emojis</button>
-  <button id="tt-quicklinks-btn" class="tt-menu-btn" onclick="ttToggleMenu('tt-quicklinks-menu')">🔗 Links</button>
-  <div id="tt-emoji-menu" class="tt-menu">
-    <h4>😀 Emojis <button class="tt-menux" onclick="document.getElementById('tt-emoji-menu').classList.remove('open')" aria-label="Close">✕</button></h4>
-    <div class="tt-sub">Click one to copy it — paste into the <b>Banner Emoji</b> field or drop it into your writing.</div>
-    <div class="tt-emoji-grid" id="tt-emoji-grid"></div>
-  </div>
-  <div id="tt-quicklinks-menu" class="tt-menu">
-    <h4>🔗 Quick Links <button class="tt-menux" onclick="document.getElementById('tt-quicklinks-menu').classList.remove('open')" aria-label="Close">✕</button></h4>
-    <div class="tt-sub">Look up a game or stats (opens in a new tab).</div>
-    <a class="tt-qlink" href="https://www.nba.com/celtics/schedule" target="_blank" rel="noopener">🏀 NBA.com — Celtics schedule<small>Open a finished game → Box Score → copy that web address for the "See full game stats" button.</small></a>
-    <a class="tt-qlink" href="https://www.nba.com/scores" target="_blank" rel="noopener">📊 NBA.com — Scores &amp; box scores<small>Recent results across the league.</small></a>
-    <a class="tt-qlink" href="https://www.espn.com/nba/team/_/name/bos/boston-celtics" target="_blank" rel="noopener">📰 ESPN — Celtics team page<small>News, roster and stats.</small></a>
-    <a class="tt-qlink" href="https://www.basketball-reference.com/teams/BOS/2026.html" target="_blank" rel="noopener">📈 Basketball Reference — Celtics<small>Deep stats, splits and history.</small></a>
+  <!-- ☘️ Toolkit panel — tabbed home for everything that used to be six buttons -->
+  <div id="tt-toolkit" class="tt-menu">
+    <div class="tt-tk-head"><b>☘️ Tatum Time Toolkit</b><button class="tt-menux" onclick="document.getElementById('tt-toolkit').classList.remove('open')" aria-label="Close">✕</button></div>
+    <div class="tt-tk-actions">
+      <a href="https://tatumtime.net" target="_blank" rel="noopener">🌐 View Live Site</a>
+      <button type="button" onclick="document.getElementById('tt-help-overlay').classList.add('open');document.getElementById('tt-toolkit').classList.remove('open')">🍀 Formatting Help</button>
+    </div>
+    <div class="tt-tabs">
+      <button class="tt-tab active" data-pane="tt-pane-recipes" type="button">📋 Recipes</button>
+      <button class="tt-tab" data-pane="tt-pane-roster" type="button">🏀 Roster</button>
+      <button class="tt-tab" data-pane="tt-pane-emoji" type="button">😀 Emojis</button>
+      <button class="tt-tab" data-pane="tt-pane-links" type="button">🔗 Links</button>
+      <button class="tt-tab" data-pane="tt-pane-ideas" type="button">💡 Ideas</button>
+    </div>
+    <div class="tt-pane active" id="tt-pane-recipes">
+      <div class="tt-warn"><span class="tt-warn-hd">⚠️ Paste in Markdown mode!</span>Flip the <b>Markdown</b> switch (top-right of the Article box) <b>before</b> you paste — otherwise the score &amp; grade cards won't appear. Flip back to <b>Rich Text</b> when you're done.</div>
+      <div class="tt-sub">Pick a recipe → <b>Copy</b> → paste into the <b>Article</b> → fill in the <b>[blanks]</b>.</div>
+      <div id="tt-recipe-list"></div>
+    </div>
+    <div class="tt-pane" id="tt-pane-roster">
+      <div class="tt-sub">Click a name to copy it. Spelled this way, names link to the player's card <b>on the published site</b>.</div>
+      <div id="tt-roster-chips">Loading roster…</div>
+    </div>
+    <div class="tt-pane" id="tt-pane-emoji">
+      <div class="tt-sub">Click one to copy it — paste into the <b>Banner Emoji</b> field or drop it into your writing.</div>
+      <div class="tt-emoji-grid" id="tt-emoji-grid"></div>
+    </div>
+    <div class="tt-pane" id="tt-pane-links">
+      <div class="tt-sub">Look up a game or stats (opens in a new tab).</div>
+      <a class="tt-qlink" href="https://www.nba.com/celtics/schedule" target="_blank" rel="noopener">🏀 NBA.com — Celtics schedule<small>Open a finished game → Box Score → copy that web address for the "See full game stats" button.</small></a>
+      <a class="tt-qlink" href="https://www.nba.com/scores" target="_blank" rel="noopener">📊 NBA.com — Scores &amp; box scores<small>Recent results across the league.</small></a>
+      <a class="tt-qlink" href="https://www.espn.com/nba/team/_/name/bos/boston-celtics" target="_blank" rel="noopener">📰 ESPN — Celtics team page<small>News, roster and stats.</small></a>
+      <a class="tt-qlink" href="https://www.basketball-reference.com/teams/BOS/2026.html" target="_blank" rel="noopener">📈 Basketball Reference — Celtics<small>Deep stats, splits and history.</small></a>
+    </div>
+    <div class="tt-pane" id="tt-pane-ideas">
+      <div class="tt-sub">Blank page? Grab a story idea - shuffle until one sparks.</div>
+      <div class="tt-idea" id="tt-idea-box"></div>
+      <button class="tt-copy" id="tt-idea-btn" type="button" style="width:100%">🔀 Another idea</button>
+    </div>
   </div>
 
   <script>
@@ -904,6 +923,66 @@
         g.appendChild(b);
       });
     })();
+
+    /* Toolkit tabs */
+    (function(){
+      document.querySelectorAll('.tt-tab').forEach(function(t){
+        t.addEventListener('click',function(){
+          document.querySelectorAll('.tt-tab').forEach(function(x){ x.classList.toggle('active',x===t); });
+          document.querySelectorAll('.tt-pane').forEach(function(p){ p.classList.toggle('active',p.id===t.dataset.pane); });
+        });
+      });
+    })();
+
+    /* Ideas deck - a story prompt for blank-page days */
+    (function(){
+      var box=document.getElementById('tt-idea-box'), btn=document.getElementById('tt-idea-btn');
+      if(!box||!btn) return;
+      var IDEAS=[
+        "Rank the Celtics' five best wins of the season so far.",
+        "Bench check: grade every reserve's last 10 games.",
+        "The one stat that worries you about this team - and why.",
+        "Trade deadline wishlist: three realistic targets for Boston.",
+        "Where does the current core rank among Celtics groups all-time?",
+        "Rookie watch: how are the newest Celtics settling in?",
+        "The unsung hero nobody is talking about.",
+        "Five bold predictions for the rest of the season.",
+        "What has to happen for Banner 19 - the honest checklist.",
+        "This month in Celtics history: pick a moment and retell it.",
+        "Report card: grade every starter's season so far.",
+        "Old vs new: compare a current Celtic to a franchise legend, tale-of-the-tape style.",
+        "Three adjustments the coaching staff should make right now.",
+        "Power-rank the East contenders through green-tinted glasses.",
+        "Break down one play that sums up this team.",
+        "If you could steal one player from a rival, who is it and why?",
+        "Midseason awards: team MVP, most improved, sixth man.",
+        "The best and worst contract on the roster.",
+        "One under-the-radar stat that proves this team is better (or worse) than its record.",
+        "Your all-time Celtics starting five - defend every pick."
+      ];
+      var last=-1;
+      function shuffle(){
+        var i; do{ i=Math.floor(Math.random()*IDEAS.length); }while(i===last&&IDEAS.length>1);
+        last=i; box.textContent='💡 '+IDEAS[i];
+      }
+      btn.addEventListener('click',shuffle);
+      shuffle();
+    })();
+
+    /* Live word count + read time while writing (read-only peek at the editor) */
+    (function(){
+      var chip=document.getElementById('tt-wordcount'), w=document.getElementById('tt-wc-words'), m=document.getElementById('tt-wc-mins');
+      if(!chip||!w||!m) return;
+      setInterval(function(){
+        var el=document.querySelector('[data-slate-editor="true"]')||document.querySelector('.cm-content')||document.querySelector('textarea');
+        var txt=el?(el.value!=null&&el.tagName==='TEXTAREA'?el.value:(el.textContent||'')):'';
+        var words=txt.trim()?txt.trim().split(/\s+/).length:0;
+        if(!el||!words){ chip.style.display='none'; return; }
+        w.textContent=words;
+        m.textContent=Math.max(1,Math.round(words/200))+' min read';
+        chip.style.display='block';
+      },2000);
+    })();
   </script>
 
   <!-- Live Celtics scoreboard (last result + next game, straight from ESPN) -->
@@ -927,9 +1006,12 @@
         if (!bos || !opp) return null;
         return { bos: scoreOf(bos), opp: scoreOf(opp), oppName: (opp.team.shortDisplayName || opp.team.abbreviation || ""), home: bos.homeAway === "home" };
       }
-      fetch("https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/bos/schedule")
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
+      Promise.all([
+        fetch("https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/bos/schedule").then(function (r) { return r.json(); }),
+        fetch("https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/bos").then(function (r) { return r.json(); }).catch(function () { return null; })
+      ])
+        .then(function (res) {
+          var data = res[0], team = res[1] && res[1].team;
           var events = (data.events || []).slice().sort(function (a, b) { return new Date(a.date) - new Date(b.date); });
           var now = Date.now(), last = null, next = null;
           events.forEach(function (ev) {
@@ -937,18 +1019,37 @@
             var done = comp && comp.status && comp.status.type && comp.status.type.completed;
             if (done || t < now) last = ev; else if (!next) next = ev;
           });
-          var html = "", lastBox = "";
+          var html = "", lastBox = "", lastLink = "";
           if (last) { var g = parseG(last); if (g) { var win = parseInt(g.bos, 10) > parseInt(g.opp, 10);
             html += '<div class="tts-h">' + (win ? "W" : "L") + " · Last Result</div><div class=\"tts-line\">Celtics " + g.bos + " " + (g.home ? "vs" : "@") + " " + g.oppName + " " + g.opp + "</div>";
             var aw = win ? " ps-win" : "", bw = (parseInt(g.opp, 10) > parseInt(g.bos, 10)) ? " ps-win" : "";
-            lastBox = '<div class="post-score"><div class="ps-row' + aw + '"><span class="ps-team">Celtics</span><span class="ps-score">' + g.bos + '</span></div><div class="ps-row' + bw + '"><span class="ps-team">' + g.oppName + '</span><span class="ps-score">' + g.opp + '</span></div></div>'; } }
+            lastBox = '<div class="post-score"><div class="ps-row' + aw + '"><span class="ps-team">Celtics</span><span class="ps-score">' + g.bos + '</span></div><div class="ps-row' + bw + '"><span class="ps-team">' + g.oppName + '</span><span class="ps-score">' + g.opp + '</span></div></div>';
+            // the game's stats page - one click to fill the "Game Box-Score Link" field
+            var L = last.links || [];
+            var pick = function (rel) { var l = L.filter(function (x) { return x.rel && x.rel.indexOf(rel) > -1 && /^https?:/.test(x.href || ""); })[0]; return l && l.href; };
+            lastLink = pick("boxscore") || pick("summary") || "";
+          } }
           if (next) { var n = parseG(next); if (n) { var d = new Date(next.date);
             html += '<div class="tts-h">Next Game</div><div class="tts-sub">' + (n.home ? "vs" : "@") + " " + n.oppName + " · " + d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }) + " " + d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + "</div>"; } }
           else { html += '<div class="tts-h">Next Game</div><div class="tts-sub">Offseason — schedule coming soon ☘️</div>'; }
+          // season record / seed / streak (same numbers as the site's courtside ticker)
+          try {
+            var overall = ((team && team.record && team.record.items) || []).filter(function (x) { return x.type === "total"; })[0] || {};
+            var S = function (nm) { var s = (overall.stats || []).filter(function (x) { return x.name === nm; })[0]; return s ? s.value : null; };
+            var wv = S("wins"), lv = S("losses"), seed = S("playoffSeed"), st = S("streak");
+            var bits = [];
+            if (wv != null && lv != null) bits.push(Math.round(wv) + "-" + Math.round(lv));
+            if (seed != null) bits.push("#" + Math.round(seed) + " East");
+            if (st) bits.push((st > 0 ? "W" : "L") + Math.abs(Math.round(st)) + " streak");
+            if (bits.length) html += '<div class="tts-h">Season</div><div class="tts-sub">' + bits.join(" · ") + "</div>";
+          } catch (e) {}
           if (lastBox) html += '<button class="tts-copy" id="tts-copybox" type="button">📋 Copy last game as a Game Score</button>';
+          if (lastLink) html += '<button class="tts-copy" id="tts-copylink" type="button">🔗 Copy last-game stats link</button>';
           if (html) { body.innerHTML = html; box.style.display = "block";
             var cb = document.getElementById("tts-copybox");
             if (cb && typeof ttCopyText === "function") cb.addEventListener("click", function () { ttCopyText(lastBox, cb, "📋 Copy last game as a Game Score"); });
+            var cl = document.getElementById("tts-copylink");
+            if (cl && typeof ttCopyText === "function") cl.addEventListener("click", function () { ttCopyText(lastLink, cl, "🔗 Copy last-game stats link"); });
           }
         })
         .catch(function () { /* stay hidden if ESPN is unreachable */ });

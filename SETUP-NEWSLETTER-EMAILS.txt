@@ -1,0 +1,54 @@
+================================================================
+  SEND THE NEWSLETTER FOR REAL  (optional, ~15 min one time)
+================================================================
+
+Right now the site COLLECTS subscribers (they're saved in Supabase),
+but nothing ever emails them. This turns on real sending: after Dan
+publishes a post, he opens one link, clicks "Send now", and every
+subscriber gets a clean Celtics-green email about the new post.
+
+Until this is set up, nothing changes - the sender page just says
+"not configured yet". Safe to skip or do later.
+
+WHAT YOU NEED
+  1. A free account at https://resend.com  (the email service; the
+     free tier sends 100 emails/day - plenty).
+  2. Your Supabase project's "service_role" key:
+     Supabase → Project Settings → API keys → service_role (secret).
+     NEVER put this key in the website code - it only goes in
+     Cloudflare's env vars (below), which stay server-side.
+
+STEP 1 - VERIFY THE DOMAIN IN RESEND  (so emails come from tatumtime.net)
+  Resend → Domains → Add Domain → tatumtime.net → it shows a few DNS
+  records → add them in Cloudflare DNS → wait for "Verified".
+  Then create an API key: Resend → API Keys → Create.
+
+STEP 2 - ADD 4 ENV VARS IN CLOUDFLARE PAGES
+  Cloudflare → your Pages project → Settings → Environment variables
+  (add to "Production"):
+
+    NEWSLETTER_KEY        = any long random secret, e.g. from
+                            https://www.random.org/strings/
+                            (this becomes the ?key= in Dan's link)
+    SUPABASE_SERVICE_KEY  = the service_role key from Supabase
+    RESEND_API_KEY        = the API key from Resend
+    NEWSLETTER_FROM       = Tatum Time <posts@tatumtime.net>
+
+  Then redeploy the site once (Deployments → Retry deployment) so the
+  function picks the variables up.
+
+STEP 3 - GIVE DAN HIS LINK
+  Bookmark this for him:
+
+    https://tatumtime.net/send-newsletter?key=THE-SECRET-FROM-STEP-2
+
+  His routine after publishing a post:
+    1. Wait for the deploy to finish (post shows on the site).
+    2. Open the bookmark → he sees a preview + subscriber count.
+    3. Click "Send now →". Done.
+
+  Notes:
+    - Every subscriber gets an individual email; addresses are
+      never visible to each other.
+    - It always sends the NEWEST published post.
+    - Clicking "Send now" twice sends twice - one click per post.

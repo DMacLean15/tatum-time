@@ -1,0 +1,19 @@
+# Cloudflare Pages headers - caching + basic security.
+# The vendored marked.min.js and uploaded photos rarely change; give
+# browsers permission to keep them so repeat visits skip re-downloads.
+
+/js/*
+  Cache-Control: public, max-age=86400
+
+/images/*
+  Cache-Control: public, max-age=604800
+
+/mp3/*
+  Cache-Control: public, max-age=604800
+
+/og.jpg
+  Cache-Control: public, max-age=86400
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin

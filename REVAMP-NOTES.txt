@@ -1,0 +1,143 @@
+================================================================
+  TATUM TIME - AUGUST 2026 REVAMP  (what changed and why)
+================================================================
+Everything that makes the site Dan's is untouched: the banners, the
+basketball cursor, the game-day anthem, the shot clock, the green.
+This pass made it faster, cleaner, and gave every post a real page.
+
+----------------------------------------------------------------
+LOOK & FEEL (index.html)
+----------------------------------------------------------------
+- Neon glows, the pulsing "Hear Dan's Take" button, the blinking
+  GAME DAY title, and the spinning close button are gone - the
+  Celtics identity now reads broadcast-graphics, not arcade.
+- The sci-fi Orbitron font is replaced by a clean monospace for
+  the countdown clocks; in-article headings switched from Anton
+  to bold Inter (Anton stays for the hero, section titles, brand,
+  banners and big stat numbers).
+- Articles read like a magazine: comfortable line length (70ch),
+  larger line height, refined drop cap.
+- New: visible keyboard-focus outlines and a prefers-reduced-motion
+  fallback (accessibility).
+
+----------------------------------------------------------------
+BOLD PASS (round 2 - homepage energy)
+----------------------------------------------------------------
+- NEW courtside ticker under the nav, like a broadcast strip:
+  last result (W/L + score + opponent logo), next tip-off
+  countdown, and live record / East seed / streak. It shows in
+  the offseason too; on game day it steps aside for the green
+  GAME DAY banner. Built entirely from the ESPN data the site
+  already fetches - no new services.
+- Parquet floor: a faint gold herringbone weave behind the hero
+  and the Franchise section. Pure CSS, unmistakably the Garden.
+- Tighter vertical rhythm: section padding 64px -> 44px, hero and
+  headers compressed - roughly a full screen less scrolling.
+- The hero's "Posts & counting" number is now live (real count).
+
+----------------------------------------------------------------
+SHORTER PAGE (round 3 - structure)
+----------------------------------------------------------------
+- Headlines is now a TAB inside Celtics Central (was its own full
+  section); it loads only when opened.
+- The roster shows the top 8 players with a "Show the full roster"
+  button (player-name links in posts auto-expand it). Cuts ~4
+  screens off the default page.
+- The newsletter band moved inside the About section (the
+  id="newsletter" anchor still works).
+- Spacing now at blog rhythm: sections 32px (24px on phones),
+  smaller section headers. The homepage is roughly HALF its old
+  scroll length.
+
+----------------------------------------------------------------
+POLISH (round 4 - small optimizations + QoL)
+----------------------------------------------------------------
+- Reading-progress bar: a thin green line under the nav fills as
+  you read the open article (only visible while reading).
+- Native share button on phones (opens the real iOS/Android share
+  sheet) next to the existing X/Facebook/Threads buttons.
+- Back-to-top button appears after you scroll a ways.
+- Post search now searches the FULL text of every article (it
+  previously only matched the first 140 characters).
+- Preconnect hints for ESPN + Supabase - live scores and comments
+  start their connections during page load.
+- NEW _headers file (commit it too): browser caching for
+  js/images/mp3 + basic security headers.
+
+----------------------------------------------------------------
+ADMIN PAGE (round 5 - Dan's editor, admin/index.html)
+----------------------------------------------------------------
+- The six stacked floating buttons became ONE "☘️ Toolkit" button
+  opening a tabbed panel: Recipes / Roster / Emojis / Links /
+  Ideas, with View Live Site + Formatting Help at the top. Much
+  cleaner, and it finally works on a phone.
+- NEW "💡 Ideas" tab: a shuffle deck of 20 Celtics story prompts
+  for blank-page days.
+- NEW live word count + read time chip that appears while Dan
+  writes (shows the same "X min read" the site will).
+- Scoreboard (bottom-left) upgrades: a Season line (record, East
+  seed, streak) and a second magic button - "Copy last-game stats
+  link" - to fill the Game Box-Score Link field in one click.
+- The login screen is Celtics dark green instead of plain white.
+- Help sheet updated to match all of the above.
+NOTE: the Toolkit only appears after login, so the full test is on
+tatumtime.net/admin after deploy (or locally via npx decap-server).
+
+----------------------------------------------------------------
+SPEED
+----------------------------------------------------------------
+- marked.js is now self-hosted (js/marked.min.js) and loads with
+  defer - it no longer blocks the first paint. The SAME file also
+  powers build-pages.js at deploy time.
+- EmailJS only loads at the moment someone actually comments or
+  subscribes (it used to load for every visitor, render-blocking).
+- The built-in fallback posts were trimmed from 10 full articles
+  to 1 (they only ever show when the site is opened from disk).
+- og.png (259 KB) replaced by og.jpg (32 KB) for link previews.
+- Google Fonts trimmed (dropped Orbitron + one Inter weight).
+- All photos inside articles now lazy-load.
+
+----------------------------------------------------------------
+EVERY POST NOW HAS ITS OWN PAGE  (big SEO/share win)
+----------------------------------------------------------------
+- NEW build-pages.js generates post/<slug>/index.html for every
+  published post, each with its own title, description and photo
+  for link previews - plus a full sitemap.xml.
+- build-rss.js runs it automatically, so the existing Cloudflare
+  build command needs NO changes.
+- Share buttons and the RSS feed now point at these real pages;
+  each page links back to the homepage reader for comments.
+- Scheduled (future-dated) posts do not get a page until a deploy
+  happens on/after their date.
+
+----------------------------------------------------------------
+NEW READER FEATURES (index.html)
+----------------------------------------------------------------
+- "More from Tatum Time": 3 related posts (same category first)
+  under every article.
+- Year dividers appear in the post list automatically once the
+  archive spans more than one year.
+
+----------------------------------------------------------------
+OPTIONAL UPGRADES (dormant until you set them up)
+----------------------------------------------------------------
+- SETUP-COMMENT-MODERATION.txt - comments wait for Dan's approval.
+  (Run the SQL, then flip moderated:true in commentsConfig.)
+- SETUP-NEWSLETTER-EMAILS.txt - actually email subscribers when a
+  post drops (functions/send-newsletter.js, needs Resend + 4 env
+  vars in Cloudflare; shows "not configured" until then).
+
+----------------------------------------------------------------
+DEPLOYING
+----------------------------------------------------------------
+Push to DMacLean15/tatum-time (main), including the NEW files:
+  js/marked.min.js       build-pages.js
+  og.jpg                 functions/send-newsletter.js
+  SETUP-COMMENT-MODERATION.txt   SETUP-NEWSLETTER-EMAILS.txt
+  post/ and sitemap.xml regenerate on every deploy - you can
+  commit them or .gitignore them, either works.
+Changed files: index.html, build-rss.js, feed.xml, sitemap.xml.
+(og.png is no longer referenced; keep or delete it.)
+
+To test locally first:  python -m http.server 8123
+then open http://localhost:8123
