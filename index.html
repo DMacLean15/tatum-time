@@ -2573,8 +2573,9 @@ function startCountdown(next){
   if(seg) seg.style.display='';
   const g=parseGame(next), opp=g.opp.team.shortDisplayName||g.opp.team.abbreviation;
   const abbr=g.opp.team.abbreviation||'';
-  mt.innerHTML=(abbr?'<img src="'+teamLogo(abbr)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'')+
-    '<span>'+(g.home?'vs ':'@ ')+escHtml(opp)+'</span>';
+  mt.innerHTML='<span>'+(g.home?'vs':'@')+'</span>'+
+    (abbr?'<img src="'+teamLogo(abbr)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'')+
+    '<span>'+escHtml(opp)+'</span>';
   const target=new Date(next.date).getTime(), pad=n=>String(n).padStart(2,'0');
   function tick(){
     let diff=target-Date.now();
