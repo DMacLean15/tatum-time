@@ -463,9 +463,11 @@
     .gd-match{width:100%;text-align:center;order:3}
   }
   @media(max-width:680px){
-    .tk-inner{gap:16px;padding:7px 14px;min-height:40px}
-    .tk-seg{font-size:.8rem}
+    /* wrap + center instead of sideways overflow - nothing gets cut off */
+    .tk-inner{gap:8px 16px;padding:8px 12px;min-height:0;flex-wrap:wrap;justify-content:center;overflow:visible}
+    .tk-seg{font-size:.8rem;flex-wrap:wrap;justify-content:center;white-space:normal;row-gap:6px}
     .tk-clock{font-size:.9rem;letter-spacing:1.5px}
+    .gd-btn{width:38px;height:38px}
   }
 
   /* ---------- LIVE SCHEDULE (last + next) ---------- */
