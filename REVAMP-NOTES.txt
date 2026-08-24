@@ -141,3 +141,16 @@ Changed files: index.html, build-rss.js, feed.xml, sitemap.xml.
 
 To test locally first:  python -m http.server 8123
 then open http://localhost:8123
+
+----------------------------------------------------------------
+FAN PICK'EM + PLAYER OF THE GAME (round 6)
+----------------------------------------------------------------
+- Pick'em on the Next Game card: call it before tip-off (Celtics
+  by 10+ / by 1-9 / opponent wins), auto-graded from the final
+  score, with per-browser streaks + season record and fanbase
+  percentages.
+- Player of the Game vote on the Last Result card (recent games
+  only), with the fanbase's top vote-getters.
+- Both hide in the offseason; preview anytime at /?fandemo=1.
+- Needs one Supabase table: SETUP-FAN-PICKS.txt. Works per-fan
+  without it; community bars switch on once the table exists.

@@ -1,0 +1,62 @@
+================================================================
+  FAN PICK'EM + PLAYER OF THE GAME  (2 min, one time)
+================================================================
+
+Two new fan features live inside the "Last & Next" score cards in
+Celtics Central:
+
+  🎯 FAN PICK'EM - before every game, fans call it: "Celtics by
+     10+", "Celtics by 1-9", or "Opponent wins". After the final,
+     the site grades the pick automatically from the real score,
+     tracks each fan's streak and season record (per browser), and
+     shows what percentage of the fanbase called it.
+
+  🏅 PLAYER OF THE GAME - after each game, fans vote the best
+     Celtic (top of the roster shown as buttons) and see the
+     fanbase's top vote-getters.
+
+Both hide themselves in the offseason and appear on their own once
+the schedule has games. To preview them today, open:
+
+    https://tatumtime.net/?fandemo=1
+
+(That fakes a finished win and a game tomorrow. Demo votes are kept
+separate from real games.)
+
+RUN THIS IN SUPABASE  (same project as comments and trivia)
+  Supabase → SQL Editor → New query → paste + Run:
+
+-------------------- copy from here --------------------
+create table if not exists fan_picks (
+  id          bigint generated always as identity primary key,
+  kind        text not null,
+  key         text not null,
+  choice      text not null,
+  created_at  timestamptz not null default now()
+);
+
+alter table fan_picks enable row level security;
+
+create policy "public can pick"
+  on fan_picks for insert
+  to anon
+  with check ( kind in ('pickem','potg')
+               and char_length(key) between 1 and 40
+               and char_length(choice) between 1 and 60 );
+
+create policy "public can read picks"
+  on fan_picks for select
+  to anon
+  using ( true );
+--------------------- to here --------------------------
+
+Until you run it, picking and voting still work for each fan (they
+see their own pick, grading, and streak) - only the community
+percentages stay hidden.
+
+NOTES
+  - One pick / one vote per browser per game (localStorage, same as
+    trivia and reactions).
+  - Streaks and season record are per browser - clearing browser
+    data resets them.
+  - Games are keyed by ESPN's game id, so nothing collides.

@@ -687,6 +687,20 @@
     .tr-choices{grid-template-columns:1fr}
     .tr-name{flex-basis:132px;font-size:.8rem}
   }
+  /* ---------- FAN PICK'EM + PLAYER OF THE GAME (inside the score cards) ---------- */
+  .fan-block{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+  .fan-lbl{font-size:.64rem;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+  .fan-btns{display:flex;flex-wrap:wrap;gap:7px}
+  .fan-btn{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:999px;padding:8px 13px;color:var(--txt);font-weight:700;font-size:.8rem;cursor:pointer;transition:.15s;font-family:inherit}
+  .fan-btn:hover{border-color:var(--green-glow);background:rgba(22,196,91,.08)}
+  .fan-note{color:var(--muted);font-size:.82rem;margin-top:6px;line-height:1.5}
+  .fan-good{color:var(--green-glow);font-weight:800}
+  .fan-bad{color:#ff7a7a;font-weight:800}
+  .fan-streak{color:var(--gold);font-weight:800}
+  .fan-bars{margin-top:8px}
+  .fan-bars .tr-row{margin:5px 0}
+  .fan-bars .tr-name{flex-basis:128px;font-size:.78rem}
+  .fan-bars .tr-pct{font-size:.8rem;flex-basis:38px}
   /* Latest Celtics news */
   .news-list{display:grid;gap:12px}
   .news-item{display:flex;justify-content:space-between;align-items:center;gap:16px;background:linear-gradient(165deg,var(--card),#0a1510);border:1px solid var(--line);border-radius:14px;padding:15px 18px;transition:.16s}
@@ -1738,6 +1752,7 @@ async function loadSchedule(){
       const done=comp&&comp.status&&comp.status.type&&comp.status.type.completed;
       if(done||t<now) last=ev; else if(!next) next=ev;
     });
+    if(/[?&]fandemo=1/.test(location.search)){ const d=demoEvents(); last=d.last; next=d.next; }   // offseason preview of pick'em/POTG
     checkGameDay(events); renderLast(last); renderNext(next); startCountdown(next); renderSchedList(events); fillTicker(last);
   }catch(e){
     const lbl=document.getElementById('scLabel'), tm=document.getElementById('scTime'), mt=document.getElementById('scMatch');
@@ -2098,6 +2113,136 @@ function renderTriviaResults(i,mine){
     .catch(function(){ /* table not set up yet - the local reveal above still works */ });
 }
 
+/* ---- Game-Day Pick'em + Player of the Game (shared fan_picks table in
+        Supabase; see SETUP-FAN-PICKS.txt). Pick'em: call the next game before
+        tip-off, get graded automatically from the final score, build a streak
+        (stored per browser). POTG: vote the best player after each game.
+        Everything hides itself in the offseason. Test with ?fandemo=1. ---- */
+const PICK_OPTS=[
+  {id:'w-big',label:'Celtics by 10+'},
+  {id:'w-close',label:'Celtics by 1-9'},
+  {id:'l',label:'Opponent wins'}
+];
+function pickLabel(id){ const o=PICK_OPTS.find(function(x){ return x.id===id; }); return o?o.label:id; }
+function fanPost(kind,key,choice){
+  if(!commentsReady()) return;
+  fetch(commentsConfig.url+'/rest/v1/fan_picks',{
+    method:'POST',
+    headers:Object.assign({'Content-Type':'application/json',Prefer:'return=minimal'},chead()),
+    body:JSON.stringify({kind:kind,key:String(key),choice:choice})
+  }).catch(function(){});
+}
+function fanCounts(kind,key){
+  if(!commentsReady()) return Promise.reject();
+  return fetch(commentsConfig.url+'/rest/v1/fan_picks?select=choice&kind=eq.'+kind+'&key=eq.'+encodeURIComponent(key),{headers:chead()})
+    .then(function(r){ return r.ok?r.json():Promise.reject(); })
+    .then(function(rows){ const c={}; rows.forEach(function(r){ c[r.choice]=(c[r.choice]||0)+1; }); return {counts:c,total:rows.length}; });
+}
+function fanBars(host,options,counts,total,winnerId,youId){
+  if(!host||!total) return;
+  host.innerHTML=options.map(function(o){
+    const n=counts[o.id]||0, pct=Math.round(n*100/total);
+    return '<div class="tr-row'+(o.id===winnerId?' correct':'')+'">'+
+      '<span class="tr-name'+(o.id===winnerId?' correct':'')+'"><b>'+escHtml(o.label)+'</b>'+(o.id===youId?'<span class="tr-you">← you</span>':'')+'</span>'+
+      '<span class="tr-bar"><span class="tr-fill" style="width:'+pct+'%"></span></span>'+
+      '<span class="tr-pct">'+pct+'%</span></div>';
+  }).join('');
+}
+/* pick'em on the NEXT game card */
+function renderPickem(ev){
+  const card=document.getElementById('nextCard'); if(!card||!ev||!ev.id) return;
+  const key='tt_pick_'+ev.id;
+  let mine=null; try{ mine=localStorage.getItem(key); }catch(e){}
+  const div=document.createElement('div'); div.className='fan-block'; card.appendChild(div);
+  function locked(choice){
+    div.innerHTML='<div class="fan-lbl">🎯 Fan Pick\'em</div>'+
+      '<div class="fan-note">Locked in: <b style="color:#fff">'+escHtml(pickLabel(choice))+'</b> - graded automatically after the final buzzer.</div>'+
+      '<div class="fan-bars" id="pkBars"></div>';
+    fanCounts('pickem',ev.id).then(function(res){ fanBars(document.getElementById('pkBars'),PICK_OPTS,res.counts,res.total,null,choice); }).catch(function(){});
+  }
+  if(mine){ locked(mine); return; }
+  div.innerHTML='<div class="fan-lbl">🎯 Fan Pick\'em - your call?</div>'+
+    '<div class="fan-btns">'+PICK_OPTS.map(function(o){ return '<button class="fan-btn" type="button" data-p="'+o.id+'">'+o.label+'</button>'; }).join('')+'</div>';
+  div.querySelectorAll('.fan-btn').forEach(function(b){
+    b.onclick=function(){ try{ localStorage.setItem(key,b.dataset.p); }catch(e){} fanPost('pickem',ev.id,b.dataset.p); locked(b.dataset.p); };
+  });
+}
+/* pick result + POTG on the LAST game card */
+function addLastFan(ev,g){
+  const card=document.getElementById('lastCard'); if(!card||!ev||!ev.id) return;
+  const done=g.status&&g.status.type&&g.status.type.completed; if(!done) return;   // never grade a live game
+  const bs=scoreOf(g.bos), os=scoreOf(g.opp); if(bs==null||os==null) return;
+  const margin=bs-os, actual=margin>=10?'w-big':(margin>0?'w-close':'l');
+  const fresh=(Date.now()-new Date(ev.date).getTime())<7*864e5;   // POTG only while the game is recent
+  let mine=null; try{ mine=localStorage.getItem('tt_pick_'+ev.id); }catch(e){}
+  if(!mine&&!fresh) return;
+  const div=document.createElement('div'); div.className='fan-block';
+  let inner='';
+  if(mine){
+    const hit=(mine===actual);
+    let st=0,w=0,tot=0;
+    try{
+      if(!localStorage.getItem('tt_pickdone_'+ev.id)){   // grade once, then remember
+        localStorage.setItem('tt_pickdone_'+ev.id,'1');
+        localStorage.setItem('tt_pick_streak',String(hit?(+(localStorage.getItem('tt_pick_streak')||0)+1):0));
+        if(hit) localStorage.setItem('tt_pick_wins',String(+(localStorage.getItem('tt_pick_wins')||0)+1));
+        localStorage.setItem('tt_pick_total',String(+(localStorage.getItem('tt_pick_total')||0)+1));
+      }
+      st=+(localStorage.getItem('tt_pick_streak')||0); w=+(localStorage.getItem('tt_pick_wins')||0); tot=+(localStorage.getItem('tt_pick_total')||0);
+    }catch(e){}
+    inner+='<div class="fan-lbl">🎯 Fan Pick\'em result</div>'+
+      '<div class="fan-note">Your call: <b style="color:#fff">'+escHtml(pickLabel(mine))+'</b> '+
+      (hit?'<span class="fan-good">✅ Nailed it!</span>':'<span class="fan-bad">❌ Not this time</span>')+
+      (st>1?' <span class="fan-streak">🔥 '+st+' straight</span>':'')+
+      (tot?' <span>· season '+w+'/'+tot+'</span>':'')+'</div>'+
+      '<div class="fan-note" id="pkAcc"></div>';
+  }
+  if(fresh) inner+='<div class="fan-lbl"'+(mine?' style="margin-top:12px"':'')+'>🏅 Player of the Game - fan vote</div><div id="potgBox" class="fan-note">Loading roster…</div>';
+  div.innerHTML=inner; card.appendChild(div);
+  if(mine){
+    fanCounts('pickem',ev.id).then(function(res){
+      const el=document.getElementById('pkAcc');
+      if(el&&res.total) el.textContent=Math.round((res.counts[actual]||0)*100/res.total)+'% of fans called it · '+res.total+' pick'+(res.total===1?'':'s');
+    }).catch(function(){});
+  }
+  if(fresh) initPotg(ev);
+}
+function initPotg(ev){
+  const box=document.getElementById('potgBox'); if(!box) return;
+  let mine=null; try{ mine=localStorage.getItem('tt_potg_'+ev.id); }catch(e){}
+  function results(v){
+    box.innerHTML='<div class="fan-note" style="margin-top:0">Your vote: <b style="color:#fff">'+escHtml(v)+'</b></div><div class="fan-bars" id="potgBars"></div>';
+    fanCounts('potg',ev.id).then(function(res){
+      const names=Object.keys(res.counts).sort(function(a,b){ return res.counts[b]-res.counts[a]; }).slice(0,5);
+      fanBars(document.getElementById('potgBars'), names.map(function(n){ return {id:n,label:n}; }), res.counts, res.total, names[0], v);
+    }).catch(function(){});
+  }
+  if(mine){ results(mine); return; }
+  cachedFetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/bos/roster',30).then(function(data){
+    const players=(data.athletes||[]).map(function(a){ return {name:a.displayName,salary:(a.contracts&&a.contracts[0]&&a.contracts[0].salary)||0}; })
+      .sort(function(a,b){ return b.salary-a.salary; }).slice(0,10);
+    if(!players.length){ box.textContent='Roster unavailable right now.'; return; }
+    box.innerHTML='<div class="fan-btns">'+players.map(function(p){ return '<button class="fan-btn" type="button" data-n="'+escHtml(p.name)+'">'+escHtml(p.name)+'</button>'; }).join('')+'</div>';
+    box.querySelectorAll('.fan-btn').forEach(function(b){
+      b.onclick=function(){ const n=b.dataset.n; try{ localStorage.setItem('tt_potg_'+ev.id,n); }catch(e){} fanPost('potg',ev.id,n); results(n); };
+    });
+  }).catch(function(){ box.textContent='Roster unavailable right now.'; });
+}
+/* offseason preview: ?fandemo=1 fakes a finished win + a game tomorrow */
+function demoEvents(){
+  function team(abbr,name){ return {abbreviation:abbr,shortDisplayName:name,displayName:name}; }
+  function comp(bos,opp,completed,home,abbr,name){
+    return {competitors:[
+      {team:team('BOS','Celtics'),homeAway:home?'home':'away',score:bos},
+      {team:team(abbr,name),homeAway:home?'away':'home',score:opp}
+    ],status:{type:{completed:completed}}};
+  }
+  return {
+    last:{id:'demo-last',date:new Date(Date.now()-864e5).toISOString(),links:[],competitions:[comp('112','104',true,true,'MIA','Heat')]},
+    next:{id:'demo-next',date:new Date(Date.now()+864e5).toISOString(),links:[],competitions:[comp(null,null,false,false,'NY','Knicks')]}
+  };
+}
+
 /* ---- Latest Celtics news (ESPN) + "Hear Dan's Take" when a post matches ---- */
 const NEWS_STOP=new Set('the and for with from over into onto after before amid among sources source report reports says said will could would that this these those their they them his her but are was were has have had who what why how new off out top get gets going per via agree agrees agreed deal deals sign signs signed trade trades traded celtics boston nba wnba season seasons game games team teams star update updates latest full former next year years night day days more back grade grades grading preview recap analysis takeaways ranking rankings winners losers buzz tracker roundup breakdown primer offseason agency signing signings extension extensions insider mock reaction reactions takes free questions question'.split(' '));
 function sigWords(s){
@@ -2349,6 +2494,7 @@ function renderLast(ev){
     </div>
     ${gameMeta(g)}
     ${url?`<a class="score-link" href="${url}" target="_blank" rel="noopener">View full game page ↗</a>`:''}`;
+  addLastFan(ev,g);   // pick'em result + Player of the Game vote
 }
 function renderNext(ev){
   const card=document.getElementById('nextCard');
@@ -2364,6 +2510,7 @@ function renderNext(ev){
       </div>
     </div>
     ${gameMeta(g)}`;
+  renderPickem(ev);   // fan pick'em on the upcoming game
 }
 function startCountdown(next){
   const tm=document.getElementById('scTime'), lbl=document.getElementById('scLabel'), mt=document.getElementById('scMatch');
