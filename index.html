@@ -1898,7 +1898,10 @@ async function fillTicker(last){
       }
     }catch(e){}
   }
-  bar.style.display='';   // show the strip even in the offseason (record still tells a story)
+  /* must be an explicit 'block': the stylesheet default is display:none, and
+     setting '' just clears the inline style, letting that default win again -
+     which is why the original shot-clock bar never actually appeared. */
+  bar.style.display='block';
 }
 
 function renderSchedList(events){
