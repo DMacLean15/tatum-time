@@ -660,6 +660,33 @@
   .thisday .td-text b{color:var(--green-glow)}
   .thisday .td-quote{display:block;font-style:italic;color:#eaf1ec}
   .thisday .td-cite{display:block;margin-top:6px;color:var(--green-glow);font-weight:700;font-size:.82rem;letter-spacing:.3px}
+  /* ---------- QUESTION OF THE DAY (fan trivia) ---------- */
+  .trivia{background:linear-gradient(120deg,rgba(22,196,91,.10),rgba(191,161,90,.07));border:1px solid rgba(22,196,91,.25);border-radius:14px;padding:18px 20px;margin-bottom:14px}
+  .tr-label{font-size:.66rem;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+  .tr-q{color:#fff;font-weight:700;font-size:1.05rem;line-height:1.4;margin-bottom:14px}
+  .tr-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .tr-btn{text-align:left;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:11px 14px;color:var(--txt);font-weight:600;font-size:.9rem;cursor:pointer;transition:.15s;font-family:inherit}
+  .tr-btn:hover{border-color:var(--green-glow);background:rgba(22,196,91,.08)}
+  .tr-verdict{font-weight:800;font-size:1rem;margin-bottom:10px}
+  .tr-verdict.good{color:var(--green-glow)}
+  .tr-verdict.bad{color:#ff7a7a}
+  .tr-row{display:flex;align-items:center;gap:10px;margin:7px 0}
+  .tr-name{flex:0 0 190px;font-size:.85rem;color:var(--txt);display:flex;align-items:center;gap:6px;min-width:0}
+  .tr-name b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+  .tr-name .tr-you{color:var(--gold);font-size:.72rem;font-weight:800;flex:0 0 auto}
+  .tr-row.correct .tr-name b{color:var(--green-glow);font-weight:800}
+  .tr-bar{flex:1;height:10px;border-radius:6px;background:rgba(255,255,255,.07);overflow:hidden}
+  .tr-fill{display:block;height:100%;border-radius:6px;background:rgba(255,255,255,.18);transition:width .5s ease}
+  .tr-row.correct .tr-fill{background:linear-gradient(90deg,var(--green),var(--green-glow))}
+  .tr-pct{flex:0 0 44px;text-align:right;font-family:'Anton',sans-serif;font-size:.9rem;color:var(--muted)}
+  .tr-row.correct .tr-pct{color:var(--green-glow)}
+  .tr-fun{color:var(--muted);font-size:.86rem;margin-top:12px;line-height:1.5}
+  .tr-meta{color:var(--gold);font-size:.78rem;font-weight:700;margin-top:10px}
+  @media(max-width:560px){
+    .trivia{padding:14px 16px}
+    .tr-choices{grid-template-columns:1fr}
+    .tr-name{flex-basis:132px;font-size:.8rem}
+  }
   /* Latest Celtics news */
   .news-list{display:grid;gap:12px}
   .news-item{display:flex;justify-content:space-between;align-items:center;gap:16px;background:linear-gradient(165deg,var(--card),#0a1510);border:1px solid var(--line);border-radius:14px;padding:15px 18px;transition:.16s}
@@ -932,6 +959,7 @@
         <p>Scores, schedule and standings — straight from the NBA, updated on its own.</p>
       </div>
     </div>
+    <div class="trivia" id="triviaCard" style="display:none"></div>
     <div class="thisday-row">
       <div class="thisday" id="factDay"></div>
       <div class="thisday" id="onThisDay"></div>
@@ -1322,6 +1350,7 @@ async function initBlog(){
   renderPost(startIdx>=0?startIdx:0, false, startIdx>=0);
   loadSchedule();   // live scores + schedule list + courtside ticker (default tab)
   renderThisDay();  // Quote of the Day + On This Day cards
+  renderTrivia();   // Question of the Day (fan trivia with shared results)
   renderTimeline(); // championship timeline (static, no network)
   wireTabs();       // tabs — Standings/Players fetch only when first opened
   wireNewsletter(); // newsletter signup (Supabase)
@@ -1959,6 +1988,96 @@ const celticsQuotes=[
   {q:'Anything is possible!', who:'Kevin Garnett'},
   {q:'I am The Truth.', who:'Paul Pierce'}
 ];
+/* ---- Question of the Day: Celtics trivia; guesses stored in Supabase so fans
+        see how everyone did. Rotates daily through the bank below (same question
+        for every visitor). One guess per browser, like reactions. ---- */
+const TRIVIA=[
+  {id:'russell-rings',q:'How many NBA championships did Bill Russell win as a player?',c:['9','10','11','13'],a:2,fun:'Eleven titles in thirteen seasons (1957-1969), the last two as player-coach - the most championships of any player in NBA history.'},
+  {id:'bird-number',q:'What jersey number did Larry Bird wear in Boston?',c:['7','32','33','35'],a:2,fun:'No. 33 was raised to the rafters in 1993. No. 32 belongs to Kevin McHale.'},
+  {id:'top-scorer',q:"Who is the Celtics' all-time leading scorer?",c:['Larry Bird','John Havlicek','Paul Pierce','Jayson Tatum'],a:1,fun:'Hondo racked up 26,395 points - with Pierce (24,021) second and Bird third.'},
+  {id:'founded',q:'In what year were the Boston Celtics founded?',c:['1936','1946','1950','1957'],a:1,fun:'A charter member of the BAA in 1946, which became the NBA in 1949.'},
+  {id:'fmvp-2024',q:'Who won Finals MVP when the Celtics raised Banner 18 in 2024?',c:['Jayson Tatum','Jaylen Brown','Derrick White','Kristaps Porzingis'],a:1,fun:'Jaylen Brown took home both the Conference Finals MVP and the Finals MVP that run.'},
+  {id:'stole-ball',q:'"Havlicek stole the ball!" - against which team did that famous play happen?',c:['Lakers','Knicks','76ers','Hawks'],a:2,fun:"Game 7 of the 1965 East finals vs Philadelphia - Johnny Most's call became the most famous line in Boston sports radio."},
+  {id:'eight-straight',q:'Which coach led the Celtics to eight straight championships?',c:['Red Auerbach','Bill Russell','Tommy Heinsohn','Doc Rivers'],a:0,fun:'1959 through 1966 - a streak no team in any major American sport has matched.'},
+  {id:'first-black-coach',q:'Who became the first Black head coach in major American pro sports - as a Celtic?',c:['K.C. Jones','Bill Russell','Sam Jones','Satch Sanders'],a:1,fun:'Russell took over as player-coach in 1966 and won two titles wearing both hats.'},
+  {id:'tatum-pick',q:'What pick was Jayson Tatum in the 2017 NBA Draft?',c:['1st overall','3rd overall','5th overall','13th overall'],a:1,fun:'Boston traded down from No. 1, let Philly take Markelle Fultz, and still got their guy at three.'},
+  {id:'bird-college',q:'Where did Larry Bird play college basketball?',c:['Indiana','Indiana State','Purdue','Kansas'],a:1,fun:"He carried Indiana State to the 1979 title game against Magic Johnson's Michigan State - still the highest-rated college hoops broadcast ever."},
+  {id:'third-big3',q:'Pierce, Garnett, and who completed the 2008 "Big Three"?',c:['Rajon Rondo','Ray Allen','Rasheed Wallace','James Posey'],a:1,fun:'Allen arrived in a draft-night trade with Seattle in 2007 - Banner 17 followed one year later.'},
+  {id:'sixty-points',q:'Who holds the Celtics single-game scoring record with 60 points?',c:['Larry Bird','Isaiah Thomas','Jayson Tatum','Paul Pierce'],a:0,fun:"Bird dropped 60 on Atlanta in March 1985 - nine days after Kevin McHale set the record with 56. Bird had told McHale he'd break it."},
+  {id:'the-truth',q:'Which NBA legend gave Paul Pierce the nickname "The Truth"?',c:['Michael Jordan','Kobe Bryant',"Shaquille O'Neal",'Charles Barkley'],a:2,fun:'After a 42-point Pierce night against the Lakers in 2001, Shaq told reporters: "Paul Pierce is the truth."'},
+  {id:'banner18-opp',q:'Which team did Boston beat in the 2024 Finals for Banner 18?',c:['Nuggets','Mavericks','Timberwolves','Thunder'],a:1,fun:'A 4-1 series win over Dallas made the Celtics the winningest franchise in NBA history.'},
+  {id:'kg-trade',q:'Which team traded Kevin Garnett to the Celtics in 2007?',c:['Timberwolves','Nets','Bucks','Warriors'],a:0,fun:'July 31, 2007 - the biggest trade in franchise history sent seven players and picks to Minnesota for the Big Ticket.'},
+  {id:'leprechaun',q:"What is the name of the leprechaun on the Celtics' logo?",c:['Shamus','Lucky','Paddy','Clover'],a:1,fun:"Lucky was drawn by Zang Auerbach - Red Auerbach's brother."},
+  {id:'cowens-mvp',q:'Which undersized Celtics center won the 1973 NBA MVP award?',c:['Dave Cowens','Robert Parish','Bill Russell','Kendrick Perkins'],a:0,fun:"At 6'9\" Cowens gave up inches to every rival center - and outworked all of them, averaging 20 and 16 that season."},
+  {id:'double-zero',q:'Which Celtics legend wore No. 00?',c:['Dennis Johnson','Robert Parish','Jo Jo White','Cedric Maxwell'],a:1,fun:'The Chief - who also played more games than anyone in NBA history (1,611).'},
+  {id:'cousy-nickname',q:'What was Bob Cousy\'s nickname?',c:['The Truth','The Houdini of the Hardwood','The Hick from French Lick','Mr. Clutch'],a:1,fun:'Cousy led the NBA in assists eight straight seasons and won the 1957 MVP.'},
+  {id:'triple-ot',q:'The legendary triple-overtime Game 5 of the 1976 Finals came against which team?',c:['Suns','Lakers','Bucks','Warriors'],a:0,fun:'Many still call it the greatest game ever played. Jo Jo White logged 60 minutes and won Finals MVP.'},
+  {id:'tommy-points',q:'Which Celtics legend handed out "Tommy Points" as a beloved broadcaster?',c:['Bob Cousy','Tommy Heinsohn','Cedric Maxwell','Brian Scalabrine'],a:1,fun:'Heinsohn is in the Hall of Fame twice - as a player AND as a coach - and was part of all 17 pre-2024 banners as player, coach, or broadcaster.'},
+  {id:'tatum-college',q:'Where did Jayson Tatum play his one college season?',c:['Kentucky','North Carolina','Duke','Kansas'],a:2,fun:'One year in Durham under Coach K, then straight to the Garden.'},
+  {id:'russell-trade',q:'Boston landed the draft rights to Bill Russell in a 1956 trade with which team?',c:['St. Louis Hawks','Rochester Royals','Syracuse Nationals','Fort Wayne Pistons'],a:0,fun:'Red Auerbach sent Ed Macauley and Cliff Hagan to St. Louis for the pick - arguably the greatest trade ever made.'}
+];
+function triviaToday(){ const now=new Date(); const doy=Math.floor((now-new Date(now.getFullYear(),0,0))/864e5); return doy%TRIVIA.length; }
+function triviaKey(id){ return 'tt_trivia_'+id; }
+function renderTrivia(){
+  const box=document.getElementById('triviaCard'); if(!box) return;
+  const i=triviaToday(), t=TRIVIA[i];
+  box.style.display='';
+  let mine=null; try{ const v=localStorage.getItem(triviaKey(t.id)); if(v!=null&&v!=='') mine=+v; }catch(e){}
+  if(mine==null||isNaN(mine)){
+    box.innerHTML='<div class="tr-label">🏀 Question of the Day</div><div class="tr-q">'+t.q+'</div>'+
+      '<div class="tr-choices">'+t.c.map(function(c,ci){ return '<button class="tr-btn" type="button" data-c="'+ci+'">'+escHtml(c)+'</button>'; }).join('')+'</div>';
+    box.querySelectorAll('.tr-btn').forEach(function(b){ b.onclick=function(){ answerTrivia(i,+b.dataset.c); }; });
+  } else {
+    renderTriviaResults(i,mine);
+  }
+}
+function answerTrivia(i,choice){
+  const t=TRIVIA[i];
+  try{ localStorage.setItem(triviaKey(t.id),String(choice)); }catch(e){}
+  if(commentsReady()){
+    fetch(commentsConfig.url+'/rest/v1/trivia_votes',{
+      method:'POST',
+      headers:Object.assign({'Content-Type':'application/json',Prefer:'return=minimal'},chead()),
+      body:JSON.stringify({question_id:t.id,choice:choice})
+    }).catch(function(){});
+  }
+  renderTriviaResults(i,choice);
+}
+function renderTriviaResults(i,mine){
+  const box=document.getElementById('triviaCard'); if(!box) return;
+  const t=TRIVIA[i], good=(mine===t.a);
+  box.innerHTML='<div class="tr-label">🏀 Question of the Day</div><div class="tr-q">'+t.q+'</div>'+
+    '<div class="tr-verdict '+(good?'good':'bad')+'">'+(good?'☘️ You got it!':'Not this one - the answer is '+escHtml(t.c[t.a])+'.')+'</div>'+
+    '<div id="triviaBars"></div>'+
+    (t.fun?'<div class="tr-fun">'+t.fun+'</div>':'')+
+    '<div class="tr-meta" id="triviaMeta"></div>';
+  const bars=document.getElementById('triviaBars'), meta=document.getElementById('triviaMeta');
+  function paint(counts,total){
+    bars.innerHTML=t.c.map(function(c,ci){
+      const n=counts[ci]||0, pct=total?Math.round(n*100/total):0;
+      return '<div class="tr-row'+(ci===t.a?' correct':'')+'">'+
+        '<span class="tr-name'+(ci===t.a?' correct':'')+'"><b>'+escHtml(c)+'</b>'+(ci===mine?'<span class="tr-you">← you</span>':'')+'</span>'+
+        '<span class="tr-bar"><span class="tr-fill" style="width:'+pct+'%"></span></span>'+
+        '<span class="tr-pct">'+pct+'%</span></div>';
+    }).join('');
+    if(total>1){
+      const rightPct=Math.round((counts[t.a]||0)*100/total);
+      meta.textContent=rightPct+'% of fans got it right · '+total+' guesses';
+    } else {
+      meta.textContent='You’re the first to guess today - check back later to see how other fans did.';
+    }
+  }
+  const seed={}; seed[mine]=1; paint(seed,1);   // instant feedback; live totals replace it below
+  if(!commentsReady()) return;
+  fetch(commentsConfig.url+'/rest/v1/trivia_votes?select=choice&question_id=eq.'+encodeURIComponent(t.id),{headers:chead()})
+    .then(function(r){ return r.ok?r.json():Promise.reject(); })
+    .then(function(rows){
+      const c={}; rows.forEach(function(r){ c[r.choice]=(c[r.choice]||0)+1; });
+      if(rows.length) paint(c,rows.length);
+    })
+    .catch(function(){ /* table not set up yet - the local reveal above still works */ });
+}
+
 /* ---- Latest Celtics news (ESPN) + "Hear Dan's Take" when a post matches ---- */
 const NEWS_STOP=new Set('the and for with from over into onto after before amid among sources source report reports says said will could would that this these those their they them his her but are was were has have had who what why how new off out top get gets going per via agree agrees agreed deal deals sign signs signed trade trades traded celtics boston nba wnba season seasons game games team teams star update updates latest full former next year years night day days more back grade grades grading preview recap analysis takeaways ranking rankings winners losers buzz tracker roundup breakdown primer offseason agency signing signings extension extensions insider mock reaction reactions takes free questions question'.split(' '));
 function sigWords(s){

@@ -1,0 +1,49 @@
+================================================================
+  QUESTION OF THE DAY - COMMUNITY RESULTS  (2 min, one time)
+================================================================
+
+The homepage now shows a daily Celtics trivia question at the top
+of Celtics Central. Guessing works immediately - fans always see
+the right answer and a fun fact. But the "X% of fans got it right"
+community bars need one small table in Supabase (same project as
+comments and reactions).
+
+Until you run this, each fan just sees their own result - nothing
+breaks.
+
+RUN THIS IN SUPABASE
+  Supabase → your project → SQL Editor → New query → paste + Run:
+
+-------------------- copy from here --------------------
+create table if not exists trivia_votes (
+  id          bigint generated always as identity primary key,
+  question_id text not null,
+  choice      smallint not null,
+  created_at  timestamptz not null default now()
+);
+
+alter table trivia_votes enable row level security;
+
+create policy "public can vote"
+  on trivia_votes for insert
+  to anon
+  with check ( char_length(question_id) between 1 and 40
+               and choice between 0 and 3 );
+
+create policy "public can read votes"
+  on trivia_votes for select
+  to anon
+  using ( true );
+--------------------- to here --------------------------
+
+That's it. No site changes needed - the card starts showing live
+community percentages as soon as the table exists.
+
+HOW IT WORKS
+  - One question per day, same for every visitor, rotating through
+    a bank of 23 Celtics questions in index.html (look for TRIVIA).
+  - One guess per browser (remembered in localStorage, like the
+    emoji reactions).
+  - Adding your own questions: copy any TRIVIA entry, give it a
+    NEW unique id, and keep 'a' as the index (0-3) of the correct
+    choice. The rotation adjusts automatically.
