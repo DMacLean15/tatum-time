@@ -1,0 +1,8 @@
+{
+  "name": "tatum-time",
+  "private": true,
+  "description": "Tatum Time - a Celtics blog by Dan MacLean. sharp powers build-time photo compression (build-images.js).",
+  "dependencies": {
+    "sharp": "^0.35.3"
+  }
+}

@@ -60,3 +60,7 @@ console.log(`feed.xml regenerated with ${posts.length} posts`);
 // existing Cloudflare build command picks it up without any dashboard changes.
 try { require('./build-pages.js'); }
 catch (e) { console.error('build-pages failed (site still deploys):', e.message); }
+
+// And shrink any oversized CMS photo uploads before deploy (no-op without sharp).
+try { require('./build-images.js'); }
+catch (e) { console.error('build-images failed (site still deploys):', e.message); }
