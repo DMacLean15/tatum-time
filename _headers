@@ -17,3 +17,18 @@
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
+
+/favicon.ico
+  Cache-Control: public, max-age=604800
+
+/favicon.svg
+  Cache-Control: public, max-age=604800
+
+/apple-touch-icon.png
+  Cache-Control: public, max-age=604800
+
+/icon-192.png
+  Cache-Control: public, max-age=604800
+
+/icon-512.png
+  Cache-Control: public, max-age=604800

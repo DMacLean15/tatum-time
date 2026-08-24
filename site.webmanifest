@@ -1,0 +1,13 @@
+{
+  "name": "Tatum Time",
+  "short_name": "Tatum Time",
+  "description": "A Celtics blog for serious fans, by Dan MacLean.",
+  "start_url": "/",
+  "display": "minimal-ui",
+  "background_color": "#0c1410",
+  "theme_color": "#007a33",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

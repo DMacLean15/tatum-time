@@ -162,13 +162,18 @@ h1{color:#fff;font-size:clamp(1.7rem,5vw,2.4rem);line-height:1.2;margin:10px 0 8
 .rating .rt-val{flex:0 0 auto;font-family:'Anton',sans-serif;color:#fff;font-size:.95rem;min-width:44px;text-align:right}
 .yt-embed{position:relative;width:100%;padding-top:56.25%;margin:20px 0;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#000}
 .yt-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.more{margin-top:34px;padding-top:20px;border-top:1px solid var(--line)}
+.more-lbl{font-size:.7rem;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.more-link{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:11px 0;color:#fff;font-weight:600;font-size:.96rem;border-bottom:1px solid var(--line)}
+.more-link:hover{color:var(--green-glow)}
+.more-cat{color:var(--muted);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;flex:0 0 auto}
 .join{margin-top:36px;padding:22px;text-align:center;background:linear-gradient(140deg,rgba(22,196,91,.10),rgba(191,161,90,.05));border:1px solid rgba(22,196,91,.2);border-radius:16px}
 .join p{color:var(--muted);font-size:.92rem;margin-bottom:12px}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;font-weight:700;font-size:.95rem;background:linear-gradient(145deg,var(--green-glow),var(--green));color:#062a14}
 footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:.82rem;text-align:center}
 `;
 
-function pageHtml(p){
+function pageHtml(p, related){
   const url = SITE + '/post/' + p.slug + '/';
   const og = p.hero ? absUrl(p.hero) : DEFAULT_OG;
   const isoDate = /^\d{4}-\d{2}-\d{2}/.test(String(p.date)) ? String(p.date).slice(0,10) : '';
@@ -179,14 +184,23 @@ function pageHtml(p){
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>${esc(p.title)} - Tatum Time</title>
 <meta name="description" content="${esc(p.excerpt)}" />
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23007a33'/><text x='50' y='75' font-size='62' text-anchor='middle'>%E2%98%98%EF%B8%8F</text></svg>" />
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<meta name="theme-color" content="#007a33" />
 <link rel="canonical" href="${url}" />
 <meta property="og:type" content="article" />
+<meta property="og:locale" content="en_US" />
 <meta property="og:site_name" content="Tatum Time" />
 <meta property="og:title" content="${esc(p.title)}" />
 <meta property="og:description" content="${esc(p.excerpt)}" />
 <meta property="og:url" content="${url}" />
 <meta property="og:image" content="${esc(og)}" />
+${og === DEFAULT_OG ? '<meta property="og:image:width" content="1200" />\n<meta property="og:image:height" content="630" />' : ''}
+${isoDate ? '<meta property="article:published_time" content="' + isoDate + '" />' : ''}
+<meta property="article:section" content="${esc(p.cat)}" />
+<meta property="article:author" content="Dan MacLean" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="${esc(p.title)}" />
 <meta name="twitter:description" content="${esc(p.excerpt)}" />
@@ -196,8 +210,9 @@ ${JSON.stringify({
   '@context':'https://schema.org','@type':'BlogPosting',
   headline:p.title, description:p.excerpt, url,
   image:og, datePublished:isoDate||undefined,
+  articleSection:p.cat, inLanguage:'en-US',
   author:{'@type':'Person',name:'Dan MacLean'},
-  publisher:{'@type':'Organization',name:'Tatum Time',logo:{'@type':'ImageObject',url:DEFAULT_OG}},
+  publisher:{'@type':'Organization',name:'Tatum Time',url:SITE+'/',logo:{'@type':'ImageObject',url:SITE+'/icon-512.png'}},
   mainEntityOfPage:url
 }, null, 0)}
 </script>
@@ -218,6 +233,7 @@ ${JSON.stringify({
   <div class="meta"><b>Dan MacLean</b> · ${esc(fmtDisplayDate(p.date))} · ${p.readMins} min read</div>
   ${p.hero ? `<img class="hero-img" src="${esc(p.hero)}" alt="${esc(p.title)}" />` : ''}
   <div class="article">${p.body}</div>
+  ${related && related.length ? `<div class="more"><div class="more-lbl">More from Tatum Time</div>${related.map(r => `<a class="more-link" href="/post/${r.slug}/">${r.emoji} ${esc(r.title)}<span class="more-cat">${esc(r.cat)}</span></a>`).join('')}</div>` : ''}
   <div class="join">
     <p>Reactions and comments live on the main site - come join the conversation. ☘️</p>
     <a class="btn" href="/#/post/${p.slug}">Discuss on Tatum Time →</a>
@@ -253,9 +269,12 @@ if (!posts.length) {
 // fresh slate so renamed/deleted posts don't leave stale pages behind
 fs.rmSync('post', { recursive: true, force: true });
 posts.forEach(p => {
+  // internal links: 3 related posts (same category first, then newest)
+  const pool = posts.filter(x => x !== p);
+  const related = pool.filter(x => x.cat === p.cat).concat(pool.filter(x => x.cat !== p.cat)).slice(0, 3);
   const dir = path.join('post', p.slug);
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'index.html'), pageHtml(p));
+  fs.writeFileSync(path.join(dir, 'index.html'), pageHtml(p, related));
 });
 
 /* ---------- sitemap.xml ---------- */
