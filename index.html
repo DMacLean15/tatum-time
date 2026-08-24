@@ -456,9 +456,14 @@
   .gd-btn svg{display:block}
   .gd-btn:hover{background:rgba(255,255,255,.28)}
   @media(max-width:680px){
-    .gd-title{font-size:.98rem}
-    .gd-inner{gap:8px 14px;padding:8px 12px}
-    .gd-match{width:100%;text-align:center;order:3}
+    /* tidy centered rows: title / clock + play button / matchup.
+       And no pinning on phones - it scrolls away with the page. */
+    .gameday-bar{position:static}
+    .gd-inner{gap:8px 12px;padding:11px 12px 12px}
+    .gd-title{font-size:1rem;width:100%;text-align:center;order:1}
+    .gd-clock{order:2}
+    .gd-audio{order:3}
+    .gd-match{width:100%;justify-content:center;text-align:center;order:4;font-size:.82rem}
   }
   @media(max-width:680px){
     /* each segment becomes its own centered row - tidy stack, nothing cut off */
