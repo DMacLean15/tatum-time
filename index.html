@@ -423,8 +423,6 @@
 
   /* ---------- COURTSIDE TICKER (broadcast strip under the nav) ---------- */
   .shotclock-bar{display:none;background:#080d0a;border-bottom:1px solid var(--line)}
-  /* keep the countdown in view while scrolling (desktop; phones keep their space) */
-  @media(min-width:761px){ .shotclock-bar{position:sticky;top:68px;z-index:49} }
   .tk-inner{display:flex;align-items:center;gap:24px;min-height:44px;padding:8px 22px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
   .tk-inner::-webkit-scrollbar{display:none}
   @media(min-width:900px){.tk-inner{justify-content:center}}
