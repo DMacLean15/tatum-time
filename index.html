@@ -1743,8 +1743,21 @@ async function loadSchedule(){
   const _lc=document.getElementById('lastCard'), _nc=document.getElementById('nextCard'), _sl=document.getElementById('schedList');
   if(_lc) _lc.innerHTML=SKEL_CARD; if(_nc) _nc.innerHTML=SKEL_CARD; if(_sl) _sl.innerHTML=SKEL_ROWS;
   try{
-    const data=await cachedFetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/bos/schedule',10);
-    const events=(data.events||[]).slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+    /* ESPN's default schedule call only returns the "current" slate - in the
+       offseason that's a few preseason games. Explicitly ask for the right
+       regular season too (Jul-Sep: the season ahead; otherwise: the season in
+       progress) and merge everything, de-duped by game id. */
+    const base='https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/bos/schedule';
+    const mo=new Date().getMonth();   // 0-based
+    const regSeason=(mo>=6&&mo<=8)?(seasonYear()+1):seasonYear();
+    const urls=[base, base+'?season='+regSeason+'&seasontype=2'];
+    const results=await Promise.all(urls.map(u=>cachedFetch(u,10).catch(()=>null)));
+    if(results.every(r=>!r)) throw new Error('schedule unavailable');
+    const seen={}, events=[];
+    results.filter(Boolean).forEach(d=>(d.events||[]).forEach(ev=>{
+      if(ev&&ev.id&&!seen[ev.id]){ seen[ev.id]=1; events.push(ev); }
+    }));
+    events.sort((a,b)=>new Date(a.date)-new Date(b.date));
     const now=Date.now(); let last=null,next=null;
     events.forEach(ev=>{
       const t=new Date(ev.date).getTime();
@@ -1884,9 +1897,8 @@ async function fillTicker(last){
 function renderSchedList(events){
   const box=document.getElementById('schedList'); if(!box) return;
   if(!events||!events.length){ box.className=''; box.innerHTML='<div class="no-results">No games to show yet — the 2026–27 schedule is on the way. ☘️</div>'; return; }
-  box.className='cal-grid';
-  box.innerHTML='';
-  events.slice().reverse().forEach(ev=>{   // latest games first
+  const isDone=ev=>{ const c=ev.competitions&&ev.competitions[0]; return !!(c&&c.status&&c.status.type&&c.status.type.completed); };
+  function gameCard(ev){
     const g=parseGame(ev), comp=g.comp||{};
     const d=new Date(ev.date);
     const done=g.status&&g.status.type&&g.status.type.completed;
@@ -1907,10 +1919,23 @@ function renderSchedList(events){
       '<div class="cal-top">'+d.toLocaleDateString(undefined,{month:'short'})+'</div>'+
       '<div class="cal-day">'+d.getDate()+'</div>'+
       '<div class="cal-dow">'+d.toLocaleDateString(undefined,{weekday:'short'})+'</div>'+
-      '<div class="cal-match"><span class="cal-vs">'+(g.home?'vs':'@')+'</span><img src="'+teamLogo(abbr)+'" alt="" onerror="this.style.display=\'none\'"><b>'+opp+'</b></div>'+
+      '<div class="cal-match"><span class="cal-vs">'+(g.home?'vs':'@')+'</span><img src="'+teamLogo(abbr)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'"><b>'+opp+'</b></div>'+
       res+foot;
-    box.appendChild(card);
-  });
+    return card;
+  }
+  // upcoming games soonest-first, then played games most-recent-first
+  const upcoming=events.filter(ev=>!isDone(ev));
+  const played=events.filter(isDone).reverse();
+  box.className=''; box.innerHTML='';
+  function addGroup(label,list){
+    if(!list.length) return;
+    if(upcoming.length&&played.length){ const h=document.createElement('div'); h.className='stand-sub'; h.textContent=label; box.appendChild(h); }
+    const grid=document.createElement('div'); grid.className='cal-grid';
+    list.forEach(ev=>grid.appendChild(gameCard(ev)));
+    box.appendChild(grid);
+  }
+  addGroup('Upcoming',upcoming);
+  addGroup('Results',played);
 }
 function shortNote(n){ return (n||'').replace(/Eastern Conference|Western Conference/gi,'').replace(/\bEast\b|\bWest\b/g,'').replace(/\s*-\s*/g,' · ').replace(/Game (\d)/gi,'G$1').replace(/\s+/g,' ').trim(); }
 
