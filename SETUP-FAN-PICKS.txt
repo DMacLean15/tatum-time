@@ -21,7 +21,8 @@ the schedule has games. To preview them today, open:
     https://tatumtime.net/?fandemo=1
 
 (That fakes a finished win and a game tomorrow. Demo votes are kept
-separate from real games.)
+separate from real games. Use ?fandemo=2 to also
+preview GAME DAY - green banner, countdown, theme-song button.)
 
 RUN THIS IN SUPABASE  (same project as comments and trivia)
   Supabase → SQL Editor → New query → paste + Run:

@@ -461,9 +461,9 @@
     .gd-match{width:100%;text-align:center;order:3}
   }
   @media(max-width:680px){
-    /* wrap + center instead of sideways overflow - nothing gets cut off */
-    .tk-inner{gap:8px 16px;padding:8px 12px;min-height:0;flex-wrap:wrap;justify-content:center;overflow:visible}
-    .tk-seg{font-size:.8rem;flex-wrap:wrap;justify-content:center;white-space:normal;row-gap:6px}
+    /* each segment becomes its own centered row - tidy stack, nothing cut off */
+    .tk-inner{gap:10px;padding:10px 12px;min-height:0;flex-wrap:wrap;justify-content:center;overflow:visible}
+    .tk-seg{width:100%;font-size:.8rem;flex-wrap:wrap;justify-content:center;white-space:normal;row-gap:6px}
     .tk-clock{font-size:.9rem;letter-spacing:1.5px}
     .gd-btn{width:38px;height:38px}
   }
@@ -1775,7 +1775,14 @@ async function loadSchedule(){
       const done=comp&&comp.status&&comp.status.type&&comp.status.type.completed;
       if(done||t<now) last=ev; else if(!next) next=ev;
     });
-    if(/[?&]fandemo=1/.test(location.search)){ const d=demoEvents(); last=d.last; next=d.next; }   // offseason preview of pick'em/POTG
+    /* offseason previews: ?fandemo=1 fakes a finished win + a game tomorrow
+       (pick'em/POTG); ?fandemo=2 additionally simulates GAME DAY - the green
+       banner, its countdown, and the theme-song play button. */
+    const fd=(location.search.match(/[?&]fandemo=(\d)/)||[])[1];
+    if(fd){
+      const d=demoEvents(); last=d.last; next=d.next;
+      if(fd==='2'){ next.date=new Date(Date.now()+3*36e5).toISOString(); showGameDay(next); }
+    }
     checkGameDay(events); renderLast(last); renderNext(next); startCountdown(next); renderSchedList(events); fillTicker(last);
   }catch(e){
     const lbl=document.getElementById('scLabel'), tm=document.getElementById('scTime'), mt=document.getElementById('scMatch');
