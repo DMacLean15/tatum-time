@@ -48,7 +48,7 @@
 <link rel="preconnect" href="https://site.api.espn.com" crossorigin />
 <link rel="preconnect" href="https://a.espncdn.com" />
 <link rel="preconnect" href="https://oeogaqrqwevjqpwvrxhq.supabase.co" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;800&family=Orbitron:wght@700&display=swap" rel="stylesheet" />
 <link rel="alternate" type="application/rss+xml" title="Tatum Time — Celtics Blog" href="/feed.xml" />
 <style>
   :root{
@@ -431,7 +431,9 @@
   .tk-seg{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;flex:0 0 auto;font-size:.84rem;color:var(--txt);font-weight:600}
   .tk-seg+.tk-seg{border-left:1px solid var(--line);padding-left:24px}
   .tk-lbl{font-size:.62rem;font-weight:800;letter-spacing:1.4px;color:var(--gold);text-transform:uppercase}
-  .tk-clock{font-family:var(--mono);font-weight:700;font-size:.95rem;color:var(--green-glow);font-variant-numeric:tabular-nums}
+  /* the shot clock itself - LED digits in a dark bezel, like the real thing */
+  .tk-shotclock{display:inline-flex;background:linear-gradient(#141414,#000);border:1px solid rgba(255,60,60,.45);border-radius:8px;padding:4px 12px;box-shadow:inset 0 0 12px rgba(255,40,40,.22)}
+  .tk-clock{font-family:'Orbitron',var(--mono);font-weight:700;font-size:1rem;color:#ff3b3b;text-shadow:0 0 8px rgba(255,40,40,.75);font-variant-numeric:tabular-nums;letter-spacing:2px;line-height:1.2}
   .tk-seg img{width:18px;height:18px;object-fit:contain;flex:0 0 auto}
   .tk-w{color:var(--green-glow);font-weight:800}
   .tk-l{color:#ff7a7a;font-weight:800}
@@ -448,8 +450,8 @@
   .gd-sep{opacity:.45}
   .gd-clock{display:inline-flex;align-items:center;gap:7px;background:rgba(0,0,0,.34);border:1px solid rgba(255,255,255,.28);border-radius:8px;padding:3px 11px;line-height:1}
   .gd-clocklabel{font-size:.58rem;font-weight:800;letter-spacing:1.2px;color:rgba(255,255,255,.78)}
-  .gd-clocktime{font-family:var(--mono);font-weight:700;font-size:.95rem;color:#ffd76b;font-variant-numeric:tabular-nums;letter-spacing:1px}
-  .gd-live{font-family:var(--mono);font-weight:700;font-size:.9rem;color:#ff5b5b;letter-spacing:1px}
+  .gd-clocktime{font-family:'Orbitron',var(--mono);font-weight:700;font-size:.95rem;color:#ffd76b;font-variant-numeric:tabular-nums;letter-spacing:1.5px;text-shadow:0 0 8px rgba(255,210,90,.5)}
+  .gd-live{font-family:'Orbitron',var(--mono);font-weight:700;font-size:.9rem;color:#ff5b5b;letter-spacing:1.5px;text-shadow:0 0 8px rgba(255,70,70,.55)}
   .gd-audio{display:flex;align-items:center;gap:8px}
   .gd-btn{width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.14);color:#fff;display:grid;place-items:center;cursor:pointer;transition:.15s;flex:0 0 auto;padding:0}
   .gd-btn svg{display:block}
@@ -931,7 +933,7 @@
     <span class="tk-seg" id="tkLast" style="display:none"></span>
     <span class="tk-seg tk-next" title="Countdown to the next Celtics tip-off">
       <span class="tk-lbl" id="scLabel">Next tip-off</span>
-      <span class="tk-clock" id="scTime">--:--:--</span>
+      <span class="tk-shotclock"><span class="tk-clock" id="scTime">--:--:--</span></span>
       <span id="scMatch"></span>
     </span>
     <span class="tk-seg" id="tkRec" style="display:none"></span>
