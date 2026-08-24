@@ -429,7 +429,8 @@
   .tk-inner::-webkit-scrollbar{display:none}
   @media(min-width:900px){.tk-inner{justify-content:center}}
   .tk-seg{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;flex:0 0 auto;font-size:.84rem;color:var(--txt);font-weight:600}
-  .tk-seg+.tk-seg{border-left:1px solid var(--line);padding-left:24px}
+  /* no border dividers: hidden segments would leave orphaned lines */
+  #scMatch{display:inline-flex;align-items:center;gap:7px}
   .tk-lbl{font-size:.62rem;font-weight:800;letter-spacing:1.4px;color:var(--gold);text-transform:uppercase}
   /* the shot clock itself - LED digits in a dark bezel, like the real thing */
   .tk-shotclock{display:inline-flex;background:linear-gradient(#141414,#000);border:1px solid rgba(255,60,60,.45);border-radius:8px;padding:4px 12px;box-shadow:inset 0 0 12px rgba(255,40,40,.22)}
@@ -462,9 +463,9 @@
     .gd-match{width:100%;text-align:center;order:3}
   }
   @media(max-width:680px){
-    .tk-inner{gap:18px;padding:7px 14px;min-height:40px}
+    .tk-inner{gap:16px;padding:7px 14px;min-height:40px}
     .tk-seg{font-size:.8rem}
-    .tk-seg+.tk-seg{padding-left:18px}
+    .tk-clock{font-size:.9rem;letter-spacing:1.5px}
   }
 
   /* ---------- LIVE SCHEDULE (last + next) ---------- */
@@ -2571,7 +2572,9 @@ function startCountdown(next){
   if(gamedayShown||!next){ if(seg) seg.style.display='none'; return; }
   if(seg) seg.style.display='';
   const g=parseGame(next), opp=g.opp.team.shortDisplayName||g.opp.team.abbreviation;
-  mt.textContent=(g.home?'vs ':'@ ')+opp;
+  const abbr=g.opp.team.abbreviation||'';
+  mt.innerHTML=(abbr?'<img src="'+teamLogo(abbr)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'')+
+    '<span>'+(g.home?'vs ':'@ ')+escHtml(opp)+'</span>';
   const target=new Date(next.date).getTime(), pad=n=>String(n).padStart(2,'0');
   function tick(){
     let diff=target-Date.now();
