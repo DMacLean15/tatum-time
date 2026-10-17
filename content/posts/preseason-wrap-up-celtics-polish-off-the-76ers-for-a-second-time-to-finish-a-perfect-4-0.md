@@ -10,41 +10,25 @@ date: 2026-10-17
 ---
 <div class="post-score"><div class="ps-row ps-win"><span class="ps-team">Celtics</span><span class="ps-score">124</span></div><div class="ps-row"><span class="ps-team">Cavs</span><span class="ps-score">113</span></div></div>
 
-<div class="post-score"><div class="ps-row ps-row"><span class="ps-team">76ers</span><span class="ps-score">106</span></div><div class="ps-row ps-win"><span class="ps-team">Celtics</span><span class="ps-score">144</span></div></div>
+<div class="post-score"><div class="ps-row"><span class="ps-team">76ers</span><span class="ps-score">106</span></div><div class="ps-row ps-win"><span class="ps-team">Celtics</span><span class="ps-score">144</span></div></div>
 
-<div class="post-score"><div class="ps-row ps-win"><span class="ps-team">Celtics</span><span class="ps-score">114</span></div><div class="ps-row"><span class="ps-team">Hornets</span><span class="ps-score">93</span></div></div>
+<div class="post-score"><div class="ps-row"><span class="ps-team">Hornets</span><span class="ps-score">93</span></div><div class="ps-row ps-win"><span class="ps-team">Celtics</span><span class="ps-score">114</span></div></div>
 
 <div class="post-score"><div class="ps-row ps-win"><span class="ps-team">Celtics</span><span class="ps-score">125</span></div><div class="ps-row"><span class="ps-team">76ers</span><span class="ps-score">120</span></div></div>
 
-
-
 The Celtics capped off a perfect preseason on Friday night with a decisive 125-120 OT victory over the Philadelphia 76ers at the XFinity Mobile Arena. They faced two tough opponents in the 76ers (x2) and the Cleveland Cavaliers. Standout performers vary on a game by game basis but here were some of the names who kept reappearing in particular:
-
-
 
 Preseason MVP Award: Payton Pritchard
 
-
-
 ![](/images/uploads/img_5793.webp)
-
-
 
 2 Games: 31 Points, 6 3PM, 7 Rebounds, 18 Assists, +54 Rating & New Contract Extension
 
-
-
 Runner Up: Jayson Tatum
-
-
 
 ![](/images/uploads/tatum_jayson_tokyomedal.jpg)
 
-
-
 2 Games: 42 Points, 7 3PM, 13 Rebounds, 10 Assists, 3 Steals
-
-
 
 Honorable Mentions: Hugo Gonzalez, Luka Garza
 
