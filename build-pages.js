@@ -13,6 +13,20 @@ const path = require('path');
 
 const SITE = 'https://tatumtime.net';
 const DEFAULT_OG = SITE + '/og.jpg';
+const SOCIALS = ['https://www.instagram.com/dmaclean15/', 'https://www.facebook.com/DMacLean15/', 'https://www.threads.com/@dmaclean15'];
+const AUTHOR = { '@type':'Person', name:'Dan MacLean', url:SITE+'/#about', sameAs:SOCIALS };
+const PUBLISHER = { '@type':'Organization', name:'Tatum Time', alternateName:'TatumTime', url:SITE+'/', logo:{'@type':'ImageObject',url:SITE+'/icon-512.png'}, sameAs:SOCIALS };
+/* category pages (/category/<slug>/): friendlier headings for the CMS categories */
+const CAT_INFO = {
+  Recap:     { h1:'Celtics Game Recaps',  blurb:'Every Tatum Time game recap of the Boston Celtics, newest first.' },
+  News:      { h1:'Celtics News',         blurb:'Boston Celtics news, birthdays, milestones off the court and more from Tatum Time.' },
+  Milestone: { h1:'Celtics Milestones',   blurb:'Records, career marks and franchise milestones for the Boston Celtics.' },
+  Draft:     { h1:'Celtics Draft Coverage', blurb:'Boston Celtics draft picks, grades and prospect breakdowns.' },
+  Playoffs:  { h1:'Celtics Playoff Coverage', blurb:'Boston Celtics playoff previews, series breakdowns and postseason recaps.' },
+  Roster:    { h1:'Celtics Roster Moves', blurb:'Boston Celtics trades, signings and roster moves, analyzed.' },
+};
+const catSlug = c => slugify(c);
+const catInfo = c => CAT_INFO[c] || { h1:'Celtics ' + c, blurb:'Every Tatum Time ' + String(c).toLowerCase() + ' post on the Boston Celtics, newest first.' };
 
 /* marked.min.js is a UMD build - in Node it fills module.exports */
 const markedLib = require('./js/marked.min.js');
@@ -86,7 +100,7 @@ function normalize(p){
   const excerpt = text.length > 160 ? text.slice(0, 160).trim() + '…' : text;
   return {
     slug: slugify(p.title), title: p.title || '', cat: p.category || 'Post',
-    date: p.date || '', emoji: p.emoji || '🏀', hero, body, excerpt, readMins
+    date: p.date || '', emoji: p.emoji || '🏀', hero, body, excerpt, readMins, featured: p.featured === true
   };
 }
 
@@ -194,6 +208,7 @@ function pageHtml(p, related){
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>${esc(p.title)} - Tatum Time</title>
 <meta name="description" content="${esc(p.excerpt)}" />
+<meta name="robots" content="max-image-preview:large" />
 <link rel="icon" href="/favicon.ico" sizes="32x32" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -221,9 +236,18 @@ ${JSON.stringify({
   headline:p.title, description:p.excerpt, url,
   image:og, datePublished:isoDate||undefined,
   articleSection:p.cat, inLanguage:'en-US',
-  author:{'@type':'Person',name:'Dan MacLean'},
-  publisher:{'@type':'Organization',name:'Tatum Time',url:SITE+'/',logo:{'@type':'ImageObject',url:SITE+'/icon-512.png'}},
+  author:AUTHOR, publisher:PUBLISHER,
   mainEntityOfPage:url
+}, null, 0)}
+</script>
+<script type="application/ld+json">
+${JSON.stringify({
+  '@context':'https://schema.org','@type':'BreadcrumbList',
+  itemListElement:[
+    {'@type':'ListItem',position:1,name:'Tatum Time',item:SITE+'/'},
+    {'@type':'ListItem',position:2,name:catInfo(p.cat).h1,item:SITE+'/category/'+catSlug(p.cat)+'/'},
+    {'@type':'ListItem',position:3,name:p.title,item:url}
+  ]
 }, null, 0)}
 </script>
 <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
@@ -233,7 +257,7 @@ ${JSON.stringify({
 @font-face{font-family:'Inter';font-weight:400 800;font-display:swap;src:url(/fonts/inter-latin-ext.woff2) format('woff2')}
 </style>
 <link rel="alternate" type="application/rss+xml" title="Tatum Time - Celtics Blog" href="/feed.xml" />
-<style>${CSS}</style>
+<style>${CSS}${CAT_CSS}</style>
 </head>
 <body>
 <header><div class="wrap nav-inner">
@@ -241,7 +265,7 @@ ${JSON.stringify({
   <a class="home-link" href="/#posts">All posts →</a>
 </div></header>
 <main><div class="wrap">
-  <div class="cat">${esc(p.cat)}</div>
+  <a class="cat" href="/category/${catSlug(p.cat)}/">${esc(p.cat)}</a>
   <h1>${p.emoji} ${esc(p.title)}</h1>
   <div class="meta"><b>Dan MacLean</b> · ${esc(fmtDisplayDate(p.date))} · ${p.readMins} min read</div>
   ${p.hero ? heroImg(p) : ''}
@@ -252,12 +276,111 @@ ${JSON.stringify({
     <a class="btn" href="/#/post/${p.slug}">Discuss on Tatum Time →</a>
   </div>
 </div></main>
-<footer><div class="wrap">© ${new Date().getFullYear()} Tatum Time · Not affiliated with the Boston Celtics or the NBA.</div></footer>
+${footerHtml()}
 <script src="/js/visits.js?v=2" defer></script>
 </body>
 </html>
 `;
 }
+
+/* footer shared by post + category pages: category links give Google a crawl path */
+let CATS = [];
+function catLinks(){
+  return CATS.map(c => `<a href="/category/${catSlug(c)}/">${esc(catInfo(c).h1.replace(/^Celtics /,''))}</a>`).join('');
+}
+function footerHtml(){
+  return `<footer><div class="wrap">${CATS.length ? `<nav class="foot-cats" aria-label="Browse by category">${catLinks()}</nav>` : ''}© ${new Date().getFullYear()} Tatum Time · Not affiliated with the Boston Celtics or the NBA.</div></footer>`;
+}
+
+/* small WebP card photo (build-images.js naming), original as the fallback */
+function cardImg(p){
+  if (!p.hero) return `<span class="cc-photo cc-emoji">${p.emoji}</span>`;
+  const m = String(p.hero).match(/^\/?images\/uploads\/([^\/?#]+)\.(jpe?g|png|webp|avif)$/i);
+  const src = m ? '/images/uploads/_v/' + m[1] + '-480.webp' : p.hero;
+  const fb = m ? ` onerror="this.onerror=null;this.src='${esc(p.hero)}'"` : '';
+  return `<span class="cc-photo"><img src="${esc(src)}"${fb} alt="" loading="lazy" decoding="async" width="480" height="270" /></span>`;
+}
+
+function categoryHtml(cat, list){
+  const info = catInfo(cat), url = SITE + '/category/' + catSlug(cat) + '/';
+  const title = info.h1 + ' - Tatum Time';
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(info.blurb)}" />
+<meta name="robots" content="max-image-preview:large" />
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<meta name="theme-color" content="#007a33" />
+<link rel="canonical" href="${url}" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tatum Time" />
+<meta property="og:title" content="${esc(title)}" />
+<meta property="og:description" content="${esc(info.blurb)}" />
+<meta property="og:url" content="${url}" />
+<meta property="og:image" content="${DEFAULT_OG}" />
+<meta name="twitter:card" content="summary_large_image" />
+<script type="application/ld+json">
+${JSON.stringify({
+  '@context':'https://schema.org','@type':'CollectionPage',
+  name:info.h1, description:info.blurb, url, inLanguage:'en-US', publisher:PUBLISHER,
+  mainEntity:{'@type':'ItemList',itemListElement:list.map((p,i)=>({'@type':'ListItem',position:i+1,url:SITE+'/post/'+p.slug+'/',name:p.title}))}
+}, null, 0)}
+</script>
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+<style>
+@font-face{font-family:'Anton';font-weight:400;font-display:swap;src:url(/fonts/anton-latin.woff2) format('woff2')}
+@font-face{font-family:'Inter';font-weight:400 800;font-display:swap;src:url(/fonts/inter-latin.woff2) format('woff2')}
+</style>
+<link rel="alternate" type="application/rss+xml" title="Tatum Time - Celtics Blog" href="/feed.xml" />
+<style>${CSS}${CAT_CSS}</style>
+</head>
+<body>
+<header><div class="wrap nav-inner">
+  <a class="brand" href="/">☘️ Tatum<span>Time</span></a>
+  <a class="home-link" href="/#posts">All posts →</a>
+</div></header>
+<main><div class="wrap">
+  <div class="cat">Tatum Time · ${list.length} post${list.length === 1 ? '' : 's'}</div>
+  <h1>${esc(info.h1)}</h1>
+  <p class="cat-blurb">${esc(info.blurb)}</p>
+  <nav class="cat-tabs" aria-label="Categories">${CATS.map(c => `<a href="/category/${catSlug(c)}/"${c === cat ? ' class="on" aria-current="page"' : ''}>${esc(c)}</a>`).join('')}</nav>
+  <div class="cat-grid">
+    ${list.map(p => `<a class="cat-card" href="/post/${p.slug}/">${cardImg(p)}<span class="cc-body"><b>${esc(p.title)}</b><small>${esc(fmtDisplayDate(p.date))} · ${p.readMins} min read</small><span class="cc-ex">${esc(p.excerpt)}</span></span></a>`).join('\n    ')}
+  </div>
+</div></main>
+${footerHtml()}
+<script src="/js/visits.js?v=2" defer></script>
+</body>
+</html>
+`;
+}
+const CAT_CSS = `
+.cat-blurb{color:var(--muted);margin:-6px 0 18px}
+.cat-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
+.cat-tabs a{font-size:.78rem;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 13px}
+.cat-tabs a:hover{color:#fff;border-color:var(--green)}
+.cat-tabs a.on{background:var(--green);border-color:var(--green);color:#fff}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-bottom:40px}
+.cat-card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:transform .18s,border-color .18s}
+.cat-card:hover{transform:translateY(-3px);border-color:rgba(22,196,91,.45)}
+.cc-photo{display:block;aspect-ratio:16/9;background:linear-gradient(135deg,#0a8f3c,#04331a);overflow:hidden}
+.cc-photo img{width:100%;height:100%;object-fit:cover}
+.cc-emoji{display:grid;place-items:center;font-size:2.2rem}
+.cc-body{display:flex;flex-direction:column;gap:5px;padding:12px 14px 15px}
+.cc-body b{color:#fff;line-height:1.3}
+.cc-body small{color:var(--muted);font-size:.74rem}
+.cc-ex{color:var(--muted);font-size:.84rem;line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.foot-cats{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;margin-bottom:12px}
+.foot-cats a{color:var(--muted);font-weight:600}
+.foot-cats a:hover{color:var(--green-glow)}
+a.cat:hover{text-decoration:underline}
+`;
 
 /* ---------- generate ---------- */
 let allPosts = [];
@@ -280,8 +403,12 @@ if (!posts.length) {
   process.exit(0);
 }
 
+// categories in the order they first appear (newest posts first)
+CATS = [...new Set(posts.map(p => p.cat))];
+
 // fresh slate so renamed/deleted posts don't leave stale pages behind
 fs.rmSync('post', { recursive: true, force: true });
+fs.rmSync('category', { recursive: true, force: true });
 posts.forEach(p => {
   // internal links: 3 related posts (same category first, then newest)
   const pool = posts.filter(x => x !== p);
@@ -291,12 +418,45 @@ posts.forEach(p => {
   fs.writeFileSync(path.join(dir, 'index.html'), pageHtml(p, related));
 });
 
+/* ---------- category pages ---------- */
+const lastmodOf = p => /^\d{4}-\d{2}-\d{2}/.test(String(p.date)) ? String(p.date).slice(0,10) : todayISO;
+CATS.forEach(c => {
+  const list = posts.filter(p => p.cat === c);
+  const dir = path.join('category', catSlug(c));
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'index.html'), categoryHtml(c, list));
+});
+
+/* ---------- homepage: write the post list + featured post into index.html ----------
+   The repo copy has empty <!--build:...--> slots; filling them on deploy gives
+   Google real links to every post without waiting for JavaScript. The live
+   script rebuilds the same list on load, so visitors see no difference. */
+try {
+  const grad = ['#0a8f3c','#066b2c','#0e7a3a','#0b5e28','#117a44','#0a6e30'];
+  const fill = (html, name, inner) => html.replace(new RegExp('(<!--build:' + name + '-->)[\\s\\S]*?(<!--/build:' + name + '-->)'), (m, a, b) => a + inner + b);
+  let home = fs.readFileSync('index.html', 'utf8');
+  const list = posts.map((p, i) =>
+    `<a class="post-item" href="/post/${p.slug}/"><span class="pi-emoji" style="background:linear-gradient(135deg, ${grad[i % grad.length]}, #04331a);">${p.emoji}</span>` +
+    `<span class="pi-text"><b>${esc(p.title)}</b><small>${esc(fmtDisplayDate(p.date))} · ${esc(p.cat)}</small></span></a>`).join('');
+  const f = posts.find(p => p.featured) || posts[0];
+  const m = f.hero && String(f.hero).match(/^\/?images\/uploads\/([^\/?#]+)\.(jpe?g|png|webp|avif)$/i);
+  const featImg = !f.hero ? '' : `<img id="feat-thumb" class="feat-thumb" alt="${esc(f.title)}" src="${esc(m ? '/images/uploads/_v/' + m[1] + '-1200.webp' : f.hero)}"${m ? ` data-orig="${esc(f.hero)}" onerror="this.onerror=null;this.src=this.dataset.orig"` : ''} fetchpriority="high">`;
+  home = fill(home, 'posts', list);
+  home = fill(home, 'feat-img', featImg);
+  home = fill(home, 'feat-title', esc(f.title));
+  home = fill(home, 'feat-ex', esc(f.excerpt));
+  home = fill(home, 'feat-meta', esc(fmtDisplayDate(f.date) + ' · ' + f.cat));
+  home = fill(home, 'cats', catLinks());
+  home = home.replace(/(<a class="btn btn-primary" id="featLink" href=")[^"]*(")/, '$1/post/' + f.slug + '/$2');
+  fs.writeFileSync('index.html', home);
+} catch (e) {
+  console.error('build-pages: homepage pre-fill skipped (' + e.message + ')');
+}
+
 /* ---------- sitemap.xml ---------- */
 const urls = [{ loc: SITE + '/', lastmod: todayISO }]
-  .concat(posts.map(p => ({
-    loc: SITE + '/post/' + p.slug + '/',
-    lastmod: /^\d{4}-\d{2}-\d{2}/.test(String(p.date)) ? String(p.date).slice(0,10) : todayISO
-  })));
+  .concat(CATS.map(c => ({ loc: SITE + '/category/' + catSlug(c) + '/', lastmod: lastmodOf(posts.find(p => p.cat === c)) })))
+  .concat(posts.map(p => ({ loc: SITE + '/post/' + p.slug + '/', lastmod: lastmodOf(p) })));
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map(u => `  <url><loc>${u.loc}</loc><lastmod>${u.lastmod}</lastmod></url>`).join('\n')}
@@ -304,4 +464,4 @@ ${urls.map(u => `  <url><loc>${u.loc}</loc><lastmod>${u.lastmod}</lastmod></url>
 `;
 fs.writeFileSync('sitemap.xml', sitemap);
 
-console.log('build-pages: wrote ' + posts.length + ' post pages + sitemap.xml');
+console.log('build-pages: wrote ' + posts.length + ' post pages, ' + CATS.length + ' category pages, homepage list + sitemap.xml');
