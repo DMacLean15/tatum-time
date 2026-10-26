@@ -183,7 +183,9 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
 
 function pageHtml(p, related){
   const url = SITE + '/post/' + p.slug + '/';
-  const og = p.hero ? absUrl(p.hero) : DEFAULT_OG;
+  // link-preview card made by build-og.js; else the post photo; else the site card
+  const card = fs.existsSync(path.join('og', p.slug + '.jpg'));
+  const og = card ? SITE + '/og/' + p.slug + '.jpg' : p.hero ? absUrl(p.hero) : DEFAULT_OG;
   const isoDate = /^\d{4}-\d{2}-\d{2}/.test(String(p.date)) ? String(p.date).slice(0,10) : '';
   return `<!DOCTYPE html>
 <html lang="en">
@@ -205,7 +207,7 @@ function pageHtml(p, related){
 <meta property="og:description" content="${esc(p.excerpt)}" />
 <meta property="og:url" content="${url}" />
 <meta property="og:image" content="${esc(og)}" />
-${og === DEFAULT_OG ? '<meta property="og:image:width" content="1200" />\n<meta property="og:image:height" content="630" />' : ''}
+${(card || og === DEFAULT_OG) ? '<meta property="og:image:width" content="1200" />\n<meta property="og:image:height" content="630" />' : ''}
 ${isoDate ? '<meta property="article:published_time" content="' + isoDate + '" />' : ''}
 <meta property="article:section" content="${esc(p.cat)}" />
 <meta property="article:author" content="Dan MacLean" />

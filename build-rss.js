@@ -56,11 +56,15 @@ ${items}
 fs.writeFileSync('feed.xml', feed);
 console.log(`feed.xml regenerated with ${posts.length} posts`);
 
-// Also (re)generate the per-post pages + sitemap. Required from here so the
-// existing Cloudflare build command picks it up without any dashboard changes.
-try { require('./build-pages.js'); }
-catch (e) { console.error('build-pages failed (site still deploys):', e.message); }
-
-// And shrink any oversized CMS photo uploads before deploy (no-op without sharp).
-try { require('./build-images.js'); }
-catch (e) { console.error('build-images failed (site still deploys):', e.message); }
+// Then, in order: link-preview cards (build-og.js), the per-post pages + sitemap
+// (which point at those cards), and photo shrinking. Run from here so the existing
+// Cloudflare build command picks them up without any dashboard changes. Each step
+// is optional - a failure is logged and the site still deploys.
+const step = (file, label) => () => {
+  try { return Promise.resolve(require(file)).catch(e => console.error(label + ' failed (site still deploys):', e.message)); }
+  catch (e) { console.error(label + ' failed (site still deploys):', e.message); }
+};
+Promise.resolve()
+  .then(step('./build-og.js', 'build-og'))
+  .then(step('./build-pages.js', 'build-pages'))
+  .then(step('./build-images.js', 'build-images'));

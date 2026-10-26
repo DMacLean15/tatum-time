@@ -201,6 +201,11 @@
   .pi-photo i,.pc-photo i{font-style:normal}
   .pi-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .pi-photo.noimg img,.pc-photo.noimg img{display:none}
+  /* "NEW" = published since this browser's last visit */
+  .post-new{display:inline-block;background:var(--green-glow);color:#062a14;font-size:.56rem;font-weight:800;letter-spacing:1px;line-height:1;padding:3px 6px 2px;border-radius:999px;margin-right:6px;vertical-align:1px}
+  .pc-photo .post-new{position:absolute;top:10px;left:10px;z-index:1;font-size:.62rem;padding:5px 9px 4px;margin:0;box-shadow:0 2px 10px rgba(0,0,0,.45)}
+  .new-note{display:flex;align-items:center;gap:8px;font-size:.8rem;font-weight:700;color:var(--green-glow);margin:0 0 12px;padding:9px 12px;border:1px solid rgba(22,196,91,.3);background:rgba(22,196,91,.08);border-radius:12px}
+  .new-note[hidden]{display:none}
   /* Read / Browse all switch + the photo-card grid */
   .view-toggle{display:inline-flex;gap:4px;padding:4px;background:var(--card);border:1px solid var(--line);border-radius:999px}
   .view-toggle button{display:inline-flex;align-items:center;gap:7px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:.8rem;font-weight:700;padding:8px 14px;border-radius:999px;cursor:pointer;transition:.15s}
@@ -1141,6 +1146,7 @@
           <input id="postSearch" class="post-search" type="search" placeholder="Search posts…" aria-label="Search posts" />
           <div class="tag-row" id="tagRow"></div>
         </div>
+        <div class="new-note" id="newNote" hidden></div>
         <div class="post-list" id="postList"></div>
         <div class="post-grid" id="postGrid"></div>
         <div id="noResults" class="no-results" style="display:none">No posts match your search.</div>
@@ -1481,7 +1487,7 @@ function buildList(){
       ? `<span class="pi-emoji pi-photo" style="${thumbStyle(i)}"><i>${p.emoji}</i>${imgTag(p.hero,480,'alt="" loading="lazy" decoding="async" width="42" height="42"')}</span>`
       : `<span class="pi-emoji" style="${thumbStyle(i)}">${p.emoji}</span>`;
     it.innerHTML=`${thumb}
-      <span class="pi-text"><b>${p.title}</b><small>${fmtDisplayDate(p.date)} · ${p.cat}</small></span>`;
+      <span class="pi-text"><b>${p.title}</b><small>${p._new?'<span class="post-new">NEW</span>':''}${fmtDisplayDate(p.date)} · ${p.cat}</small></span>`;
     it.onclick=()=>renderPost(i,true);
     listBox.appendChild(it);
   });
@@ -1495,7 +1501,7 @@ function buildGrid(){
   posts.forEach((p,i)=>{
     const c=document.createElement('button'); c.type='button'; c.className='pc-card'; c.dataset.i=i;
     const photo=p.hero?imgTag(p.hero,480,'alt="" loading="lazy" decoding="async" style="object-position:'+(p.heroFocus||'50% 50%')+'"'):'';
-    c.innerHTML=`<span class="pc-photo" style="${thumbStyle(i)}"><i>${p.emoji}</i>${photo}</span>
+    c.innerHTML=`<span class="pc-photo" style="${thumbStyle(i)}">${p._new?'<span class="post-new">NEW</span>':''}<i>${p.emoji}</i>${photo}</span>
       <span class="pc-body"><span class="pc-cat">${escHtml(p.cat)}</span><b>${escHtml(p.title)}</b><small>${fmtDisplayDate(p.date)} · ${p.readMins} min read</small></span>`;
     c.onclick=()=>{ setView('read'); renderPost(i,true); };
     box.appendChild(c);
@@ -1509,6 +1515,34 @@ function setView(v){
   document.querySelectorAll('.view-toggle button').forEach(b=>{ const on=b.dataset.view===v; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); });
 }
 document.querySelectorAll('.view-toggle button').forEach(b=>{ b.onclick=()=>setView(b.dataset.view); });
+
+/* "New since your last visit": this browser remembers which posts existed when it
+   was last here (tt_known). Anything published since then gets a NEW badge until
+   it's opened; the list for the current visit lives in sessionStorage so a refresh
+   doesn't wipe it. A first-time visitor sees no badges. */
+let newSlugs=new Set(), blogBooting=true;
+function computeNewPosts(){
+  const all=posts.map(p=>p.slug);
+  let known=null, sess=null;
+  try{ known=JSON.parse(localStorage.getItem('tt_known')||'null'); }catch(e){}
+  try{ sess=JSON.parse(sessionStorage.getItem('tt_new')||'null'); }catch(e){}
+  newSlugs=new Set(Array.isArray(sess)?sess.filter(s=>all.includes(s)):[]);
+  if(Array.isArray(known)){ const k=new Set(known); all.forEach(s=>{ if(!k.has(s)) newSlugs.add(s); }); }
+  try{ localStorage.setItem('tt_known',JSON.stringify(all)); }catch(e){}
+  saveNew();
+  posts.forEach(p=>{ p._new=newSlugs.has(p.slug); });
+}
+function saveNew(){
+  try{ sessionStorage.setItem('tt_new',JSON.stringify([...newSlugs])); }catch(e){}
+  const n=newSlugs.size, el=document.getElementById('newNote'); if(!el) return;
+  el.hidden=!n;
+  el.textContent=n?('\u2618\uFE0F '+n+' new post'+(n>1?'s':'')+' since your last visit'):'';
+}
+function markSeen(i){
+  const p=posts[i]; if(!p||!p._new) return;
+  p._new=false; newSlugs.delete(p.slug); saveNew();
+  document.querySelectorAll('[data-i="'+i+'"] .post-new').forEach(b=>b.remove());
+}
 
 function setFeatured(){
   const fi=posts.findIndex(p=>p.featured); featuredIdx = fi>=0 ? fi : 0;   // pinned post, else newest
@@ -1533,12 +1567,15 @@ async function initBlog(){
     }
   }catch(e){ /* offline / opened from disk — keep the built-in fallback */ }
   posts = source.map(ensureMeta).filter(isPublished).sort((a,b)=>dateNum(b.date)-dateNum(a.date));   // newest first; hide future-dated (scheduled) posts until their day
+  computeNewPosts();
   buildList(); buildTags(); setFeatured();
   const sp=document.getElementById('statPosts'); if(sp&&posts.length) sp.textContent=posts.length;   // live post count in the hero
   const searchEl=document.getElementById('postSearch');
   if(searchEl) searchEl.addEventListener('input', applyFilter);
   const startIdx=postIndexFromHash();
   renderPost(startIdx>=0?startIdx:0, false, startIdx>=0);
+  blogBooting=false;
+  if(startIdx>=0) markSeen(startIdx);   // opened straight from a shared link
   loadSchedule();   // live scores + schedule list + courtside ticker (default tab)
   renderThisDay();  // Quote of the Day + On This Day cards
   renderTrivia();   // Question of the Day (fan trivia with shared results)
@@ -1565,6 +1602,7 @@ function renderPost(i, scroll, setHash=true){
   linkifyPlayers(document.getElementById('readerArticle'));
   document.getElementById('readTime').textContent='⏱ '+p.readMins+' min read';
   buildShare(p); renderRelated(p);
+  if(!blogBooting) markSeen(i);   // the post shown automatically on load doesn't count as read
   currentCommentSlug=p.slug;
   whenNear(document.getElementById('reactBar'),function(){ loadComments(p.slug); loadReactions(p.slug); });
   if(setHash && history.replaceState) history.replaceState(null,'','#/post/'+p.slug);
