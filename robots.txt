@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /stats/
 
 Sitemap: https://tatumtime.net/sitemap.xml

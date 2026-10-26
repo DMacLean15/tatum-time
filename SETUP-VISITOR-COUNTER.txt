@@ -1,0 +1,121 @@
+================================================================
+  VISITOR COUNTER + STATS PAGE  (2 min, one time)
+================================================================
+
+Tatum Time now counts who stops by:
+
+  - FOOTER COUNTER - bottom of the homepage shows
+      "12,345 visits - 1,234 fans - 56 today"
+  - STATS PAGE - https://tatumtime.net/stats/  (not linked anywhere,
+    hidden from Google). Shows visits, fans, today, regulars (fans
+    who came back), visits per day for the last 30 days, the most-read
+    posts, which sites sent people (Google, Facebook, Threads...), and
+    phone vs desktop.
+
+Every visitor is anonymous. The site keeps a random id per browser -
+never names, emails or IP addresses - so it can tell you HOW MANY
+people came and from where, but not WHO they are.
+
+Both stay hidden until you run the SQL below. Nothing breaks before then.
+
+
+RUN THIS IN SUPABASE  (same project as comments, trivia and picks)
+  Supabase -> SQL Editor -> New query -> paste + Run:
+
+-------------------- copy from here --------------------
+create table if not exists site_visits (
+  id          bigint generated always as identity primary key,
+  visitor     text not null,
+  session     text not null,
+  path        text not null,
+  referrer    text,
+  device      text,
+  created_at  timestamptz not null default now()
+);
+create index if not exists site_visits_created_at on site_visits (created_at);
+
+alter table site_visits enable row level security;
+
+create policy "public can log a visit"
+  on site_visits for insert
+  to anon
+  with check ( char_length(visitor) between 8 and 40
+               and char_length(session) between 8 and 40
+               and char_length(path) between 1 and 200
+               and (referrer is null or char_length(referrer) <= 100)
+               and (device is null or device in ('phone','tablet','desktop')) );
+
+-- Footer counter: just the three totals.
+create or replace function visit_counter() returns json
+language sql stable security definer set search_path = public as $$
+  select json_build_object(
+    'visits', count(distinct session),
+    'fans',   count(distinct visitor),
+    'today',  count(distinct session) filter (
+                where (created_at at time zone 'America/New_York')::date
+                    = (now() at time zone 'America/New_York')::date)
+  ) from site_visits;
+$$;
+
+-- Stats page: totals plus 30-day breakdowns.
+create or replace function visit_stats() returns json
+language sql stable security definer set search_path = public as $$
+  with recent as (
+    select * from site_visits where created_at > now() - interval '30 days'
+  )
+  select json_build_object(
+    'visits',    (select count(distinct session) from site_visits),
+    'fans',      (select count(distinct visitor) from site_visits),
+    'views',     (select count(*) from site_visits),
+    'since',     (select min(created_at) from site_visits),
+    'today',     (select count(distinct session) from recent
+                  where (created_at at time zone 'America/New_York')::date
+                      = (now() at time zone 'America/New_York')::date),
+    'returning', (select count(*) from (select visitor from site_visits
+                  group by visitor having count(distinct session) > 1) r),
+    'days',      (select coalesce(json_agg(d order by d.day desc), '[]') from (
+                    select (created_at at time zone 'America/New_York')::date as day,
+                           count(distinct session) as visits,
+                           count(distinct visitor) as fans
+                    from recent group by 1) d),
+    'pages',     (select coalesce(json_agg(p), '[]') from (
+                    select path, count(*) as views from recent
+                    group by path order by views desc limit 15) p),
+    'sources',   (select coalesce(json_agg(s), '[]') from (
+                    select coalesce(referrer, 'Direct / bookmark / app') as source,
+                           count(distinct session) as visits
+                    from recent group by 1 order by visits desc limit 15) s),
+    'devices',   (select coalesce(json_agg(v), '[]') from (
+                    select coalesce(device, 'unknown') as device,
+                           count(distinct session) as visits
+                    from recent group by 1 order by visits desc) v)
+  );
+$$;
+
+grant execute on function visit_counter() to anon;
+grant execute on function visit_stats() to anon;
+--------------------- to here --------------------------
+
+(There is NO public read policy on the table on purpose - the site
+can only see the totals above, never the raw rows.)
+
+
+DON'T COUNT YOURSELF
+  Open  https://tatumtime.net/stats/  once on each of your devices
+  (phone, laptop...). That browser stops being counted, so checking
+  your own site doesn't pad the numbers. Same thing: add ?notme to
+  any page link. To be counted again, open  https://tatumtime.net/?countme
+
+
+HOW IT COUNTS
+  - Visit = one browsing session. Refreshing or clicking around
+    doesn't add more visits; closing the browser and coming back
+    later does.
+  - Fan = one browser. The same person on phone + laptop = 2 fans.
+    Clearing browser data or private/incognito mode = a new fan.
+  - Today = since midnight Eastern.
+  - Search-engine bots and link-preview bots are skipped.
+  - Counting starts the moment the SQL is run (no history before that).
+  - Post pages (tatumtime.net/post/...) count too, so shared links
+    show up under "Most-read pages".
+================================================================

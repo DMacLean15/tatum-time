@@ -240,6 +240,7 @@ ${JSON.stringify({
   </div>
 </div></main>
 <footer><div class="wrap">© ${new Date().getFullYear()} Tatum Time · Not affiliated with the Boston Celtics or the NBA.</div></footer>
+<script src="/js/visits.js" defer></script>
 </body>
 </html>
 `;
