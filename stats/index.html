@@ -7,129 +7,786 @@
 <title>Visitor Stats - Tatum Time</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
-/* Dan's visitor dashboard. Reads the visit_stats() summary from Supabase (see
-   SETUP-VISITOR-COUNTER.txt). Only totals - no individual visitors are shown.
-   Opening this page also marks this browser as "not counted". */
+/* Dan's visitor dashboard. Reads the visit_stats(days) summary from Supabase (see
+   SETUP-VISITOR-COUNTER.txt). Only totals and anonymous summaries - no individual
+   visitors are shown. Opening this page also marks this browser as "not counted".
+   Add ?mock=1 to the address to preview the layout with made-up numbers. */
 :root{
+  color-scheme:dark;
   --green:#007a33; --green-glow:#16c45b; --gold:#bfa15a;
-  --ink:#0c1410; --card:#0f1d16; --line:rgba(255,255,255,.08);
-  --txt:#e8efe9; --muted:#9bb3a5;
+  --ink:#0c1410; --card:#0f1d16; --card2:#132519; --line:rgba(255,255,255,.08); --grid:rgba(255,255,255,.07);
+  --txt:#e8efe9; --muted:#9bb3a5; --faint:#6f8a7b;
+  --good:#16c45b; --bad:#ef7b7b;
+  --s-game:#13a650; --s-off:#9085e9;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--ink);color:var(--txt);font-family:'Inter',system-ui,sans-serif;line-height:1.5;min-height:100vh}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--ink);color:var(--txt);font-family:'Inter',system-ui,sans-serif;line-height:1.5;min-height:100vh;overflow-x:hidden}
 a{color:var(--green-glow);text-decoration:none}
-.wrap{max-width:900px;margin:0 auto;padding:0 16px}
-header{border-bottom:1px solid var(--line);padding:16px 0}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.wrap{max-width:1160px;margin:0 auto;padding:0 16px}
+header{border-bottom:1px solid var(--line);padding:14px 0}
 .nav{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .brand{font-family:'Anton',sans-serif;font-size:1.3rem;color:#fff;letter-spacing:.5px}
 .brand span{color:var(--green-glow)}
-h1{font-family:'Anton',sans-serif;font-weight:400;color:#fff;font-size:2rem;letter-spacing:.5px;margin:28px 0 4px}
-.sub{color:var(--muted);font-size:.9rem;margin-bottom:22px}
-.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:26px}
-.tile{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
-.tile .lbl{font-size:.68rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold)}
-.tile .val{font-family:'Anton',sans-serif;font-size:2rem;color:#fff;font-variant-numeric:tabular-nums;line-height:1.2;margin-top:4px}
-.tile .hint{color:var(--muted);font-size:.75rem}
-.panels{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
-.panel.wide{grid-column:1/-1}
-.panel h2{font-size:.72rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
-.row{display:grid;grid-template-columns:minmax(0,1fr) 3.5em;align-items:center;gap:10px;padding:5px 0;font-size:.88rem}
-.row .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;position:relative;padding:3px 8px;border-radius:6px}
-.row .bar{position:absolute;inset:0 auto 0 0;background:rgba(22,196,91,.18);border-radius:6px;z-index:0}
-.row .name b{position:relative;z-index:1;font-weight:600}
-.row .num{text-align:right;color:#fff;font-weight:700;font-variant-numeric:tabular-nums}
-.empty{color:var(--muted);font-size:.88rem}
-.note{color:var(--muted);font-size:.78rem;margin:18px 0 40px}
+.nav .back{font-size:.88rem}
+
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin:26px 0 14px}
+h1{font-family:'Anton',sans-serif;font-weight:400;color:#fff;font-size:2.2rem;letter-spacing:.5px;line-height:1.1}
+.sub{color:var(--muted);font-size:.88rem;margin-top:6px}
+.live{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px 8px 12px;font-size:.85rem;color:var(--muted);white-space:nowrap}
+.live b{color:#fff;font-size:1.05rem;font-weight:800}
+.pulse{width:10px;height:10px;border-radius:50%;background:var(--green-glow);box-shadow:0 0 0 0 rgba(22,196,91,.6);animation:pulse 2s infinite}
+.live.zero .pulse{background:var(--faint);animation:none;box-shadow:none}
+@keyframes pulse{70%{box-shadow:0 0 0 9px rgba(22,196,91,0)}100%{box-shadow:0 0 0 0 rgba(22,196,91,0)}}
+@media (prefers-reduced-motion:reduce){.pulse{animation:none}}
+
+.controls{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;margin-bottom:16px}
+.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px}
+.seg button{padding:7px 14px;border-radius:9px;font-size:.84rem;font-weight:600;color:var(--muted)}
+.seg button:hover{color:#fff;background:rgba(255,255,255,.04)}
+.seg button[aria-pressed="true"]{background:var(--green);color:#fff}
+.seg.off{opacity:.45;pointer-events:none}
+.updated{color:var(--faint);font-size:.78rem}
+
+.banner{background:rgba(191,161,90,.1);border:1px solid rgba(191,161,90,.45);color:#efe3c4;border-radius:14px;padding:12px 16px;font-size:.88rem;margin-bottom:16px}
+.banner b{color:var(--gold)}
+.oops{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 20px;text-align:center;color:var(--muted);margin-bottom:24px}
+.oops b{display:block;color:#fff;font-size:1.05rem;margin-bottom:4px}
+
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px 12px;min-width:0;display:flex;flex-direction:column}
+.kpi .lbl{font-size:.68rem;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;color:var(--gold)}
+.kpi .val{font-size:1.9rem;font-weight:800;color:#fff;line-height:1.15;margin-top:4px;letter-spacing:-.5px}
+.kpi .val small{font-size:.9rem;font-weight:600;color:var(--muted);letter-spacing:0;margin-left:2px}
+.kpi .dl{font-size:.76rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dl .up,.dl .down,.dl .flat{font-weight:700}
+.dl .good{color:var(--good)} .dl .bad{color:var(--bad)} .dl .flat{color:var(--muted)}
+.spark{display:block;width:100%;height:26px;margin-top:auto;padding-top:8px}
+
+.grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;transition:opacity .2s}
+.busy .grid,.busy .kpis{opacity:.55}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0;grid-column:span 2}
+.panel.w6{grid-column:span 6} .panel.w3{grid-column:span 3} .panel.w4{grid-column:span 4}
+.ph{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.panel h2{font-size:.72rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold)}
+.ph .aside{font-size:.78rem;color:var(--muted)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--muted)}
+.legend i{display:inline-block;vertical-align:middle;margin-right:6px}
+.legend .ln{width:14px;height:2px;border-radius:2px}
+.legend .dot{width:8px;height:8px;border-radius:50%}
+.legend .band{width:10px;height:12px;border-radius:3px;background:rgba(191,161,90,.22)}
+.chart{position:relative;width:100%;touch-action:pan-y}
+.chart svg{display:block;width:100%;overflow:visible}
+.chart text{font-family:'Inter',system-ui,sans-serif;font-size:11px;fill:var(--faint);font-variant-numeric:tabular-nums}
+.chart .lab{fill:var(--txt);font-weight:700}
+.empty{color:var(--muted);font-size:.86rem;padding:6px 0}
+.hide{display:none!important}
+
+/* bar lists */
+.bl{list-style:none}
+.bl li{padding:6px 0}
+.bl .r{display:flex;align-items:baseline;gap:8px;font-size:.87rem}
+.bl .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)}
+.bl .nm .fl{margin-right:7px}
+.bl .nm small{color:var(--faint);margin-left:6px;font-size:.78rem}
+.bl .v{color:#fff;font-weight:700;font-variant-numeric:tabular-nums}
+.bl .p{color:var(--faint);font-size:.76rem;width:3.1em;text-align:right;font-variant-numeric:tabular-nums}
+.bl .trk{height:6px;border-radius:3px;background:rgba(255,255,255,.05);margin-top:5px;overflow:hidden}
+.bl .bar{height:100%;border-radius:3px;background:var(--green-glow);opacity:.85}
+.more{margin-top:8px;font-size:.8rem;font-weight:600;color:var(--green-glow)}
+.more:hover{text-decoration:underline}
+
+/* game day block */
+.gfig{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.gfig>div{background:var(--card2);border-radius:12px;padding:10px 12px;min-width:0}
+.gfig .k{font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.gfig .k i{width:12px;height:2px;border-radius:2px;display:inline-block}
+.gfig .n{font-size:1.45rem;font-weight:800;color:#fff;line-height:1.2}
+.gfig .n small{font-size:.75rem;color:var(--muted);font-weight:600}
+
+/* heatmap */
+.heat{display:grid;grid-template-columns:34px repeat(24,minmax(0,1fr));gap:2px;font-size:10px;color:var(--faint)}
+.heat .c{aspect-ratio:1/1;border-radius:3px;background:rgba(255,255,255,.035);min-height:8px}
+.heat .c:hover{outline:2px solid #fff;outline-offset:-1px}
+.heat .dn{display:flex;align-items:center;font-size:11px}
+.heat .hn{text-align:left;white-space:nowrap;overflow:visible;height:14px}
+.hlegend{display:flex;align-items:center;gap:8px;font-size:.74rem;color:var(--faint);margin-top:10px}
+.wk{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
+.wkh{font-size:.74rem;color:var(--muted);margin-bottom:6px}
+.wkc{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;height:120px}
+.wkc .col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:0}
+.wkc .cb{width:100%;max-width:24px;background:var(--green-glow);border-radius:4px 4px 0 0;opacity:.85;flex:none}
+.wkc .cv{font-size:.72rem;color:var(--txt);font-weight:700;margin-bottom:3px;font-variant-numeric:tabular-nums}
+.wkc .cd{font-size:.72rem;color:var(--faint);margin-top:4px;border-top:1px solid rgba(255,255,255,.16);width:100%;text-align:center;padding-top:3px}
+.hlegend span.g{width:90px;height:8px;border-radius:4px;background:linear-gradient(90deg,rgba(22,196,91,.12),rgba(22,196,91,1))}
+
+/* posts table */
+.tbl{width:100%;border-collapse:collapse;font-size:.86rem;table-layout:fixed}
+.tbl th{font-size:.68rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--faint);text-align:right;padding:0 0 8px 10px;white-space:nowrap}
+.tbl th:first-child{text-align:left;padding-left:0}
+.tbl td{padding:9px 0 9px 10px;border-top:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);vertical-align:middle}
+.tbl td:first-child{padding-left:0;text-align:left;color:var(--txt)}
+.tbl td.v{color:#fff;font-weight:700}
+.tbl .tt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.35}
+.tbl .tt a{color:var(--txt)} .tbl .tt a:hover{color:var(--green-glow)}
+.tbl .rk{color:var(--faint);font-size:.75rem;margin-right:6px;font-variant-numeric:tabular-nums}
+.sc{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+.sc .trk{width:46px;height:6px;border-radius:3px;background:rgba(255,255,255,.06);overflow:hidden}
+.sc .bar{height:100%;background:var(--green-glow);border-radius:3px}
+.tbl th.c-v{width:62px} .tbl th.c-f{width:56px} .tbl th.c-t{width:78px} .tbl th.c-s{width:96px}
+.tbl td{white-space:nowrap} .tbl td:first-child{white-space:normal}
+
+/* recent feed */
+.feed{list-style:none}
+.feed li{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:9px 0;border-top:1px solid var(--line);font-size:.86rem}
+.feed li:first-child{border-top:0}
+.feed .when{color:var(--faint);font-size:.78rem;font-variant-numeric:tabular-nums}
+.feed .wh{color:#fff;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feed .pg{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.8rem}
+.feed .tags{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.tag{font-size:.7rem;font-weight:600;color:var(--muted);background:rgba(255,255,255,.05);border-radius:999px;padding:2px 8px;white-space:nowrap}
+.tag.new{color:#0c1410;background:var(--gold)}
+
+.note{color:var(--muted);font-size:.78rem;margin:20px 0 40px;max-width:760px}
+
+/* tooltip */
+#tip{position:fixed;z-index:50;pointer-events:none;background:#08100c;border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:8px 11px;font-size:.8rem;box-shadow:0 8px 24px rgba(0,0,0,.45);min-width:120px;max-width:260px;opacity:0;transition:opacity .1s}
+#tip.on{opacity:1}
+#tip .h{color:var(--muted);font-size:.74rem;margin-bottom:4px}
+#tip .row{display:flex;align-items:center;gap:8px;white-space:nowrap}
+#tip .row i{width:12px;height:2px;border-radius:2px;flex:none}
+#tip .row b{color:#fff;font-variant-numeric:tabular-nums}
+#tip .row span{color:var(--muted)}
+#tip .x{color:var(--gold);font-size:.74rem;margin-top:4px}
+
+@media (max-width:960px){
+  .panel{grid-column:span 3} .panel.w4{grid-column:span 6}
+}
 @media (max-width:700px){
-  .tiles{grid-template-columns:repeat(2,1fr)}
-  .panels{grid-template-columns:1fr}
-  h1{font-size:1.6rem}
+  h1{font-size:1.75rem}
+  .top{margin-top:20px}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .kpi{padding:12px 13px 10px}
+  .kpi .val{font-size:1.55rem}
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .panel,.panel.w3,.panel.w4,.panel.w6{grid-column:1/-1}
+  .panel{padding:14px}
+  .seg{width:100%} .seg button{flex:1;padding:8px 4px}
+  .tbl .cf{display:none}
+  .tbl th.c-v{width:50px} .tbl th.c-t{width:66px} .tbl th.c-s{width:48px}
+  .tbl{font-size:.83rem}
+  .sc .trk{display:none}
+  .feed li{grid-template-columns:minmax(0,1fr) auto}
+  .feed .when{grid-column:2;grid-row:1;text-align:right}
+  .feed .who{grid-column:1;grid-row:1}
+  .feed .tags{grid-column:1/-1;justify-content:flex-start}
+  .heat{grid-template-columns:28px repeat(24,minmax(0,1fr));gap:1px}
+  .heat .c{border-radius:2px}
+  .gfig{gap:6px} .gfig>div{padding:9px 10px} .gfig .k{font-size:.68rem;gap:5px}
+  .gfig .n{font-size:1.2rem} .gfig .n small{display:block;font-size:.68rem}
 }
 </style>
 </head>
 <body>
 <header><div class="wrap nav">
   <a class="brand" href="/">&#9752;&#65039; Tatum<span>Time</span></a>
-  <a href="/">Back to the site &rarr;</a>
+  <a class="back" href="/">Back to the site &rarr;</a>
 </div></header>
-<main class="wrap">
-  <h1>Who's Been Visiting</h1>
-  <p class="sub" id="sub">Loading...</p>
-  <div class="tiles">
-    <div class="tile"><div class="lbl">Visits</div><div class="val" id="tVisits">-</div><div class="hint">all time</div></div>
-    <div class="tile"><div class="lbl">Fans</div><div class="val" id="tFans">-</div><div class="hint">different browsers</div></div>
-    <div class="tile"><div class="lbl">Today</div><div class="val" id="tToday">-</div><div class="hint">visits since midnight ET</div></div>
-    <div class="tile"><div class="lbl">Regulars</div><div class="val" id="tReturning">-</div><div class="hint">fans who came back</div></div>
+<main class="wrap" id="main">
+  <div class="top">
+    <div><h1>Who's Been Visiting</h1><p class="sub" id="sub">Loading...</p></div>
+    <div class="live zero" id="live" title="Visits that opened a page in the last 30 minutes"><span class="pulse"></span><span><b id="active">-</b> here now</span></div>
   </div>
-  <div class="panels">
-    <div class="panel wide"><h2>Visits per day (last 30 days)</h2><div id="pDays"></div></div>
-    <div class="panel"><h2>Most-read pages (30 days)</h2><div id="pPages"></div></div>
-    <div class="panel"><h2>Where they came from (30 days)</h2><div id="pSources"></div></div>
-    <div class="panel"><h2>Devices (30 days)</h2><div id="pDevices"></div></div>
+  <div class="controls">
+    <div class="seg" id="seg" role="group" aria-label="Date range">
+      <button data-d="7" aria-pressed="false">7 days</button>
+      <button data-d="30" aria-pressed="true">30 days</button>
+      <button data-d="90" aria-pressed="false">90 days</button>
+      <button data-d="0" aria-pressed="false">All time</button>
+    </div>
+    <span class="updated" id="updated"></span>
   </div>
+  <div class="banner" id="banner" hidden><b>One more step, Dan:</b> run <b>STEP 2 - UPGRADE</b> from SETUP-VISITOR-COUNTER.txt in Supabase
+    (SQL Editor, paste, Run). It switches on countries and states, time on page, game-day stats, browsers and the rest of this page.
+    Until then you're seeing the basic numbers.</div>
+  <div class="oops" id="oops" hidden><b>No stats to show yet</b>Couldn't reach the visitor numbers. If the counter is brand new, run the SQL in SETUP-VISITOR-COUNTER.txt, then reload.</div>
+
+  <section class="kpis" id="kpis"></section>
+
+  <section class="grid" id="grid">
+    <div class="panel w6">
+      <div class="ph"><h2 id="dailyTitle">Visits per day</h2>
+        <div class="legend"><span><i class="ln" style="background:var(--green-glow)"></i>Visits</span><span data-v2 id="gameLeg"><i class="band"></i>Celtics game day</span></div></div>
+      <div class="chart" id="cDaily"></div>
+    </div>
+
+    <div class="panel w3" data-v2>
+      <div class="ph"><h2>Game days vs off days</h2><span class="aside" id="gameAside"></span></div>
+      <div id="gameBox"></div>
+    </div>
+    <div class="panel w3" data-v2>
+      <div class="ph"><h2>When they visit</h2><span class="aside">Eastern time</span></div>
+      <div id="heat"></div>
+    </div>
+
+    <div class="panel" data-v2><div class="ph"><h2>Countries</h2></div><div id="lCountries"></div></div>
+    <div class="panel" data-v2><div class="ph"><h2>US states</h2></div><div id="lRegions"></div></div>
+    <div class="panel" data-v2><div class="ph"><h2>Cities</h2></div><div id="lCities"></div></div>
+
+    <div class="panel w4">
+      <div class="ph"><h2>Most-read pages</h2><span class="aside" data-v2>time and scroll = average per view</span></div>
+      <div id="tPages"></div>
+    </div>
+    <div class="panel"><div class="ph"><h2>Where they came from</h2></div><div id="lSources"></div></div>
+
+    <div class="panel" data-v2><div class="ph"><h2>First page they landed on</h2></div><div id="lEntries"></div></div>
+    <div class="panel"><div class="ph"><h2>Devices</h2></div><div id="lDevices"></div></div>
+    <div class="panel" data-v2><div class="ph"><h2>Browsers</h2></div><div id="lBrowsers"></div></div>
+    <div class="panel" data-v2><div class="ph"><h2>Phone / computer system</h2></div><div id="lOs"></div></div>
+    <div class="panel" data-v2><div class="ph"><h2>Languages</h2></div><div id="lLangs"></div></div>
+    <div class="panel" data-v2><div class="ph"><h2>Screen sizes</h2></div><div id="lScreens"></div></div>
+
+    <div class="panel w6" data-v2>
+      <div class="ph"><h2>Latest visits</h2><span class="aside">newest first, refreshes every minute</span></div>
+      <ul class="feed" id="feed"></ul>
+    </div>
+  </section>
+
   <p class="note">Every visitor is anonymous - the site only keeps a random id per browser,
-    never names, emails or IP addresses. A "visit" is one browsing session; refreshing
-    doesn't count twice. This browser is now excluded from the count, so your own
-    checking-in doesn't pad the numbers.</p>
+    never names, emails or IP addresses. Location comes from Cloudflare's country/city lookup.
+    A "visit" is one browsing session; refreshing doesn't count twice. "Fans" are different
+    browsers. Time on page only counts while the page is on screen. This browser is now
+    excluded from the count, so your own checking-in doesn't pad the numbers.</p>
 </main>
+<div id="tip" role="status" aria-live="polite"></div>
 <script>
 (function(){
   var SB='https://oeogaqrqwevjqpwvrxhq.supabase.co';
   var KEY='sb_publishable_qHH5R2FwTF-zKs5zoVXZzA_f98jkW75';
+  var TZ='America/New_York';
   try{ localStorage.setItem('tt_notme','1'); }catch(e){}
+  var MOCK=(/[?&]mock=(\w+)/.exec(location.search)||[])[1];
 
+  /* ---------- little helpers ---------- */
   function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function fmt(n){ return Number(n||0).toLocaleString('en-US'); }
+  function compact(n){ n=+n||0; return n>=1e6?(n/1e6).toFixed(1).replace(/\.0$/,'')+'M':n>=1e4?Math.round(n/1e3)+'K':n>=1e3?(n/1e3).toFixed(1).replace(/\.0$/,'')+'K':String(Math.round(n*10)/10); }
+  function secs(s){ if(s==null) return '-'; s=Math.round(s); return s<60?s+'s':Math.floor(s/60)+'m '+(s%60<10?'0':'')+(s%60)+'s'; }
+  function lget(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function lset(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  function sget(k){ try{ return JSON.parse(sessionStorage.getItem(k)); }catch(e){ return null; } }
+  function sset(k,v){ try{ sessionStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+  function etDate(d){ return new Date(d).toLocaleDateString('en-CA',{timeZone:TZ}); }
+  function dayObj(s){ return new Date(s+'T12:00:00'); }
+  function addDays(s,n){ var d=dayObj(s); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+  function dShort(s){ return dayObj(s).toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+  function dLong(s){ return dayObj(s).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}); }
+  function hr(h){ return (h%12||12)+(h<12?' AM':' PM'); }
+  function hrS(h){ return (h%12||12)+(h<12?'a':'p'); }
+  function ago(t){
+    var m=Math.round((Date.now()-new Date(t))/60000);
+    if(m<1) return 'just now'; if(m<60) return m+' min ago'; if(m<24*60) return Math.round(m/60)+' hr ago';
+    return new Date(t).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  }
+  var regionNames=null, langNames=null;
+  try{ regionNames=new Intl.DisplayNames(['en'],{type:'region'}); langNames=new Intl.DisplayNames(['en'],{type:'language'}); }catch(e){}
+  function countryName(c){
+    if(!c) return 'Unknown'; if(c==='T1') return 'Tor network'; if(c==='XX') return 'Unknown';
+    try{ return regionNames?regionNames.of(c):c; }catch(e){ return c; }
+  }
+  function flag(c){
+    if(!c||!/^[A-Z]{2}$/.test(c)||c==='XX') return '\u{1F310}';
+    return String.fromCodePoint(127397+c.charCodeAt(0),127397+c.charCodeAt(1));
+  }
+  function langName(l){ if(!l) return 'Unknown'; try{ return langNames?langNames.of(l):l; }catch(e){ return l; } }
+  function cap(s){ return s?s.charAt(0).toUpperCase()+s.slice(1):'Unknown'; }
+
+  /* ---------- page titles from slugs ---------- */
+  var titles={};
+  function slugify(s){ return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'post'; }
+  var titlesReady=fetch('/content/posts.json').then(function(r){ return r.ok?r.json():null; }).then(function(j){
+    ((j&&j.posts)||[]).forEach(function(p){ if(p.title) titles[slugify(p.title)]={t:p.title,e:p.emoji||''}; });
+  }).catch(function(){});
+  var SMALL={a:1,an:1,the:1,of:1,to:1,in:1,on:1,and:1,or:1,for:1,vs:1,at:1,by:1,with:1};
+  function postSlug(p){ var m=/^\/(?:#\/)?post\/([^/?#]+)\/?$/.exec(p||''); return m?m[1]:null; }
   function prettyPath(p){
-    var m=/^\/(?:post\/|#\/post\/)([^/]+)\/?$/.exec(p);
-    if(m) return decodeURIComponent(m[1]).replace(/-/g,' ');
-    if(p==='/'||p==='/index.html') return 'Home page';
+    var slug=postSlug(p);
+    if(slug){
+      try{ slug=decodeURIComponent(slug); }catch(e){}
+      if(titles[slug]) return titles[slug].t;
+      return slug.split('-').map(function(w,i){ return (i&&SMALL[w])?w:w.charAt(0).toUpperCase()+w.slice(1); }).join(' ');
+    }
+    if(!p||p==='/'||p==='/index.html') return 'Home page';
     return p;
   }
-  function prettyDay(d){
-    var t=new Date(d+'T12:00:00');
-    return t.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  function pathLink(p){ var s=postSlug(p); return s?'/post/'+s+'/':(p&&p.charAt(0)==='/'?p:'/'); }
+
+  /* ---------- sources ---------- */
+  var SRC=[[/^(l\.|lm\.|m\.)?facebook|^fb$|^fb\./,'Facebook'],[/instagram/,'Instagram'],[/^t\.co$|twitter|^x\.com$|^x$/,'X / Twitter'],
+    [/threads/,'Threads'],[/reddit/,'Reddit'],[/news\.google/,'Google News'],[/google/,'Google'],[/bing/,'Bing'],
+    [/duckduckgo/,'DuckDuckGo'],[/yahoo/,'Yahoo'],[/tiktok/,'TikTok'],[/youtube|youtu\.be/,'YouTube'],[/linkedin|lnkd/,'LinkedIn'],
+    [/bsky/,'Bluesky'],[/discord/,'Discord'],[/newsletter|email|mail/,'Email / newsletter'],[/chatgpt|openai/,'ChatGPT'],[/perplexity/,'Perplexity']];
+  function srcName(s){
+    if(!s) return 'Direct / bookmark / app';
+    s=String(s).toLowerCase();
+    for(var i=0;i<SRC.length;i++) if(SRC[i][0].test(s)) return SRC[i][1];
+    return s;
   }
-  function bars(el,items,label,count){
-    el.textContent='';
-    if(!items||!items.length){ el.innerHTML='<p class="empty">Nothing yet.</p>'; return; }
-    var max=Math.max.apply(null,items.map(count))||1;
-    items.forEach(function(it){
-      var row=document.createElement('div'); row.className='row';
-      var name=document.createElement('div'); name.className='name';
-      var bar=document.createElement('span'); bar.className='bar'; bar.style.width=(count(it)/max*100)+'%';
-      var b=document.createElement('b'); b.textContent=label(it); name.title=label(it);
-      name.appendChild(bar); name.appendChild(b);
-      var num=document.createElement('div'); num.className='num'; num.textContent=fmt(count(it));
-      row.appendChild(name); row.appendChild(num); el.appendChild(row);
-    });
+  function mergeBy(items,keyFn,valKey){
+    var m={},order=[];
+    (items||[]).forEach(function(it){ var k=keyFn(it); if(!(k in m)){ m[k]=0; order.push(k); } m[k]+=+it[valKey]||0; });
+    return order.map(function(k){ return {label:k,value:m[k]}; }).sort(function(a,b){ return b.value-a.value; });
   }
 
-  fetch(SB+'/rest/v1/rpc/visit_stats',{
-    method:'POST',
-    headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'},
-    body:'{}'
-  })
-  .then(function(r){ return r.ok?r.json():Promise.reject(r.status); })
-  .then(function(s){
-    $('tVisits').textContent=fmt(s.visits);
-    $('tFans').textContent=fmt(s.fans);
-    $('tToday').textContent=fmt(s.today);
-    $('tReturning').textContent=fmt(s.returning);
-    $('sub').textContent=s.since
-      ? fmt(s.views)+' page views since '+new Date(s.since).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+'.'
-      : 'No visits recorded yet - check back after a few people stop by.';
-    bars($('pDays'),s.days,function(d){ return prettyDay(d.day); },function(d){ return d.visits; });
-    bars($('pPages'),s.pages,function(p){ return prettyPath(p.path); },function(p){ return p.views; });
-    bars($('pSources'),s.sources,function(x){ return x.source; },function(x){ return x.visits; });
-    bars($('pDevices'),s.devices,function(x){ return x.device.charAt(0).toUpperCase()+x.device.slice(1); },function(x){ return x.visits; });
-  })
-  .catch(function(){
-    $('sub').textContent='Stats aren\'t switched on yet - run the SQL in SETUP-VISITOR-COUNTER.txt in Supabase, then reload.';
+  /* ---------- tooltip ---------- */
+  var tip=$('tip');
+  function showTip(html,x,y){
+    tip.innerHTML=html; tip.classList.add('on');
+    var w=tip.offsetWidth,h=tip.offsetHeight,vw=document.documentElement.clientWidth;
+    var left=x+14; if(left+w>vw-8) left=Math.max(8,x-w-14);
+    var top=y-h-12; if(top<8) top=y+16;
+    tip.style.left=left+'px'; tip.style.top=top+'px';
+  }
+  function hideTip(){ tip.classList.remove('on'); }
+  function tipRow(color,val,label){ return '<div class="row"><i style="background:'+color+'"></i><b>'+esc(val)+'</b><span>'+esc(label)+'</span></div>'; }
+
+  /* ---------- line / area chart (hand-rolled SVG) ---------- */
+  function niceStep(m,ticks){ var raw=Math.max(m,1)/ticks, p=Math.pow(10,Math.floor(Math.log10(raw))), f=raw/p;
+    return Math.max(1,(f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p); }
+  function lineChart(el,cfg){
+    var n=cfg.n, W=Math.max(260,el.clientWidth), H=cfg.h||(W<520?190:240);
+    var L=36,R=14,T=16,B=cfg.marks?32:26, iw=W-L-R, ih=H-T-B;
+    var max=0; cfg.series.forEach(function(s){ s.vals.forEach(function(v){ if(v>max) max=v; }); });
+    var step=niceStep(max,4), top=Math.max(step,Math.ceil(max/step)*step);
+    function X(i){ return L+(n<2?iw/2:i*iw/(n-1)); }
+    function Y(v){ return T+ih-(v/top)*ih; }
+    var o='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(cfg.label||'')+'">';
+    for(var g=0;g<=top+1e-9;g+=step){
+      var gy=Y(g).toFixed(1);
+      o+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+gy+'" y2="'+gy+'" stroke="'+(g?'var(--grid)':'rgba(255,255,255,.16)')+'" stroke-width="1"/>';
+      o+='<text x="'+(L-8)+'" y="'+(+gy+4)+'" text-anchor="end">'+compact(g)+'</text>';
+    }
+    if(cfg.marks){
+      var bw=Math.max(2,Math.min(18,n>1?iw/(n-1)*0.7:18));
+      cfg.marks.forEach(function(m,i){ if(m){
+        var x0=Math.max(L,X(i)-bw/2), x1=Math.min(W-R,X(i)+bw/2);
+        o+='<rect x="'+x0.toFixed(1)+'" y="'+T+'" width="'+(x1-x0).toFixed(1)+'" height="'+ih+'" rx="2" fill="rgba(191,161,90,.13)"/>';
+        o+='<circle cx="'+X(i).toFixed(1)+'" cy="'+(T+ih+6)+'" r="2.5" fill="var(--gold)"/>';
+      }});
+    }
+    var cnt=Math.min(n,W<520?4:7), seen={}, at=cfg.xat?cfg.xat(W):null;
+    if(!at){ at=[]; for(var k=0;k<cnt;k++){ var i=cnt<2?0:Math.round(k*(n-1)/(cnt-1)); if(!seen[i]){ seen[i]=1; at.push(i); } } }
+    at.forEach(function(i){
+      var anchor=i===0&&n>1?'start':(i===n-1&&n>1?'end':'middle');
+      o+='<text x="'+X(i).toFixed(1)+'" y="'+(H-6)+'" text-anchor="'+anchor+'">'+esc(cfg.xlab(i))+'</text>';
+    });
+    cfg.series.forEach(function(s){
+      var pts=s.vals.map(function(v,i){ return X(i).toFixed(1)+','+Y(v).toFixed(1); });
+      if(s.area&&n>1) o+='<path d="M'+X(0).toFixed(1)+','+Y(0)+' L'+pts.join(' L')+' L'+X(n-1).toFixed(1)+','+Y(0)+' Z" fill="'+s.color+'" fill-opacity=".12"/>';
+      o+='<polyline points="'+pts.join(' ')+'" fill="none" stroke="'+s.color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+    });
+    if(cfg.peak){
+      var s0=cfg.series[0], pi=0; s0.vals.forEach(function(v,i){ if(v>=s0.vals[pi]) pi=i; });
+      if(s0.vals[pi]>0){
+        var px=X(pi), anc=px<L+30?'start':(px>W-R-30?'end':'middle');
+        o+='<circle cx="'+px.toFixed(1)+'" cy="'+Y(s0.vals[pi]).toFixed(1)+'" r="4" fill="'+s0.color+'" stroke="var(--card)" stroke-width="2"/>';
+        o+='<text class="lab" x="'+px.toFixed(1)+'" y="'+(Y(s0.vals[pi])-9).toFixed(1)+'" text-anchor="'+anc+'">'+compact(s0.vals[pi])+'</text>';
+      }
+    }
+    o+='<g class="hov" style="display:none"><line y1="'+T+'" y2="'+(T+ih)+'" stroke="rgba(255,255,255,.35)" stroke-width="1"/>';
+    cfg.series.forEach(function(s){ o+='<circle r="4.5" fill="'+s.color+'" stroke="var(--card)" stroke-width="2"/>'; });
+    o+='</g><rect class="hit" x="'+L+'" y="0" width="'+iw+'" height="'+H+'" fill="transparent"/></svg>';
+    el.innerHTML=o;
+    var svg=el.firstChild, hov=svg.querySelector('.hov'), ln=hov.querySelector('line'), dots=hov.querySelectorAll('circle');
+    function move(ev){
+      var r=svg.getBoundingClientRect(), x=ev.clientX-r.left;
+      var i=n<2?0:Math.max(0,Math.min(n-1,Math.round((x-L)/iw*(n-1))));
+      hov.style.display=''; ln.setAttribute('x1',X(i)); ln.setAttribute('x2',X(i));
+      cfg.series.forEach(function(s,j){ dots[j].setAttribute('cx',X(i)); dots[j].setAttribute('cy',Y(s.vals[i])); });
+      showTip(cfg.tip(i),ev.clientX,r.top+Y(Math.max.apply(null,cfg.series.map(function(s){ return s.vals[i]; }))));
+    }
+    svg.addEventListener('pointermove',move);
+    svg.addEventListener('pointerdown',move);
+    svg.addEventListener('pointerleave',function(){ hov.style.display='none'; hideTip(); });
+  }
+
+  /* ---------- bar lists ---------- */
+  function barList(el,items,opt){
+    opt=opt||{};
+    if(!items||!items.length||!items.some(function(x){ return x.value>0; })){ el.innerHTML='<p class="empty">'+(opt.empty||'Nothing yet.')+'</p>'; return; }
+    var total=items.reduce(function(a,b){ return a+b.value; },0)||1, max=items[0].value||1, lim=opt.limit||8;
+    function draw(all){
+      var o='<ul class="bl">';
+      (all?items:items.slice(0,lim)).forEach(function(it){
+        o+='<li><div class="r"><span class="nm" title="'+esc(it.label)+'">'+(it.flag?'<span class="fl">'+it.flag+'</span>':'')+esc(it.label)+
+           (it.sub?'<small>'+esc(it.sub)+'</small>':'')+'</span><span class="v">'+fmt(it.value)+'</span><span class="p">'+Math.round(it.value/total*100)+'%</span></div>'+
+           '<div class="trk"><div class="bar" style="width:'+Math.max(1.5,it.value/max*100).toFixed(1)+'%"></div></div></li>';
+      });
+      o+='</ul>';
+      if(items.length>lim) o+='<button class="more">'+(all?'Show fewer':'Show all '+items.length)+'</button>';
+      el.innerHTML=o;
+      var b=el.querySelector('.more'); if(b) b.onclick=function(){ draw(!all); };
+    }
+    draw(false);
+  }
+
+  /* ---------- Celtics schedule (ESPN) ---------- */
+  function seasonOf(day){ var y=+day.slice(0,4), m=+day.slice(5,7); return m>=8?y+1:y; }
+  function scoreOf(c){ var s=c&&c.score; return s==null?'':(typeof s==='object'?(s.displayValue||s.value||''):s); }
+  function loadSchedule(fromDay,toDay){
+    if(MOCK) return Promise.resolve(mockSchedule(fromDay,toDay));
+    var years=[]; for(var y=seasonOf(fromDay);y<=seasonOf(toDay);y++) years.push(y);
+    years=years.slice(-3);
+    var jobs=[];
+    years.forEach(function(y){ [1,2,3].forEach(function(t){
+      var key='tt_sched_'+y+'_'+t, c=sget(key);
+      if(c&&Date.now()-c.at<6*3600e3){ jobs.push(Promise.resolve(c.games)); return; }
+      jobs.push(fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/bos/schedule?season='+y+'&seasontype='+t)
+        .then(function(r){ return r.ok?r.json():Promise.reject(); })
+        .then(function(j){
+          var games={};
+          (j.events||[]).forEach(function(ev){
+            var comp=(ev.competitions||[])[0]||{}, cs=comp.competitors||[];
+            var us=cs.filter(function(c){ return c.team&&c.team.abbreviation==='BOS'; })[0], them=cs.filter(function(c){ return c!==us; })[0];
+            if(!us||!them||!ev.date) return;
+            var done=comp.status&&comp.status.type&&comp.status.type.completed;
+            games[etDate(ev.date)]={opp:them.team.abbreviation||'',home:us.homeAway==='home',
+              res:done?((us.winner?'W ':'L ')+scoreOf(us)+'-'+scoreOf(them)):'',type:t};
+          });
+          sset(key,{at:Date.now(),games:games}); return games;
+        }).catch(function(){ return null; }));
+    }); });
+    return Promise.all(jobs).then(function(all){
+      var out={}, ok=false;
+      all.forEach(function(g){ if(g){ ok=true; for(var k in g) out[k]=g[k]; } });
+      return ok?out:null;
+    });
+  }
+  function gameText(g){ return g?((g.home?'vs ':'@ ')+g.opp+(g.type===3?' (playoffs)':g.type===1?' (preseason)':'')+(g.res?' - '+g.res:'')):''; }
+
+  /* ---------- state ---------- */
+  var days=+(lget('tt_stats_days')||30); if([0,7,30,90].indexOf(days)<0) days=30;
+  var data=null, sched=null, schedKey='', loading=false, lastLoad=0, v2=true;
+
+  function rpc(args){
+    return fetch(SB+'/rest/v1/rpc/visit_stats',{method:'POST',
+      headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify(args)})
+      .then(function(r){ return r.ok?r.json():Promise.reject(r.status); });
+  }
+  function fetchStats(d){
+    if(MOCK==='v1') return Promise.resolve(mockV1());
+    if(MOCK==='none') return Promise.reject('mock');
+    if(MOCK) return Promise.resolve(mockV2(d));
+    return rpc({days:d}).then(function(s){ return s&&s.version>=2?s:Promise.reject('old'); })
+      .catch(function(){ return rpc({}); });       // STEP 2 not run yet: the original visit_stats()
+  }
+
+  function load(quiet){
+    if(loading) return; loading=true;
+    if(data) $('main').classList.add('busy');
+    var d=days;
+    fetchStats(d).then(function(s){
+      return titlesReady.then(function(){ return s; });
+    }).then(function(s){
+      if(d!==days) return;
+      data=s; lastLoad=Date.now();
+      $('oops').hidden=true;
+      v2=s&&s.version>=2;
+      if(v2) render(s); else renderV1(s);
+      $('updated').textContent='Updated '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    }).catch(function(){
+      if(!data){ $('oops').hidden=false; $('sub').textContent=''; $('kpis').innerHTML=''; $('grid').classList.add('hide'); }
+    }).then(function(){ loading=false; $('main').classList.remove('busy'); });
+  }
+
+  /* ---------- KPI tiles ---------- */
+  function delta(cur,prev,goodUp,label){
+    if(prev==null||cur==null) return '<span class="flat">'+esc(label||'')+'</span>';
+    cur=+cur; prev=+prev;
+    if(prev===0) return cur>0?'<span class="up '+(goodUp?'good':'bad')+'">▲ new</span> '+esc(label):'<span class="flat">no change</span> '+esc(label);
+    var pct=Math.round((cur-prev)/prev*100);
+    if(pct===0) return '<span class="flat">= 0%</span> '+esc(label);
+    var up=pct>0, good=up===goodUp;
+    return '<span class="'+(up?'up':'down')+' '+(good?'good':'bad')+'">'+(up?'▲':'▼')+' '+Math.abs(pct)+'%</span> '+esc(label);
+  }
+  function spark(vals){
+    if(!vals||vals.length<2) return '';
+    var max=Math.max.apply(null,vals)||1, n=vals.length;
+    var pts=vals.map(function(v,i){ return (i/(n-1)*100).toFixed(2)+','+(24-v/max*21).toFixed(2); }).join(' ');
+    var lx=100, ly=(24-vals[n-1]/max*21).toFixed(2);
+    return '<svg class="spark" viewBox="0 0 100 26" preserveAspectRatio="none" aria-hidden="true"><polyline points="'+pts+'" fill="none" stroke="#5f7d6c" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>'+
+           '<line x1="'+lx+'" x2="'+lx+'" y1="'+ly+'" y2="'+ly+'" stroke="var(--green-glow)" stroke-width="6" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>';
+  }
+  function tile(lbl,val,dl,sp,title){
+    return '<div class="kpi"'+(title?' title="'+esc(title)+'"':'')+'><div class="lbl">'+esc(lbl)+'</div><div class="val">'+val+'</div><div class="dl">'+dl+'</div>'+(sp||'')+'</div>';
+  }
+  function rangeName(d){ return d?'last '+d+' days':'all time'; }
+  function prevName(d){ return d?'vs prev '+d+' days':'all time'; }
+
+  /* ---------- full render (after STEP 2) ---------- */
+  function render(s){
+    document.querySelectorAll('[data-v2]').forEach(function(el){ el.classList.remove('hide'); });
+    $('banner').hidden=true; $('seg').classList.remove('off'); $('grid').classList.remove('hide');
+    var t=s.totals||{}, p=s.prev, a=s.all_time||{}, td=s.today||{}, ser=s.series||[];
+    var since=s.since?new Date(s.since).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):null;
+    $('sub').textContent=since?('All time: '+fmt(a.visits)+' visits from '+fmt(a.fans)+' fans since '+since+
+      (s.peak?'. Best day: '+dShort(s.peak.day)+' ('+fmt(s.peak.visits)+' visits).':'.')):'No visits recorded yet - check back after a few people stop by.';
+    $('active').textContent=fmt(s.active); $('live').classList.toggle('zero',!s.active);
+
+    var pv=function(k){ return p?p[k]:null; }, pn=prevName(s.days);
+    var col=function(k){ return ser.map(function(x){ return +x[k]||0; }); };
+    $('kpis').innerHTML=
+      tile('Visits',fmt(t.visits),delta(t.visits,pv('visits'),true,pn),spark(col('visits')),'Browsing sessions, '+rangeName(s.days))+
+      tile('Fans',fmt(t.fans),delta(t.fans,pv('fans'),true,pn),spark(col('fans')),'Different browsers')+
+      tile('Page views',fmt(t.views),delta(t.views,pv('views'),true,pn),spark(col('views')))+
+      tile('New fans',fmt(t.new_fans),delta(t.new_fans,pv('new_fans'),true,pn),spark(col('new_fans')),'First-ever visit in this period')+
+      tile('Today',fmt(td.visits),delta(td.visits,td.yesterday_so_far,true,'vs yesterday'),'','Visits since midnight ET, compared with yesterday at this time. Yesterday all day: '+fmt(td.yesterday))+
+      tile('Pages per visit',t.pages_per_visit!=null?(+t.pages_per_visit).toFixed(1):'-',delta(t.pages_per_visit,pv('pages_per_visit'),true,pn))+
+      tile('Avg time on page',secs(t.avg_seconds),delta(t.avg_seconds,pv('avg_seconds'),true,pn),'','Only counts while the page is on screen')+
+      tile('Bounce rate',t.bounce!=null?Math.round(t.bounce)+'<small>%</small>':'-',delta(t.bounce,pv('bounce'),false,pn),'','Visits that only looked at one page - lower is better');
+
+    $('dailyTitle').textContent=s.days?'Visits per day - last '+s.days+' days':'Visits per day - all time';
+    drawDaily();
+
+    /* where */
+    var ctry=(s.countries||[]).map(function(c){ return {label:countryName(c.country),flag:flag(c.country),value:+c.visits}; });
+    barList($('lCountries'),ctry);
+    barList($('lRegions'),(s.regions||[]).map(function(r){ return {label:r.region,value:+r.visits}; }),{empty:'No US visits with a state yet.'});
+    barList($('lCities'),(s.cities||[]).map(function(c){ return {label:c.city,flag:flag(c.country),sub:c.country==='US'?c.region:countryName(c.country),value:+c.visits}; }),{empty:'No city data yet.'});
+
+    /* pages */
+    var pg=s.pages||[];
+    if(!pg.length) $('tPages').innerHTML='<p class="empty">Nothing yet.</p>';
+    else{
+      var o='<table class="tbl"><thead><tr><th>Page</th><th class="c-v">Views</th><th class="cf c-f">Fans</th><th class="c-t">Avg time</th><th class="c-s">Scroll</th></tr></thead><tbody>';
+      pg.slice(0,15).forEach(function(r,i){
+        var sl=postSlug(r.path), em=sl&&titles[sl]?titles[sl].e+' ':'';
+        o+='<tr><td><div class="tt"><span class="rk">'+(i+1)+'</span><a href="'+esc(pathLink(r.path))+'" target="_blank" rel="noopener" title="'+esc(r.path)+'">'+esc(em+prettyPath(r.path))+'</a></div></td>'+
+           '<td class="v">'+fmt(r.views)+'</td><td class="cf">'+fmt(r.fans)+'</td><td>'+secs(r.avg_seconds)+'</td>'+
+           '<td>'+(r.avg_scroll!=null?'<div class="sc"><div class="trk"><div class="bar" style="width:'+(+r.avg_scroll)+'%"></div></div>'+Math.round(r.avg_scroll)+'%</div>':'-')+'</td></tr>';
+      });
+      $('tPages').innerHTML=o+'</tbody></table>';
+    }
+    barList($('lSources'),mergeBy(s.sources,function(x){ return srcName(x.source); },'visits'));
+    barList($('lEntries'),(s.entries||[]).map(function(e){ return {label:prettyPath(e.path),value:+e.visits}; }));
+
+    /* tech */
+    var nm=function(list,f){ return (list||[]).map(function(x){ return {label:f(x.name),value:+x.visits}; }); };
+    barList($('lDevices'),nm(s.devices,cap));
+    barList($('lBrowsers'),nm(s.browsers,function(n){ return n==='Samsung'?'Samsung Internet':(n||'Unknown'); }));
+    barList($('lOs'),nm(s.os,function(n){ return n||'Unknown'; }));
+    barList($('lLangs'),nm(s.langs,langName));
+    var SCR={'<400':'Small phone (under 400px)','400-767':'Phone (400-767px)','768-1279':'Tablet / small laptop','1280-1919':'Laptop / desktop','1920+':'Big screen (1920px+)'};
+    barList($('lScreens'),nm(s.screens,function(n){ return SCR[n]||'Unknown'; }));
+
+    /* heatmap */
+    drawHeat(s.heat||[]);
+
+    /* recent feed */
+    var DEV={phone:'\u{1F4F1}',tablet:'\u{1F4F1}',desktop:'\u{1F4BB}'};
+    $('feed').innerHTML=(s.recent||[]).map(function(r){
+      var where=r.city?(r.city+', '+(r.country==='US'&&r.region?r.region:countryName(r.country))):(r.region?r.region+', '+countryName(r.country):(r.country?countryName(r.country):'Unknown location'));
+      var tech=[r.browser,r.os].filter(Boolean).join(' on ');
+      return '<li><span class="when" title="'+esc(new Date(r.at).toLocaleString('en-US'))+'">'+esc(ago(r.at))+'</span>'+
+        '<div class="who"><div class="wh">'+flag(r.country)+' '+esc(where)+'</div><div class="pg">'+esc(prettyPath(r.path))+'</div></div>'+
+        '<div class="tags">'+(r.new_fan?'<span class="tag new">New fan</span>':'')+'<span class="tag">'+(DEV[r.device]||'')+' '+esc(tech||cap(r.device))+'</span>'+
+        '<span class="tag">'+esc(srcName(r.source))+'</span></div></li>';
+    }).join('')||'<li class="empty">No visits yet.</li>';
+
+    /* schedule-dependent pieces */
+    var from=ser.length?ser[0].day:etDate(Date.now()), to=ser.length?ser[ser.length-1].day:from;
+    var key=from+'|'+to;
+    if(key!==schedKey){
+      schedKey=key;
+      $('gameAside').textContent='loading the Celtics schedule...';
+      loadSchedule(from,to).then(function(g){ if(schedKey!==key) return; sched=g; drawDaily(); drawGame(); });
+    } else drawGame();
+  }
+
+  function drawDaily(){
+    if(!data) return;
+    var ser, isV2=data.version>=2;
+    if(isV2) ser=data.series||[];
+    else{
+      var m={}; (data.days||[]).forEach(function(d){ m[d.day]=d; });
+      var today=etDate(Date.now()); ser=[];
+      for(var i=29;i>=0;i--){ var dd=addDays(today,-i); ser.push({day:dd,visits:m[dd]?+m[dd].visits:0,fans:m[dd]?+m[dd].fans:0}); }
+    }
+    var el=$('cDaily');
+    if(!ser.length){ el.innerHTML='<p class="empty">Nothing yet.</p>'; return; }
+    var g=isV2?sched:null;
+    $('gameLeg').classList.toggle('hide',!g);
+    lineChart(el,{n:ser.length,label:'Visits per day',peak:true,
+      series:[{name:'Visits',color:'#16c45b',area:true,vals:ser.map(function(x){ return +x.visits||0; })}],
+      marks:g?ser.map(function(x){ return !!g[x.day]; }):null,
+      xlab:function(i){ return dShort(ser[i].day); },
+      tip:function(i){
+        var x=ser[i], gm=g&&g[x.day];
+        return '<div class="h">'+esc(dLong(x.day))+'</div>'+tipRow('#16c45b',fmt(x.visits),'visits')+
+          (x.fans!=null?tipRow('transparent',fmt(x.fans),'fans'):'')+(x.new_fans!=null?tipRow('transparent',fmt(x.new_fans),'new fans'):'')+
+          (gm?'<div class="x">\u{1F3C0} Celtics '+esc(gameText(gm))+'</div>':'');
+      }});
+  }
+
+  function drawGame(){
+    var box=$('gameBox'), s=data, ser=(s&&s.series)||[];
+    if(!sched){ $('gameAside').textContent=''; box.innerHTML='<p class="empty">Couldn\'t load the Celtics schedule from ESPN right now - try again in a bit.</p>'; return; }
+    var since=s.since?etDate(s.since):null, today=etDate(Date.now());
+    var gd={}, gN=0, oN=0, gV=0, oV=0, w=0, l=0;
+    ser.forEach(function(x){
+      if(since&&x.day<since) return;
+      var gm=sched[x.day];
+      if(gm){ gd[x.day]=1; if(gm.res){ if(gm.res.charAt(0)==='W') w++; else l++; } }
+      if(x.day===today) return;               // today isn't over yet
+      if(gm){ gN++; gV+=+x.visits||0; } else { oN++; oV+=+x.visits||0; }
+    });
+    var gA=gN?gV/gN:null, oA=oN?oV/oN:null;
+    $('gameAside').textContent=(gN||w||l)?('Celtics went '+w+'-'+l+' in this range'):'';
+    if(!gN&&!Object.keys(gd).length){
+      box.innerHTML='<p class="empty">No Celtics games in this range'+(oN?' - average day had '+fmt(Math.round(oA))+' visits':'')+'. Pick a longer range to compare.</p>';
+      return;
+    }
+    var lift=(gA!=null&&oA)?Math.round((gA-oA)/oA*100):null;
+    box.innerHTML='<div class="gfig"><div><div class="k"><i style="background:var(--s-game)"></i>Game days</div><div class="n">'+(gA!=null?fmt(Math.round(gA)):'-')+' <small>visits/day</small></div></div>'+
+      '<div><div class="k"><i style="background:var(--s-off)"></i>Off days</div><div class="n">'+(oA!=null?fmt(Math.round(oA)):'-')+' <small>visits/day</small></div></div>'+
+      '<div><div class="k">Game bump</div><div class="n">'+(lift==null?'-':(lift>0?'+':'')+lift+'%')+'</div></div></div>'+
+      '<div class="legend" style="margin-bottom:6px"><span><i class="ln" style="background:var(--s-game)"></i>Game days ('+gN+')</span><span><i class="ln" style="background:var(--s-off)"></i>Off days ('+oN+')</span><span>avg visits by hour, ET</span></div>'+
+      '<div class="chart" id="cHourly"></div>';
+    var gh=new Array(24).fill(0), oh=new Array(24).fill(0);
+    (s.hourly||[]).forEach(function(r){ if(r[0]===today) return; if(gd[r[0]]) gh[r[1]]+=+r[2]; else oh[r[1]]+=+r[2]; });
+    var gs=gh.map(function(v){ return gN?Math.round(v/gN*10)/10:0; }), os=oh.map(function(v){ return oN?Math.round(v/oN*10)/10:0; });
+    lineChart($('cHourly'),{n:24,h:200,label:'Average visits by hour, game days vs off days',
+      xat:function(W){ return W<520?[0,6,12,18,23]:[0,3,6,9,12,15,18,21,23]; },
+      series:[{name:'Off days',color:'#9085e9',vals:os},{name:'Game days',color:'#13a650',vals:gs}],
+      xlab:function(i){ return i===23?'11p':hrS(i); },
+      tip:function(i){ return '<div class="h">'+hr(i)+' to '+hr((i+1)%24)+' ET</div>'+tipRow('#13a650',gs[i],'game days')+tipRow('#9085e9',os[i],'off days'); }});
+  }
+
+  function drawHeat(cells){
+    var m={}, max=0;
+    cells.forEach(function(c){ m[c[0]+'_'+c[1]]=+c[2]; if(+c[2]>max) max=+c[2]; });
+    var D=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], o='<div class="heat" role="img" aria-label="Visits by weekday and hour"><span></span>';
+    for(var h=0;h<24;h++) o+='<span class="hn">'+(h%6===0?hrS(h):'')+'</span>';
+    for(var d=1;d<=7;d++){
+      o+='<span class="dn">'+D[d-1]+'</span>';
+      for(h=0;h<24;h++){
+        var v=m[d+'_'+h]||0, a=v?(0.14+0.86*Math.sqrt(v/max)).toFixed(2):0;
+        o+='<span class="c" data-t="'+D[d-1]+' '+hr(h)+'" data-v="'+v+'"'+(v?' style="background:rgba(22,196,91,'+a+')"':'')+'></span>';
+      }
+    }
+    o+='</div><div class="hlegend">Fewer <span class="g"></span> More'+(max?' <span style="margin-left:auto">busiest hour: '+fmt(max)+' visits</span>':'')+'</div>';
+    var wd=[0,0,0,0,0,0,0]; cells.forEach(function(c){ wd[c[0]-1]+=+c[2]; });
+    var wmax=Math.max.apply(null,wd)||1;
+    o+='<div class="wk"><div class="wkh">By day of week</div><div class="wkc">'+wd.map(function(v,i){
+      return '<div class="col" data-t="'+D[i]+'" data-v="'+v+'"><span class="cv">'+compact(v)+'</span><span class="cb" style="height:calc((100% - 36px) * '+Math.max(0.02,v/wmax).toFixed(3)+')"></span><span class="cd">'+D[i]+'</span></div>';
+    }).join('')+'</div></div>';
+    var el=$('heat'); el.innerHTML=o;
+    el.querySelector('.heat').onpointermove=function(ev){
+      var c=ev.target.closest('.c'); if(!c){ hideTip(); return; }
+      showTip('<div class="h">'+esc(c.dataset.t)+' ET</div>'+tipRow('#16c45b',fmt(c.dataset.v),'visits'),ev.clientX,ev.clientY);
+    };
+    el.querySelector('.heat').onpointerleave=hideTip;
+  }
+
+  /* ---------- basic render (before STEP 2) ---------- */
+  function renderV1(s){
+    document.querySelectorAll('[data-v2]').forEach(function(el){ el.classList.add('hide'); });
+    $('banner').hidden=false; $('seg').classList.add('off'); $('grid').classList.remove('hide');
+    $('live').classList.add('hide');
+    $('sub').textContent=s.since?fmt(s.views)+' page views since '+new Date(s.since).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+'.'
+      :'No visits recorded yet - check back after a few people stop by.';
+    $('kpis').innerHTML=tile('Visits',fmt(s.visits),'all time')+tile('Fans',fmt(s.fans),'different browsers')+
+      tile('Today',fmt(s.today),'visits since midnight ET')+tile('Regulars',fmt(s.returning),'fans who came back');
+    $('dailyTitle').textContent='Visits per day - last 30 days';
+    drawDaily();
+    var pg=s.pages||[];
+    $('tPages').innerHTML='';
+    barList($('tPages'),pg.map(function(p){ return {label:prettyPath(p.path),value:+p.views}; }),{limit:10});
+    barList($('lSources'),mergeBy(s.sources,function(x){ return srcName(x.source==='Direct / bookmark / app'?null:x.source); },'visits'));
+    barList($('lDevices'),(s.devices||[]).map(function(x){ return {label:cap(x.device==='unknown'?'':x.device),value:+x.visits}; }));
+  }
+
+  /* ---------- range buttons, refresh, resize ---------- */
+  function setRange(d){
+    days=d; lset('tt_stats_days',String(d));
+    [].forEach.call($('seg').children,function(b){ b.setAttribute('aria-pressed',String(+b.dataset.d===d)); });
+  }
+  $('seg').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b||+b.dataset.d===days) return;
+    setRange(+b.dataset.d); loading=false; load();
   });
+  setRange(days);
+  setInterval(function(){ if(document.visibilityState==='visible') load(true); },60000);
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='visible'&&Date.now()-lastLoad>60000) load(true);
+  });
+  var rz=0, lastW=window.innerWidth;
+  window.addEventListener('resize',function(){
+    if(window.innerWidth===lastW) return; lastW=window.innerWidth;
+    clearTimeout(rz); rz=setTimeout(function(){ if(data){ drawDaily(); if(data.version>=2&&sched) drawGame(); } },150);
+  });
+  document.addEventListener('scroll',hideTip,{passive:true});
+
+  /* ---------- ?mock=1 preview data (layout testing only) ---------- */
+  function rnd(seed){ return function(){ seed=(seed*16807)%2147483647; return (seed-1)/2147483646; }; }
+  function mockSchedule(from,to){
+    var g={}, r=rnd(7), opp=['NYK','PHI','MIA','MIL','TOR','BKN','CLE','ORL','ATL','CHI','DET','IND','LAL','GSW','DEN'];
+    for(var d=from;d<=to;d=addDays(d,1)){ var m=+d.slice(5,7); if((m>=10||m<=4)&&r()<0.45){ var w=r()<0.68;
+      g[d]={opp:opp[Math.floor(r()*opp.length)],home:r()<0.5,type:2,res:d<etDate(Date.now())?(w?'W ':'L ')+(100+Math.floor(r()*25))+'-'+(95+Math.floor(r()*20)):''}; } }
+    return g;
+  }
+  function mockV2(d){
+    var r=rnd(42), today=etDate(Date.now()), start=d?addDays(today,-(d-1)):'2026-08-20', ser=[], hourly=[], heat={};
+    var games=mockSchedule(start,today);
+    for(var day=start;day<=today;day=addDays(day,1)){
+      var base=40+ser.length*0.25, wk=dayObj(day).getDay(), gm=!!games[day];
+      var v=Math.round(base*(wk===0||wk===6?0.8:1)*(gm?1.7:1)*(0.75+r()*0.5)*(day===today?0.55:1));
+      ser.push({day:day,visits:v,fans:Math.round(v*0.78),views:Math.round(v*2.3),new_fans:Math.round(v*0.3)});
+      for(var h=0;h<24;h++){ var w=h<6?0.15:h<11?0.6:h<17?0.9:h<19?1.2:h<23?(gm?3.2:1.4):0.6, n=Math.round(v/24*w*(0.6+r()*0.8));
+        if(n){ hourly.push([day,h,n]); var k=(wk||7)+'_'+h; heat[k]=(heat[k]||0)+n; } }
+    }
+    var sum=function(k){ return ser.reduce(function(a,x){ return a+x[k]; },0); }, V=sum('visits');
+    var tot={visits:V,fans:Math.round(V*0.62),views:sum('views'),new_fans:sum('new_fans'),returning_fans:Math.round(V*0.2),pages_per_visit:2.31,bounce:46.2,avg_seconds:94,avg_scroll:58};
+    var prev={visits:Math.round(V*0.86),fans:Math.round(V*0.55),views:Math.round(sum('views')*0.9),new_fans:Math.round(sum('new_fans')*1.1),pages_per_visit:2.12,bounce:49.8,avg_seconds:88,avg_scroll:55};
+    var sc=function(list){ return list.map(function(x){ var o={}; for(var k in x) o[k]=typeof x[k]==='number'?Math.max(1,Math.round(x[k]*V/1000)):x[k]; return o; }); };
+    var ps=Object.keys(titles); if(ps.length<6) ps=['celtics-beat-the-knicks-in-overtime','jayson-tatum-return-timeline','trade-deadline-preview','ten-takeaways-from-opening-night','baylor-scheierman-proving-his-worth-off-the-bench','draft-night-recap'];
+    var pages=[{path:'/',views:900,fans:520,avg_seconds:71,avg_scroll:44}].concat(ps.slice(0,11).map(function(p,i){ return {path:(i%2?'/#/post/':'/post/')+p+(i%2?'':'/'),views:Math.round(420/(i+1.3)),fans:Math.round(330/(i+1.4)),avg_seconds:60+Math.round(r()*240),avg_scroll:30+Math.round(r()*65)}; }));
+    var cities=[['Boston','Massachusetts','US',260],['Worcester','Massachusetts','US',70],['Providence','Rhode Island','US',52],['Manchester','New Hampshire','US',40],['New York','New York','US',33],['Hartford','Connecticut','US',25],['Toronto','Ontario','CA',14],['Dublin','Leinster','IE',9],['London','England','GB',8],['Portland','Maine','US',8]];
+    var src=['google.com','facebook','l.facebook.com','t.co','reddit.com','threads.net','bing.com','instagram.com',null];
+    var recent=[];
+    for(var i=0;i<20;i++){ var c=cities[Math.floor(r()*cities.length)];
+      recent.push({at:new Date(Date.now()-i*i*95000-r()*60000).toISOString(),country:c[2],region:c[1],city:c[0],device:r()<0.7?'phone':'desktop',
+        browser:['Safari','Chrome','Chrome','Edge','Samsung'][Math.floor(r()*5)],os:r()<0.5?'iOS':r()<0.5?'Android':'Windows',
+        path:pages[Math.floor(r()*pages.length)].path,source:src[Math.floor(r()*src.length)],new_fan:r()<0.25}); }
+    return {version:2,days:d,since:'2026-08-20T14:00:00Z',all_time:{visits:Math.round(V*(d?4:1)),fans:Math.round(V*(d?2.4:0.62)),views:Math.round(V*(d?9:2.3))},
+      totals:tot,prev:d?prev:null,today:{visits:ser[ser.length-1].visits,fans:ser[ser.length-1].fans,views:ser[ser.length-1].views,yesterday:ser.length>1?ser[ser.length-2].visits:0,yesterday_so_far:Math.round(ser[ser.length-1].visits*0.9)},
+      peak:{day:addDays(today,-12),visits:Math.round(base*2.4)},active:7,series:ser,hourly:hourly,
+      heat:Object.keys(heat).map(function(k){ var a=k.split('_'); return [+a[0],+a[1],heat[k]]; }),
+      countries:sc([{country:'US',visits:880,fans:640},{country:'CA',visits:38,fans:30},{country:'GB',visits:21,fans:17},{country:'IE',visits:14,fans:11},{country:'AU',visits:9,fans:8},{country:'PH',visits:7,fans:6},{country:'DE',visits:5,fans:5},{country:null,visits:26,fans:20}]),
+      regions:sc([{region:'Massachusetts',visits:520},{region:'New Hampshire',visits:88},{region:'Rhode Island',visits:61},{region:'New York',visits:44},{region:'Connecticut',visits:39},{region:'Maine',visits:30},{region:'Florida',visits:22},{region:'California',visits:18},{region:'Texas',visits:12}]),
+      cities:sc(cities.map(function(c){ return {city:c[0],region:c[1],country:c[2],visits:c[3]}; })),
+      sources:sc([{source:null,visits:420},{source:'facebook',visits:180},{source:'l.facebook.com',visits:95},{source:'google.com',visits:150},{source:'t.co',visits:48},{source:'reddit.com',visits:40},{source:'threads.net',visits:22},{source:'instagram.com',visits:18},{source:'bing.com',visits:9}]),
+      devices:sc([{name:'phone',visits:690},{name:'desktop',visits:260},{name:'tablet',visits:50}]),
+      browsers:sc([{name:'Safari',visits:430},{name:'Chrome',visits:380},{name:'Edge',visits:70},{name:'Samsung',visits:60},{name:'Firefox',visits:30},{name:'Other',visits:10}]),
+      os:sc([{name:'iOS',visits:520},{name:'Android',visits:200},{name:'Windows',visits:170},{name:'macOS',visits:90},{name:'Linux',visits:6}]),
+      langs:sc([{name:'en',visits:950},{name:'es',visits:20},{name:'fr',visits:12},{name:'pt',visits:6}]),
+      screens:sc([{name:'400-767',visits:610},{name:'<400',visits:90},{name:'1280-1919',visits:200},{name:'768-1279',visits:70},{name:'1920+',visits:30}]),
+      pages:pages,entries:pages.slice(0,8).map(function(p){ return {path:p.path,visits:Math.round(p.views*0.6)}; }),recent:recent};
+  }
+  function mockV1(){
+    var m=mockV2(30);
+    return {visits:m.all_time.visits,fans:m.all_time.fans,views:m.all_time.views,since:m.since,today:m.today.visits,returning:412,
+      days:m.series.slice().reverse().map(function(x){ return {day:x.day,visits:x.visits,fans:x.fans}; }),
+      pages:m.pages.map(function(p){ return {path:p.path,views:p.views}; }),
+      sources:m.sources.map(function(x){ return {source:x.source||'Direct / bookmark / app',visits:x.visits}; }),
+      devices:m.devices.map(function(x){ return {device:x.name,visits:x.visits}; })};
+  }
+
+  load();
 })();
 </script>
 </body>

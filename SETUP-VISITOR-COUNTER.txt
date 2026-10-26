@@ -119,3 +119,239 @@ HOW IT COUNTS
   - Post pages (tatumtime.net/post/...) count too, so shared links
     show up under "Most-read pages".
 ================================================================
+
+
+================================================================
+  STEP 2 - UPGRADE (run once)  -  countries, time on page, more stats
+================================================================
+
+This makes the stats page a lot richer:
+
+  - which COUNTRIES, US STATES and CITIES visitors come from
+    (looked up by Cloudflare - the site still never stores IP addresses)
+  - how long people stay on each post and how far they scroll
+  - browsers, phones vs computers, languages, screen sizes
+  - busiest days and hours, game days vs off days, who's on right now
+  - a 7 / 30 / 90 day / all-time switch, with "vs the period before"
+
+Run it once, the same way as above:
+  Supabase -> SQL Editor -> New query -> paste + Run.
+
+It only ADDS things - every visit already counted stays, and the
+footer counter keeps working. Running it a second time by accident
+is harmless. Until it's run, the stats page shows the basic numbers
+plus a reminder banner.
+
+-------------------- copy from here --------------------
+-- 1. New columns on the visits table (old rows just leave them empty).
+alter table site_visits add column if not exists country text;
+alter table site_visits add column if not exists region  text;
+alter table site_visits add column if not exists city    text;
+alter table site_visits add column if not exists browser text;
+alter table site_visits add column if not exists os      text;
+alter table site_visits add column if not exists lang    text;
+alter table site_visits add column if not exists tz      text;
+alter table site_visits add column if not exists screen  text;
+alter table site_visits add column if not exists source  text;
+
+create index if not exists site_visits_visitor on site_visits (visitor);
+create index if not exists site_visits_session on site_visits (session);
+
+-- 2. The insert rule now also checks the new columns.
+drop policy if exists "public can log a visit" on site_visits;
+create policy "public can log a visit"
+  on site_visits for insert
+  to anon
+  with check ( char_length(visitor) between 8 and 40
+               and char_length(session) between 8 and 40
+               and char_length(path) between 1 and 200
+               and (referrer is null or char_length(referrer) <= 100)
+               and (device is null or device in ('phone','tablet','desktop'))
+               and (country is null or country ~ '^[A-Z0-9]{2}$')
+               and (region is null or char_length(region) between 1 and 60)
+               and (city is null or char_length(city) between 1 and 60)
+               and (browser is null or browser in ('Chrome','Safari','Edge','Firefox','Samsung','Other'))
+               and (os is null or os in ('iOS','Android','Windows','macOS','Linux','Other'))
+               and (lang is null or lang ~ '^[a-z]{2}$')
+               and (tz is null or char_length(tz) between 1 and 50)
+               and (screen is null or screen in ('<400','400-767','768-1279','1280-1919','1920+'))
+               and (source is null or char_length(source) between 1 and 40) );
+
+-- 3. Time on page + scroll depth, one row per page view.
+create table if not exists site_engagement (
+  id          bigint generated always as identity primary key,
+  session     text not null,
+  path        text not null,
+  seconds     int  not null,
+  scroll      int  not null,
+  created_at  timestamptz not null default now()
+);
+create index if not exists site_engagement_created_at on site_engagement (created_at);
+
+alter table site_engagement enable row level security;
+grant insert on site_engagement to anon;
+
+drop policy if exists "public can log engagement" on site_engagement;
+create policy "public can log engagement"
+  on site_engagement for insert
+  to anon
+  with check ( char_length(session) between 8 and 40
+               and char_length(path) between 1 and 200
+               and seconds between 0 and 3600
+               and scroll between 0 and 100 );
+
+-- 4. Headline numbers for any stretch of time (used by visit_stats only).
+create or replace function visit_totals(s timestamptz, e timestamptz) returns json
+language sql stable security definer set search_path = public as $$
+  with v  as (select * from site_visits where created_at >= s and created_at < e),
+       ss as (select session, count(*) as n from v group by session),
+       en as (select seconds, scroll from site_engagement where created_at >= s and created_at < e)
+  select json_build_object(
+    'visits',          (select count(*) from ss),
+    'fans',            (select count(distinct visitor) from v),
+    'views',           (select count(*) from v),
+    'new_fans',        (select count(*) from (select visitor from site_visits group by visitor
+                         having min(created_at) >= s and min(created_at) < e) x),
+    'returning_fans',  (select count(*) from (select visitor from site_visits
+                         where created_at < e and visitor in (select visitor from v)
+                         group by visitor having count(distinct session) > 1) x),
+    'pages_per_visit', (select round(avg(n), 2) from ss),
+    'bounce',          (select round(100.0 * count(*) filter (where n = 1) / nullif(count(*), 0), 1) from ss),
+    'avg_seconds',     (select round(avg(seconds)) from en),
+    'avg_scroll',      (select round(avg(scroll)) from en)
+  );
+$$;
+revoke all on function visit_totals(timestamptz, timestamptz) from public;
+revoke all on function visit_totals(timestamptz, timestamptz) from anon;
+revoke all on function visit_totals(timestamptz, timestamptz) from authenticated;
+
+-- 5. The stats page. visit_stats(7), visit_stats(30), visit_stats(90), visit_stats(0) = all time.
+drop function if exists visit_stats();
+create or replace function visit_stats(days int default 30) returns json
+language sql stable security definer set search_path = public as $$
+  with p as (
+    select greatest(coalesce(visit_stats.days, 30), 0) as d,
+           (now() at time zone 'America/New_York')::date as today
+  ),
+  r as (
+    select d, today,
+           case when d > 0 then ((today - (d - 1))::timestamp at time zone 'America/New_York')
+                else '-infinity'::timestamptz end as s,
+           case when d > 0 then ((today - (d - 1))::timestamp at time zone 'America/New_York') - make_interval(days => d) end as ps,
+           case when d > 0 then now() - make_interval(days => d) end as pe
+    from p
+  ),
+  v as (
+    select sv.*, (sv.created_at at time zone 'America/New_York') as et
+    from site_visits sv, r where sv.created_at >= r.s
+  ),
+  e as (select se.* from site_engagement se, r where se.created_at >= r.s),
+  fs as (select visitor, min(created_at) as first_at from site_visits group by visitor),
+  allday as (
+    select (created_at at time zone 'America/New_York')::date as day,
+           count(distinct session) as visits, count(distinct visitor) as fans, count(*) as views
+    from site_visits group by 1
+  ),
+  bounds as (
+    select coalesce(case when r.d > 0 then r.today - (r.d - 1) end,
+                    (select min(day) from allday), r.today) as d0, r.today as d1
+    from r
+  )
+  select json_build_object(
+    'version',  2,
+    'days',     (select d from r),
+    'now',      now(),
+    'since',    (select min(created_at) from site_visits),
+    'all_time', (select json_build_object('visits', count(distinct session),
+                   'fans', count(distinct visitor), 'views', count(*)) from site_visits),
+    'totals',   (select visit_totals(r.s, now() + interval '1 minute') from r),
+    'prev',     (select case when r.d > 0 then visit_totals(r.ps, r.pe) end from r),
+    'today',    (select json_build_object(
+                   'visits', count(distinct session) filter (where a.created_at >= r.today::timestamp at time zone 'America/New_York'),
+                   'fans',   count(distinct visitor) filter (where a.created_at >= r.today::timestamp at time zone 'America/New_York'),
+                   'views',  count(*) filter (where a.created_at >= r.today::timestamp at time zone 'America/New_York'),
+                   'yesterday', count(distinct session) filter (where a.created_at < r.today::timestamp at time zone 'America/New_York'),
+                   'yesterday_so_far', count(distinct session) filter (where a.created_at < now() - interval '1 day'))
+                 from site_visits a, r
+                 where a.created_at >= (r.today - 1)::timestamp at time zone 'America/New_York'),
+    'peak',     (select row_to_json(x) from (select day, visits from allday order by visits desc, day desc limit 1) x),
+    'active',   (select count(distinct session) from site_visits where created_at > now() - interval '30 minutes'),
+    'series',   (select coalesce(json_agg(x order by x.day), '[]') from (
+                   select g.day::date as day,
+                          coalesce(a.visits, 0) as visits, coalesce(a.fans, 0) as fans, coalesce(a.views, 0) as views,
+                          (select count(*) from fs where (fs.first_at at time zone 'America/New_York')::date = g.day::date) as new_fans
+                   from bounds b
+                   cross join generate_series(b.d0::timestamp, b.d1::timestamp, interval '1 day') g(day)
+                   left join allday a on a.day = g.day::date) x),
+    'heat',     (select coalesce(json_agg(json_build_array(dow, hr, n)), '[]') from (
+                   select extract(isodow from et)::int as dow, extract(hour from et)::int as hr,
+                          count(distinct session) as n
+                   from v group by 1, 2) x),
+    'hourly',   (select coalesce(json_agg(json_build_array(day, hr, n)), '[]') from (
+                   select et::date as day, extract(hour from et)::int as hr, count(distinct session) as n
+                   from v group by 1, 2) x),
+    'countries',(select coalesce(json_agg(x), '[]') from (
+                   select country, count(distinct session) as visits, count(distinct visitor) as fans
+                   from v group by 1 order by visits desc limit 40) x),
+    'regions',  (select coalesce(json_agg(x), '[]') from (
+                   select region, count(distinct session) as visits
+                   from v where country = 'US' and region is not null
+                   group by 1 order by visits desc limit 30) x),
+    'cities',   (select coalesce(json_agg(x), '[]') from (
+                   select city, region, country, count(distinct session) as visits
+                   from v where city is not null
+                   group by 1, 2, 3 order by visits desc limit 25) x),
+    'sources',  (select coalesce(json_agg(x), '[]') from (
+                   select coalesce(source, referrer) as source, count(distinct session) as visits
+                   from v group by 1 order by visits desc limit 30) x),
+    'devices',  (select coalesce(json_agg(x), '[]') from (
+                   select device as name, count(distinct session) as visits from v group by 1 order by visits desc) x),
+    'browsers', (select coalesce(json_agg(x), '[]') from (
+                   select browser as name, count(distinct session) as visits from v group by 1 order by visits desc) x),
+    'os',       (select coalesce(json_agg(x), '[]') from (
+                   select os as name, count(distinct session) as visits from v group by 1 order by visits desc) x),
+    'langs',    (select coalesce(json_agg(x), '[]') from (
+                   select lang as name, count(distinct session) as visits from v group by 1 order by visits desc limit 15) x),
+    'screens',  (select coalesce(json_agg(x), '[]') from (
+                   select screen as name, count(distinct session) as visits from v group by 1 order by visits desc) x),
+    'pages',    (select coalesce(json_agg(x order by x.views desc), '[]') from (
+                   select pv.path, pv.views, pv.fans, en.avg_seconds, en.avg_scroll
+                   from (select path, count(*) as views, count(distinct visitor) as fans
+                         from v group by path order by views desc limit 30) pv
+                   left join (select path, round(avg(seconds)) as avg_seconds, round(avg(scroll)) as avg_scroll
+                              from e group by path) en on en.path = pv.path) x),
+    'entries',  (select coalesce(json_agg(x), '[]') from (
+                   select path, count(*) as visits from (
+                     select distinct on (session) session, path from v order by session, created_at) f
+                   group by path order by visits desc limit 15) x),
+    'recent',   (select coalesce(json_agg(x order by x.at desc), '[]') from (
+                   select sv.created_at as at, sv.country, sv.region, sv.city, sv.device, sv.browser, sv.os,
+                          sv.path, coalesce(sv.source, sv.referrer) as source,
+                          (sv.created_at = fs.first_at) as new_fan
+                   from site_visits sv join fs on fs.visitor = sv.visitor
+                   order by sv.created_at desc limit 20) x)
+  );
+$$;
+
+grant execute on function visit_stats(int) to anon;
+grant execute on function visit_counter() to anon;
+
+-- Tell the Supabase API about the new function right away.
+notify pgrst, 'reload schema';
+--------------------- to here --------------------------
+
+After it runs, reload https://tatumtime.net/stats/ - the reminder
+banner goes away. New details (country, time on page...) fill in
+from new visits on; older visits show as "Unknown" there.
+
+WHAT'S NEW ON THE STATS PAGE
+  - Visits = browsing sessions, Fans = different browsers (same as before).
+  - New fans = first-ever visit in the period. Returning = fans who
+    have come back at least once.
+  - Time on page counts only while the page is actually on screen
+    (capped at 1 hour), scroll = how far down the page they got.
+  - Bounce rate = visits that only looked at one page.
+  - Game days come from the Celtics schedule on ESPN, so you can see
+    how much traffic a game night brings compared with an off day.
+  - "Here now" = visits that opened a page in the last 30 minutes.
+================================================================

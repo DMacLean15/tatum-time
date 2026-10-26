@@ -41,6 +41,14 @@ function captionImages(html){
     return cap ? '<figure>'+img+'<figcaption>'+cap+'</figcaption></figure>' : '<figure>'+img+'</figure>';
   });
 }
+/* the small WebP copy made by build-images.js (same naming as imgVariant() in
+   index.html); falls back to the original photo if the copy is missing */
+function heroImg(p){
+  const m = String(p.hero).match(/^\/?images\/uploads\/([^\/?#]+)\.(jpe?g|png|webp|avif)$/i);
+  const src = m ? '/images/uploads/_v/' + m[1] + '-1200.webp' : p.hero;
+  const fb = m ? ` onerror="this.onerror=null;this.src='${esc(p.hero)}'"` : '';
+  return `<img class="hero-img" src="${esc(src)}"${fb} alt="${esc(p.title)}" />`;
+}
 function absUrl(u){
   u = String(u||'').trim();
   if (!u) return '';
@@ -216,9 +224,12 @@ ${JSON.stringify({
   mainEntityOfPage:url
 }, null, 0)}
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+<style>
+@font-face{font-family:'Anton';font-weight:400;font-display:swap;src:url(/fonts/anton-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Inter';font-weight:400 800;font-display:swap;src:url(/fonts/inter-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Inter';font-weight:400 800;font-display:swap;src:url(/fonts/inter-latin-ext.woff2) format('woff2')}
+</style>
 <link rel="alternate" type="application/rss+xml" title="Tatum Time - Celtics Blog" href="/feed.xml" />
 <style>${CSS}</style>
 </head>
@@ -231,7 +242,7 @@ ${JSON.stringify({
   <div class="cat">${esc(p.cat)}</div>
   <h1>${p.emoji} ${esc(p.title)}</h1>
   <div class="meta"><b>Dan MacLean</b> · ${esc(fmtDisplayDate(p.date))} · ${p.readMins} min read</div>
-  ${p.hero ? `<img class="hero-img" src="${esc(p.hero)}" alt="${esc(p.title)}" />` : ''}
+  ${p.hero ? heroImg(p) : ''}
   <div class="article">${p.body}</div>
   ${related && related.length ? `<div class="more"><div class="more-lbl">More from Tatum Time</div>${related.map(r => `<a class="more-link" href="/post/${r.slug}/">${r.emoji} ${esc(r.title)}<span class="more-cat">${esc(r.cat)}</span></a>`).join('')}</div>` : ''}
   <div class="join">

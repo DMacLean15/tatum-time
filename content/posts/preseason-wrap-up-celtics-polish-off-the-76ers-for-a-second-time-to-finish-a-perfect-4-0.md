@@ -2,7 +2,7 @@
 title: "Preseason Wrap-Up: Celtics Polish Off The 76ers For A Second Time To
   Finish A Perfect 4-0"
 emoji: ☘️
-image: /images/uploads/nba-basketball-tickets-1.jxl
+image: /images/uploads/nba-basketball-tickets-1.jpg
 imageFocus: Center
 category: Recap
 featured: false

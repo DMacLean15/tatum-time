@@ -11,7 +11,11 @@
    - respects EXIF rotation (phone photos stay right-side up)
    - keeps the original if compression doesn't save at least 10%
    - if sharp isn't installed (e.g. a local run without npm install), it just
-     logs and moves on - the build never breaks because of this step.        */
+     logs and moves on - the build never breaks because of this step.
+   Also writes small WebP copies the site prefers (it falls back to the original
+   if one is missing): images/uploads/_v/<name>-480.webp for list thumbnails and
+   cards, <name>-1200.webp for hero and article photos. Only deployed copies -
+   nothing new lands in the repo.                                              */
 const fs = require('fs');
 const path = require('path');
 
@@ -23,6 +27,7 @@ const DIR = path.join('images', 'uploads');
 const MIN_BYTES = 250 * 1024;   // leave small files alone
 const MAX_WIDTH = 1600;
 const QUALITY = 80;
+const VARIANT_WIDTHS = [480, 1200];
 
 async function run() {
   let files = [];
@@ -60,6 +65,25 @@ async function run() {
     }
   }
   console.log('build-images: compressed ' + done + ' of ' + files.length + ' photos, saved ' + (saved / 1048576).toFixed(1) + ' MB');
+
+  // WebP variants (from the already-shrunk file). Names must match imgVariant() in index.html.
+  const VDIR = path.join(DIR, '_v');
+  try { fs.mkdirSync(VDIR, { recursive: true }); } catch (e) {}
+  let made = 0;
+  for (const f of fs.readdirSync(DIR).filter(f => /\.(jpe?g|png|webp|avif)$/i.test(f))) {
+    const base = f.replace(/\.[^.]+$/, '');
+    try {
+      const input = fs.readFileSync(path.join(DIR, f));
+      for (const w of VARIANT_WIDTHS) {
+        const buf = await sharp(input).rotate().resize({ width: w, withoutEnlargement: true }).webp({ quality: 74 }).toBuffer();
+        fs.writeFileSync(path.join(VDIR, base + '-' + w + '.webp'), buf);
+        made++;
+      }
+    } catch (e) {
+      console.log('build-images: no WebP for ' + f + ' (' + e.message + ')');
+    }
+  }
+  console.log('build-images: wrote ' + made + ' WebP variants');
 }
 
 module.exports = run();
