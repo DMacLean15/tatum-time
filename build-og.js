@@ -6,6 +6,7 @@
    build-pages.js points each post page's og:image at its card, and falls back to
    the post photo if a card is missing. Like build-images.js, this never breaks the
    build: without sharp (or if anything fails) it logs and moves on.
+   Uses each post's slug + hero from posts.json (build-posts.js).
    Fonts: build-assets/*.ttf (SIL Open Font License, see build-assets/OFL-*.txt). */
 const fs = require('fs');
 const path = require('path');
@@ -15,26 +16,14 @@ const OUT = 'og';
 const ANTON = path.join('build-assets', 'Anton-Regular.ttf');
 const INTER = path.join('build-assets', 'Inter.ttf');
 
-const slugify = s => (String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60) || 'post');
+const TT = require('./js/shared.js');
 const xml = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-function niceDate(s) {
-  const iso = String(s||'').match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (iso) return M[+iso[2]-1] + ' ' + (+iso[3]) + ', ' + iso[1];
-  const d = new Date(s); return isNaN(d) ? '' : M[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
-}
 function gravity(focus) {
   switch (String(focus||'').toLowerCase()) {
     case 'top': return 'north'; case 'bottom': return 'south';
     case 'left': return 'west'; case 'right': return 'east';
     default: return 'centre';
   }
-}
-/* first photo in the post if no Featured Photo was picked (same rule as the site) */
-function heroOf(p) {
-  if (p.image && p.image.trim()) return p.image.trim();
-  const m = String(p.body||'').match(/!\[[^\]]*\]\(([^)\s]+)/) || String(p.html||'').match(/<img[^>]*\bsrc="([^"]+)"/i);
-  return m ? m[1] : '';
 }
 
 async function run() {
@@ -45,6 +34,8 @@ async function run() {
   try { posts = JSON.parse(fs.readFileSync(path.join('content','posts.json'),'utf8')).posts || []; }
   catch (e) { console.log('build-og: no posts.json - nothing to do.'); return; }
   if (!fs.existsSync(ANTON)) { console.log('build-og: fonts missing - skipping.'); return; }
+  // fresh slate so deleted/renamed posts don't leave stale cards behind
+  fs.rmSync(OUT, { recursive: true, force: true });
   fs.mkdirSync(OUT, { recursive: true });
 
   const text = (markup, font, file, opts) => sharp({ text: Object.assign({ text: markup, font, fontfile: file, rgba: true }, opts) })
@@ -71,13 +62,14 @@ async function run() {
 
   let made = 0;
   for (const p of posts) {
-    if (!p.title) continue;
-    const slug = slugify(p.title);
+    if (!p.title || !p.slug || !TT.isPublished(p.date)) continue;   // posts.json has no scheduled posts; belt and braces
+    const slug = p.slug;
     try {
       // background: the post photo, cropped to 1200x630 around its focus point
       let bg = null;
-      const hero = heroOf(p);
-      const local = hero && /^\/?images\/uploads\//.test(hero) ? hero.replace(/^\//,'') : '';
+      const hero = p.hero || '';
+      let local = hero && /^\/?images\/uploads\//.test(hero) ? hero.replace(/^\//,'').replace(/[?#].*$/,'') : '';
+      try { local = decodeURIComponent(local); } catch (e) {}
       if (local && fs.existsSync(local)) {
         try {
           bg = await sharp(fs.readFileSync(local)).rotate()
@@ -92,7 +84,7 @@ async function run() {
       const title = await text('<span foreground="#ffffff">' + xml(p.title.toUpperCase()) + '</span>', 'Anton', ANTON,
         { width: W - PAD*2, height: tH, wrap: 'word', align: 'left' });
       const cat = await text('<span foreground="#16c45b" letter_spacing="2600"><b>' + xml(String(p.category||'Post').toUpperCase()) + '</b></span>', 'Inter Bold 22', INTER, {});
-      const meta = await text('<span foreground="#c9d6ce">Dan MacLean  ·  ' + xml(niceDate(p.date)) + '</span>', 'Inter 24', INTER, {});
+      const meta = await text('<span foreground="#c9d6ce">Dan MacLean  ·  ' + xml(TT.fmtDisplayDate(p.date)) + '</span>', 'Inter 24', INTER, {});
 
       const metaTop = H - PAD - meta.info.height + 6;
       const titleTop = metaTop - 18 - title.info.height;
@@ -115,4 +107,4 @@ async function run() {
   console.log('build-og: wrote ' + made + ' preview cards to ' + OUT + '/');
 }
 
-module.exports = run();
+module.exports = run().catch(e => console.log('build-og: stopped early (' + e.message + ') - pages fall back to the post photo.'));

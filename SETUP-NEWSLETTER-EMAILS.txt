@@ -51,4 +51,76 @@ STEP 3 - GIVE DAN HIS LINK
     - Every subscriber gets an individual email; addresses are
       never visible to each other.
     - It always sends the NEWEST published post.
-    - Clicking "Send now" twice sends twice - one click per post.
+    - Each post can only be sent ONCE. Opening or refreshing the
+      link never sends; only the "Send now" button does, and after
+      that the page says "already sent on <date>".
+    - Only CONFIRMED subscribers get it (see the upgrade below), and
+      every email has its own unsubscribe link.
+
+
+================================================================
+  UPGRADE - run once  (double opt-in, unsubscribe, send-once log)
+================================================================
+
+What changed:
+  - Signing up on the homepage now goes through /api/subscribe.
+    The person gets a "Confirm your subscription" email and is only
+    added to the newsletter after clicking the link (/api/confirm).
+  - Every newsletter email has an unsubscribe link (/api/unsubscribe)
+    plus the one-click unsubscribe headers Gmail/Yahoo/Apple use.
+    Unsubscribing keeps the row but stamps unsubscribed_at, so that
+    address is never mailed again unless they sign up + confirm again.
+  - Each post is logged in a new newsletter_sends table BEFORE it is
+    mailed, so the same post can never go out twice.
+  - People who signed up with the old form are kept and counted as
+    confirmed (they opted in already).
+
+ORDER MATTERS:
+  1. FIRST add the env vars from STEP 2 above (SUPABASE_SERVICE_KEY,
+     RESEND_API_KEY, NEWSLETTER_FROM, NEWSLETTER_KEY), verify the
+     domain in Resend (STEP 1), and redeploy. Signups go through the
+     server from now on, so they need those keys.
+  2. THEN run this SQL. It removes the old "anyone can add an email"
+     rule, so after this the homepage form only works through
+     /api/subscribe. Safe to run twice.
+
+  Supabase -> SQL Editor -> New query -> paste + Run:
+
+-------------------- copy from here --------------------
+alter table subscribers add column if not exists confirmed       boolean not null default false;
+alter table subscribers add column if not exists token           text;
+alter table subscribers add column if not exists confirm_sent_at timestamptz;
+alter table subscribers add column if not exists unsubscribed_at timestamptz;
+create unique index if not exists subscribers_token_key on subscribers (token);
+
+-- only the server (service key) may add or change subscribers now
+alter table subscribers enable row level security;
+drop policy if exists "public can subscribe" on subscribers;
+
+-- tidy old addresses to lower case (the server always saves lower case);
+-- skips any that would clash with an existing lower-case copy
+update subscribers s set email = lower(trim(s.email))
+ where s.email <> lower(trim(s.email))
+   and not exists (select 1 from subscribers d where d.email = lower(trim(s.email)));
+
+-- grandfather everyone who signed up with the old form (new signups
+-- always get a token from the server, so a second run changes nothing)
+update subscribers
+   set confirmed = true, token = gen_random_uuid()::text
+ where token is null;
+
+-- one row per post that has been mailed
+create table if not exists newsletter_sends (
+  post_slug   text primary key,
+  sent_at     timestamptz not null default now(),
+  recipients  int
+);
+alter table newsletter_sends enable row level security;
+-- (no policies on purpose: only the server's service key can read/write it)
+--------------------- to here --------------------------
+
+Check it worked: Supabase -> Table Editor -> subscribers shows the
+new columns, old rows have confirmed = true and a token.
+
+To re-send a post on purpose (rare): delete its row in
+Table Editor -> newsletter_sends, then use the send link again.

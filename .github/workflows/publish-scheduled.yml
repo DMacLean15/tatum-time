@@ -1,0 +1,56 @@
+# Publishes scheduled (future-dated) posts on their day.
+# The site build leaves posts dated after today (Boston time) out of the site
+# entirely, so something has to trigger a rebuild when their day arrives. This
+# runs just after midnight Boston time; if a post is dated today and nothing has
+# been pushed yet today, it pushes an EMPTY commit - Cloudflare Pages sees the
+# push and rebuilds, and the post goes live. No secrets needed.
+# Two cron times because GitHub cron is UTC: 04:10 UTC = 00:10 EDT (summer),
+# 05:10 UTC = 00:10 EST (winter). Whichever runs second finds today's commit
+# and does nothing. Run it by hand from the Actions tab (workflow_dispatch) any time.
+name: Publish scheduled posts
+
+on:
+  schedule:
+    - cron: '10 4 * * *'
+    - cron: '10 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-scheduled
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Find posts dated today and trigger a rebuild
+        run: |
+          node - <<'EOF'
+          const fs = require('fs'), path = require('path'), { execSync } = require('child_process');
+          const TT = require(path.resolve('js/shared.js'));
+          const { parseFile } = require(path.resolve('build-posts.js'));
+          const today = TT.todayET();
+          const dir = path.join('content', 'posts');
+          const due = fs.readdirSync(dir).filter(f => /\.md$/i.test(f)).map(f => {
+            const fm = parseFile(fs.readFileSync(path.join(dir, f), 'utf8').replace(/^﻿/, ''));
+            return fm && fm.title && String(fm.date || '').slice(0, 10) === today ? fm.title : null;
+          }).filter(Boolean);
+          console.log('Today (Boston): ' + today + ' - posts dated today: ' + (due.length ? due.join(' | ') : 'none'));
+          if (!due.length) process.exit(0);
+          // any commit made today (Boston time) already triggered a build that includes today's posts
+          const last = execSync('git log -1 --format=%cI').toString().trim();
+          if (TT.todayET(new Date(last)) === today) { console.log('Last commit (' + last + ') is from today - the site already rebuilt. Nothing to do.'); process.exit(0); }
+          const msg = 'Publish scheduled post(s): ' + due.join('; ');
+          execSync('git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit --allow-empty -F -', { input: msg, stdio: ['pipe', 'inherit', 'inherit'] });
+          execSync('git push', { stdio: 'inherit' });
+          console.log('Pushed: ' + msg);
+          EOF

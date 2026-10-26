@@ -1,0 +1,104 @@
+TATUM TIME - HOW THE SITE BUILD WORKS
+================================================================
+Cloudflare Pages build command (unchanged):
+  node build-posts.js && node build-rss.js
+build-rss.js then runs, in order: build-og.js -> build-pages.js -> build-images.js.
+A full build takes ~13 s locally (most of it photo work + ESPN).
+
+WHAT FAILS THE DEPLOY (the live site keeps its last good version)
+  - build-posts.js: content/posts missing, js/marked.min.js missing, or
+    post files exist but NONE could be read.
+  - build-pages.js: any error (posts.json unreadable, index.html missing...).
+WHAT IS BEST-EFFORT (logged, site still deploys)
+  - build-og.js (link-preview cards), build-images.js (photo shrinking +
+    WebP copies), and the ESPN player data inside build-pages.js.
+
+SHARED CODE: js/shared.js
+  One file used by the build (require('./js/shared.js')) AND the browser
+  (<script src="/js/shared.js?v=dev"> -> window.TT):
+  TT.esc(s)                 HTML-escape & < > " '
+  TT.slugify(s)             URL slug (DON'T change - live URLs depend on it)
+  TT.fmtDisplayDate(s)      'Oct 24, 2026'
+  TT.todayET(now?)          'YYYY-MM-DD' in Boston time
+  TT.isPublished(date, now?) false for dates after today (Boston)
+  TT.VARIANT_WIDTHS         [96, 480, 1200]
+  TT.imgVariant(src, w)     WebP copy URL (see IMAGES)
+  TT.embedYouTube(html), TT.captionImages(html), TT.readMins(html),
+  TT.excerpt(html, n)       clean text, prose only, cut at a word + '...'
+  TT.shiftHeadings(html)    <h1> -> <h2> (h2-h6 untouched)
+  TT.plainText(html)        (extra) tags stripped, entities decoded
+
+content/posts.json (built, never edit by hand)
+  { posts: [ { slug, title, emoji, category, featured, date, image,
+               imageFocus, gameLink, hero, readMins, excerpt, file, body, html } ] }
+  - slug = front matter `slug:` if present, else the FILE NAME (the CMS names
+    the file from the headline when the post is created). Renaming a headline
+    later no longer changes the URL. Two posts with the same slug: the older
+    keeps it, the newer gets -2, -3 (logged as a WARNING) - add `slug:` to fix.
+  - html = Markdown rendered once at build; any # (h1) becomes h2.
+  - hero = Featured Photo, else the first photo in the post.
+  - Posts dated in the future are NOT in posts.json at all ("scheduled").
+  - Skipped files are logged with the reason (no front matter / no title).
+    A UTF-8 byte-order mark is stripped automatically.
+
+SCHEDULED POSTS (.github/workflows/publish-scheduled.yml)
+  Because future posts are left out of the build, the site has to rebuild on
+  their day. A GitHub Action runs at 04:10 and 05:10 UTC (= 00:10 Boston time
+  in summer and in winter). If a post is dated today and nothing has been
+  committed yet today (Boston time), it pushes an EMPTY commit
+  "Publish scheduled post(s): <titles>" as github-actions[bot]; Cloudflare
+  sees the push and rebuilds. No secrets. Run it by hand any time from the
+  repo's Actions tab ("Publish scheduled posts" -> Run workflow).
+  Needs: Actions enabled on the repo, and Settings -> Actions -> General ->
+  Workflow permissions allowing write (the file asks for contents: write).
+
+GENERATED PAGES (deployed copies only - post/, category/, player/, og/,
+images/uploads/_v/ and _v/ are deleted and rebuilt every deploy)
+  /post/<slug>/       every published post
+  /category/<slug>/   one per category
+  /player/<slug>/     one per current Celtic (ESPN roster), slug = slugify(full name)
+  /player/            roster grid
+  sitemap.xml, feed.xml, og/<slug>.jpg, content/players.json
+  index.html: the <!--build:...--> slots are filled (post list, featured
+  post, footer links). Re-running the build gives the same file.
+
+PLAYER PAGES
+  Data: ESPN public API - 1 roster request + 1 stats request per player
+  (https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba/athletes/<id>/stats),
+  4 at a time, 8 s timeout. If ESPN is down the deploy still goes out, just
+  without player pages (and players.json = []). Rookies without games show a
+  "no games yet" note; players with no games this season show last season.
+  "Tatum Time posts about X" = posts whose title or text has the full name,
+  or the last name when it's unambiguous (unique on the roster, not someone's
+  first name, not a very common surname like White/Williams; "Tatum Time"
+  is ignored). In post pages the FIRST mention of each player's full name
+  links to his page (never inside links, headings or captions).
+  Offline build: TT_SKIP_PLAYERS=1 node build-rss.js
+  content/players.json (for the homepage roster cards):
+    [ { "id": "4065648", "name": "Jayson Tatum", "slug": "jayson-tatum",
+        "url": "/player/jayson-tatum/", "jersey": "0", "position": "F" } ]
+
+IMAGES (build-images.js)
+  - Uploads over 250 KB are shrunk in place (max 1600 px wide) as before.
+  - WebP copies, ONLY for photos a published post uses (hero or in the text):
+      /images/uploads/<name>.<ext> -> /images/uploads/_v/<name>-<ext>-<w>.webp
+      w = 96, 480, 1200; ext lowercased (photo.JPEG -> photo-jpeg-480.webp)
+  - Dan's avatar: /dan.jpg -> /_v/dan-jpg-96.webp and /_v/dan-jpg-192.webp
+    (TT.imgVariant('/dan.jpg', 96 or 192) returns these).
+  - Always keep the original as the onerror fallback (copies can be missing).
+  - HEIC / JXL / GIF / BMP / TIFF photos in posts are logged as WARNINGs
+    naming the post (no copies made; HEIC/JXL don't show in most browsers).
+
+CACHE BUSTING (?v=dev)
+  In index.html (and the generated pages) write /js/<file>.js?v=dev or
+  /css/<file>.css?v=dev. At build, build-pages.js rewrites EVERY
+  /js/*.js?v=<anything> and /css/*.css?v=<anything> whose file exists to
+  ?v=<first 10 hex of the file's sha1>, so those files can be cached for a
+  year (Cache-Control: public, max-age=31536000, immutable in _headers) and
+  still update the moment they change. A referenced file that doesn't exist
+  is left alone and logged.
+
+TESTING LOCALLY
+  Copy the repo somewhere else (the build rewrites index.html and photos),
+  run npm install (sharp), then: node build-posts.js && node build-rss.js
+  and serve that folder: python -m http.server 8123

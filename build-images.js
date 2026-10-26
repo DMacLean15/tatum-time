@@ -10,29 +10,53 @@
    - resizes anything wider than 1600px, re-encodes at quality 80
    - respects EXIF rotation (phone photos stay right-side up)
    - keeps the original if compression doesn't save at least 10%
-   - if sharp isn't installed (e.g. a local run without npm install), it just
-     logs and moves on - the build never breaks because of this step.
-   Also writes small WebP copies the site prefers (it falls back to the original
-   if one is missing): images/uploads/_v/<name>-480.webp for list thumbnails and
-   cards, <name>-1200.webp for hero and article photos. Only deployed copies -
-   nothing new lands in the repo.                                              */
+   - best-effort: if sharp isn't installed or anything fails, it logs and the
+     site still deploys.
+   Also writes small WebP copies the site prefers (pages fall back to the original
+   if one is missing), named by TT.imgVariant() in js/shared.js:
+     images/uploads/_v/<name>-<ext>-<96|480|1200>.webp  - only for photos a
+       published post actually uses (its hero or a photo in the article)
+     _v/dan-jpg-96.webp, _v/dan-jpg-192.webp           - Dan's avatar (/dan.jpg)
+   Photos in formats browsers or sharp can't handle well (heic, jxl, gif, bmp,
+   tiff) are logged as WARNINGs naming the post. Deployed copies only.          */
 const fs = require('fs');
 const path = require('path');
-
-let sharp;
-try { sharp = require('sharp'); }
-catch (e) { console.log('build-images: sharp not installed - skipping photo compression.'); process.exit(0); }
+const TT = require('./js/shared.js');
 
 const DIR = path.join('images', 'uploads');
 const MIN_BYTES = 250 * 1024;   // leave small files alone
 const MAX_WIDTH = 1600;
 const QUALITY = 80;
-const VARIANT_WIDTHS = [480, 1200];
+const ROOT_IMAGES = { 'dan.jpg': [96, 192] };   // must match ROOT_VARIANTS in js/shared.js
+
+/* every local photo a published post uses -> the posts using it */
+function referencedImages() {
+  const refs = new Map();
+  let posts = [];
+  try { posts = JSON.parse(fs.readFileSync(path.join('content', 'posts.json'), 'utf8')).posts || []; }
+  catch (e) { console.log('build-images: no posts.json - no WebP copies.'); return refs; }
+  posts.forEach(p => {
+    const srcs = [p.hero];
+    String(p.html || '').replace(/<img[^>]*\bsrc="([^"]+)"/gi, (m, s) => srcs.push(s));
+    srcs.forEach(s => {
+      s = String(s || '').trim().replace(/&amp;/g, '&');
+      if (!s || /^(https?:)?\/\//i.test(s) || /^data:/i.test(s)) return;
+      if (!refs.has(s)) refs.set(s, new Set());
+      refs.get(s).add(p.title);
+    });
+  });
+  return refs;
+}
+const localPath = src => { let f = String(src).replace(/^\//, '').replace(/[?#].*$/, ''); try { f = decodeURIComponent(f); } catch (e) {} return f; };
 
 async function run() {
+  let sharp;
+  try { sharp = require('sharp'); }
+  catch (e) { console.log('build-images: sharp not installed - skipping photo compression.'); return; }
+
   let files = [];
   try { files = fs.readdirSync(DIR).filter(f => /\.(jpe?g|png|webp)$/i.test(f)); }
-  catch (e) { console.log('build-images: no uploads folder - nothing to do.'); return; }
+  catch (e) { console.log('build-images: no uploads folder.'); }
 
   let done = 0, saved = 0;
   for (const f of files) {
@@ -66,24 +90,36 @@ async function run() {
   }
   console.log('build-images: compressed ' + done + ' of ' + files.length + ' photos, saved ' + (saved / 1048576).toFixed(1) + ' MB');
 
-  // WebP variants (from the already-shrunk file). Names must match imgVariant() in index.html.
-  const VDIR = path.join(DIR, '_v');
-  try { fs.mkdirSync(VDIR, { recursive: true }); } catch (e) {}
+  // WebP copies (from the already-shrunk files). Fresh slate each build.
+  fs.rmSync(path.join(DIR, '_v'), { recursive: true, force: true });
+  fs.rmSync('_v', { recursive: true, force: true });
+  const jobs = [];   // [source file, [[width, out file, quality]]]
+  for (const [src, titles] of referencedImages()) {
+    const who = [...titles].map(t => '"' + t + '"').join(', ');
+    const file = localPath(src);
+    if (/\.(heic|heif|jxl|gif|bmp|tiff?)$/i.test(file)) { console.log('build-images: WARNING - ' + src + ' (used by ' + who + ') is a ' + file.split('.').pop().toUpperCase() + ' - no small WebP copies are made for it' + (/\.(heic|heif|jxl|tiff?)$/i.test(file) ? ' and most browsers cannot show it' : '') + '. Re-upload it as JPG/PNG/WebP.'); continue; }
+    if (TT.imgVariant(src, TT.VARIANT_WIDTHS[0]) === src) continue;   // not an upload we make copies for
+    if (!fs.existsSync(file)) { console.log('build-images: WARNING - ' + src + ' (used by ' + who + ') is missing from the repo.'); continue; }
+    jobs.push([file, TT.VARIANT_WIDTHS.map(w => [w, localPath(TT.imgVariant(src, w)), w <= 192 ? 72 : 74])]);
+  }
+  Object.keys(ROOT_IMAGES).forEach(f => {
+    if (fs.existsSync(f)) jobs.push([f, ROOT_IMAGES[f].map(w => [w, localPath(TT.imgVariant('/' + f, w)), 72])]);
+  });
+
   let made = 0;
-  for (const f of fs.readdirSync(DIR).filter(f => /\.(jpe?g|png|webp|avif)$/i.test(f))) {
-    const base = f.replace(/\.[^.]+$/, '');
+  for (const [file, outs] of jobs) {
     try {
-      const input = fs.readFileSync(path.join(DIR, f));
-      for (const w of VARIANT_WIDTHS) {
-        const buf = await sharp(input).rotate().resize({ width: w, withoutEnlargement: true }).webp({ quality: 74 }).toBuffer();
-        fs.writeFileSync(path.join(VDIR, base + '-' + w + '.webp'), buf);
+      const input = fs.readFileSync(file);
+      for (const [w, out, q] of outs) {
+        fs.mkdirSync(path.dirname(out), { recursive: true });
+        fs.writeFileSync(out, await sharp(input).rotate().resize({ width: w, withoutEnlargement: true }).webp({ quality: q }).toBuffer());
         made++;
       }
     } catch (e) {
-      console.log('build-images: no WebP for ' + f + ' (' + e.message + ')');
+      console.log('build-images: no WebP for ' + file + ' (' + e.message + ')');
     }
   }
-  console.log('build-images: wrote ' + made + ' WebP variants');
+  console.log('build-images: wrote ' + made + ' WebP copies for ' + jobs.length + ' photos');
 }
 
-module.exports = run();
+module.exports = run().catch(e => console.log('build-images: stopped early (' + e.message + ') - pages fall back to the original photos.'));

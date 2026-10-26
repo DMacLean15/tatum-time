@@ -2,10 +2,19 @@
 # The vendored marked.min.js and uploaded photos rarely change; give
 # browsers permission to keep them so repeat visits skip re-downloads.
 
+# page scripts are loaded as /js/<file>.js?v=<content hash> (stamped by build-pages.js),
+# so a new version always has a new URL and browsers can keep each one for a year
 /js/*
-  Cache-Control: public, max-age=86400
+  Cache-Control: public, max-age=31536000, immutable
 
 /images/*
+  Cache-Control: public, max-age=604800
+
+# WebP copies are generated from the upload; a changed photo gets a new upload name
+/images/uploads/_v/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/_v/*
   Cache-Control: public, max-age=604800
 
 # self-hosted fonts never change in place (a new version gets a new name)
@@ -25,6 +34,9 @@
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000
+  X-Frame-Options: SAMEORIGIN
+# (SAMEORIGIN also covers /admin - Cloudflare merges duplicate header rules, so no second value)
 
 /favicon.ico
   Cache-Control: public, max-age=604800
