@@ -496,8 +496,7 @@
   /* GAME DAY banner */
   .gameday-bar{background:linear-gradient(90deg,var(--green-deep),var(--green) 55%,var(--green-glow));border-bottom:1px solid rgba(22,196,91,.55);box-shadow:0 6px 22px -8px rgba(22,196,91,.6);position:sticky;top:67px;z-index:49;overflow:hidden}
   .gameday-bar::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(600px 120px at 50% -40%,rgba(255,255,255,.25),transparent 70%)}
-  /* opponent's color as an angled panel on the right edge, TV-graphic style (--opp set by gdTint) */
-  .gameday-bar::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(104deg,transparent calc(100% - 210px),rgba(255,255,255,.55) calc(100% - 210px),rgba(255,255,255,.55) calc(100% - 207px),var(--opp,transparent) calc(100% - 207px));opacity:.92}
+
   .gd-inner{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:16px;padding:9px 0;flex-wrap:wrap}
   .gd-head{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}
   .gd-teams{display:inline-flex;align-items:center;gap:7px;color:#fff;font-weight:800;font-size:.9rem;white-space:nowrap}
@@ -541,7 +540,8 @@
     /* three roomy centered rows: GAME DAY + who's playing / clock, link, play /
        time, TV, arena. No pinning on phones - it scrolls away with the page. */
     .gameday-bar{position:relative;top:auto}
-    .gameday-bar::before{background:linear-gradient(0deg,var(--opp,transparent) 0 4px,transparent 4px);opacity:1}
+    /* phones only: opponent's color as a thin stripe along the bottom (--opp set by gdTint) */
+    .gameday-bar::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(0deg,var(--opp,transparent) 0 4px,transparent 4px)}
     .gameday-bar .gd-inner{flex-direction:column;gap:11px;padding:14px 14px 20px}
     .gd-clock.is-score{flex-basis:100%;justify-content:center;padding:8px 12px}
     .gd-head{gap:4px 12px}
@@ -3127,6 +3127,6 @@ window.addEventListener('scroll',function(){
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 </script>
-<script src="/js/visits.js" defer></script>
+<script src="/js/visits.js?v=2" defer></script>
 </body>
 </html>
