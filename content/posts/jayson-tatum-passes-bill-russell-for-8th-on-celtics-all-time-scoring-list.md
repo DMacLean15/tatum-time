@@ -7,7 +7,7 @@ category: Milestone
 featured: true
 date: 2026-11-23
 ---
-<file:///Users/danmaclean/Downloads/ssstwitter.com_1795445120561.mp4>
+
 
 ![](/images/uploads/screenshot-2026-11-23-at-09-49-09-celtics-star-jayson-tatum-passes-bill-russell-in-historic-nba-milestone-yahoo-sports.png)
 
